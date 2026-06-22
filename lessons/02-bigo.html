@@ -1119,77 +1119,69 @@ print(sum_to_n(100))   # 5050</code></pre>
 
 <script>
 new StepReveal('ex1-steps', [
-  { title: 'Nhận diện cấu trúc',
-    content: '<p>Đây là 1 vòng <code>for</code> chạy từ 1 đến <code>n</code>. Thân vòng lặp là <code>print(i)</code> — chi phí cố định O(1).</p>' },
-  { title: 'Đếm số lần lặp',
-    content: '<p>Vòng lặp <code>for i in range(1, n+1)</code> chạy đúng <strong>n</strong> lần (i = 1, 2, ..., n).</p>' },
-  { title: 'Áp dụng quy tắc for',
-    content: '<p>Độ phức tạp = (số lần lặp) × (độ phức tạp thân) = <code>n × O(1)</code>.</p>' },
-  { title: 'Rút gọn',
-    content: '<p><code>n × O(1) = O(n)</code>. Vậy BigO = <strong>O(n)</strong> — tuyến tính.</p>' }
+  { title: '💡 Ý tưởng + Các bước thực hiện',
+    content: '<p><strong>Ý tưởng:</strong> Đây là 1 vòng <code>for</code> chạy từ 1 đến <code>n</code>. Mỗi lần lặp thực hiện <code>print(i)</code> với chi phí cố định O(1). Áp dụng quy tắc for: BigO = (số lần lặp) × (độ phức tạp thân).</p><p><strong>Các bước:</strong></p><ol style="padding-left:22px;"><li>Đếm số lần lặp: <code>n</code> lần (i = 1..n).</li><li>Tính chi phí thân: <code>print(i)</code> = O(1).</li><li>Nhân lại: <code>n × O(1)</code>.</li><li>Rút gọn theo BigO.</li></ol>' },
+  { title: '📋 Giả mã',
+    content: '<pre><code>THUẬT TOÁN print_numbers(n)\nBƯỚC 1: FOR i ← 1 TO n DO\nBƯỚC 2:     PRINT(i)\nBƯỚC 3: END FOR\nBƯỚC 4: Kết thúc</code></pre>' },
+  { title: '🐍 Cài đặt Python',
+    content: '<pre><code>def print_numbers(n):\n    for i in range(1, n + 1):\n        print(i)\n\n# Test\nprint_numbers(5)\n# Output: 1 2 3 4 5</code></pre>' },
+  { title: '📊 Độ phức tạp + Chứng minh',
+    content: '<p><strong>BigO = O(n).</strong></p><p><strong>Chứng minh:</strong></p><ul style="padding-left:22px;"><li>Số lần lặp: vòng <code>for i in range(1, n+1)</code> chạy đúng <code>n</code> lần.</li><li>Chi phí thân: <code>print(i)</code> là thao tác xuất 1 số → O(1).</li><li>Quy tắc for: <code>T(n) = (số lần) × (chi phí thân) = n × O(1) = O(n)</code>.</li><li>Theo định nghĩa BigO: ∃ c = 1, n₀ = 1 sao cho T(n) = n ≤ 1·n với mọi n ≥ 1. ✓</li></ul>' }
 ]);
 
 new StepReveal('ex2-steps', [
-  { title: 'Nhận diện cấu trúc',
-    content: '<p>2 vòng <code>for</code> lồng nhau, mỗi vòng chạy từ 1 đến n. Thân là <code>print(i, j)</code> — O(1).</p>' },
-  { title: 'Phân tích vòng ngoài',
-    content: '<p>Vòng ngoài <code>for i</code>: chạy n lần. Mỗi lần chạy toàn bộ vòng trong.</p>' },
-  { title: 'Phân tích vòng trong',
-    content: '<p>Vòng trong <code>for j</code>: mỗi lần i cố định, j chạy n lần → chi phí mỗi i là <code>O(n)</code>.</p>' },
-  { title: 'Quy tắc nhân',
-    content: '<p>Tổng = (vòng ngoài) × (vòng trong) × (thân) = <code>O(n) × O(n) × O(1) = O(n²)</code>.</p>' },
-  { title: 'Kết luận',
-    content: '<p>BigO = <strong>O(n²)</strong>. Tổng số cặp (i, j) = n × n = n², mỗi cặp in 1 lần.</p>' }
+  { title: '💡 Ý tưởng + Các bước thực hiện',
+    content: '<p><strong>Ý tưởng:</strong> 2 vòng <code>for</code> lồng nhau, mỗi vòng chạy từ 1 đến n. Thân là <code>print(i, j)</code> — O(1). Áp dụng quy tắc nhân: BigO = O(n) × O(n) × O(1).</p><p><strong>Các bước:</strong></p><ol style="padding-left:22px;"><li>Phân tích vòng ngoài: chạy n lần.</li><li>Phân tích vòng trong: mỗi i cố định, j chạy n lần → O(n).</li><li>Quy tắc nhân: O(n) × O(n) × O(1).</li><li>Rút gọn theo BigO.</li></ol>' },
+  { title: '📋 Giả mã',
+    content: '<pre><code>THUẬT TOÁN print_pairs(n)\nBƯỚC 1: FOR i ← 1 TO n DO\nBƯỚC 2:     FOR j ← 1 TO n DO\nBƯỚC 3:         PRINT(i, j)\nBƯỚC 4:     END FOR\nBƯỚC 5: END FOR\nBƯỚC 6: Kết thúc</code></pre>' },
+  { title: '🐍 Cài đặt Python',
+    content: '<pre><code>def print_pairs(n):\n    for i in range(1, n + 1):\n        for j in range(1, n + 1):\n            print(i, j)\n\n# Test\nprint_pairs(3)\n# Output: (1,1) (1,2) (1,3) (2,1) ... (3,3) — 9 cặp</code></pre>' },
+  { title: '📊 Độ phức tạp + Chứng minh',
+    content: '<p><strong>BigO = O(n²).</strong></p><p><strong>Chứng minh:</strong></p><ul style="padding-left:22px;"><li>Vòng ngoài: <code>n</code> lần lặp.</li><li>Vòng trong: mỗi i cố định, j chạy <code>n</code> lần → chi phí mỗi i là <code>O(n)</code>.</li><li>Quy tắc nhân: <code>T(n) = n × n × O(1) = n²</code>.</li><li>Số cặp (i, j) = n × n = n², mỗi cặp in 1 lần → đúng <code>n²</code> phép toán.</li><li>Theo định nghĩa BigO: T(n) = n² ≤ 1·n² với mọi n ≥ 1. ✓</li></ul>' }
 ]);
 
 new StepReveal('ex3-steps', [
-  { title: 'Quan sát bước nhảy',
-    content: '<p>Vòng lặp không tăng <code>i</code> lên 1, mà <strong>nhân đôi</strong>: <code>i *= 2</code>. i nhận giá trị 1, 2, 4, 8, 16, ...</p>' },
-  { title: 'Đếm số lần lặp',
-    content: '<p>Sau k lần lặp, <code>i = 2^k</code>. Vòng dừng khi <code>2^k ≥ n</code> ⇔ <code>k ≥ log₂(n)</code>.</p><p>Vậy số lần lặp = ⌈log₂(n)⌉.</p>' },
-  { title: 'Tính BigO',
-    content: '<p>Thân O(1), số lần lặp = log₂(n) → <code>O(log n)</code>.</p>' },
-  { title: 'Kết luận',
-    content: '<p>BigO = <strong>O(log n)</strong>. Đây là dạng điển hình của "bước nhảy log".</p>' }
+  { title: '💡 Ý tưởng + Các bước thực hiện',
+    content: '<p><strong>Ý tưởng:</strong> Vòng lặp không tăng i lên 1 mà <strong>nhân đôi</strong> (<code>i *= 2</code>). i nhận giá trị 1, 2, 4, 8, 16, ... Sau k lần lặp, i = 2^k. Vòng dừng khi 2^k ≥ n. Đây là dạng "bước nhảy log".</p><p><strong>Các bước:</strong></p><ol style="padding-left:22px;"><li>Quan sát bước nhảy: i × 2 mỗi lần.</li><li>Lập phương trình i sau k lần: i = 2^k.</li><li>Giải bất phương trình 2^k ≥ n → k ≥ log₂(n).</li><li>Tính BigO = log₂(n) × O(1).</li></ol>' },
+  { title: '📋 Giả mã',
+    content: '<pre><code>THUẬT TOÁN print_powers(n)\nBƯỚC 1: i ← 1\nBƯỚC 2: TRONG KHI i &lt; n DO\nBƯỚC 3:     PRINT(i)\nBƯỚC 4:     i ← i × 2\nBƯỚC 5: Kết thúc</code></pre>' },
+  { title: '🐍 Cài đặt Python',
+    content: '<pre><code>def print_powers(n):\n    i = 1\n    while i &lt; n:\n        print(i)\n        i *= 2\n\n# Test\nprint_powers(16)\n# Output: 1 2 4 8 (4 lần in, log₂(16) = 4)</code></pre>' },
+  { title: '📊 Độ phức tạp + Chứng minh',
+    content: '<p><strong>BigO = O(log n).</strong></p><p><strong>Chứng minh:</strong></p><ul style="padding-left:22px;"><li>Sau k lần lặp: <code>i = 2^k</code>.</li><li>Vòng dừng khi <code>i ≥ n</code>, tức <code>2^k ≥ n</code> ⇔ <code>k ≥ log₂(n)</code>.</li><li>Vậy số lần lặp = ⌈log₂(n)⌉.</li><li>Thân O(1) → <code>T(n) = ⌈log₂(n)⌉ × O(1) = O(log n)</code>.</li><li>Theo định nghĩa: ∃ c = 1, n₀ = 2 sao cho T(n) = log₂(n) ≤ 1·log₂(n). ✓</li></ul>' }
 ]);
 
 new StepReveal('ex4-steps', [
-  { title: 'Lập phương trình đệ quy',
-    content: '<p>MergeSort chia mảng làm 2 nửa, đệ quy sắp xếp từng nửa, rồi trộn. Mỗi nửa có kích thước n/2 → 2 lời gọi T(n/2). Trộn 2 mảng mất O(n).</p><p style="text-align:center;font-size:1.15rem;">T(n) = 2·T(n/2) + O(n)</p>' },
-  { title: 'Xác định a, b, f(n)',
-    content: '<p>Theo dạng tổng quát T(n) = a·T(n/b) + f(n):</p><ul style="padding-left:22px;"><li>a = 2 (số bài toán con)</li><li>b = 2 (kích thước con = n/2)</li><li>f(n) = n (chi phí chia &amp; trộn)</li></ul>' },
-  { title: 'Tính c* = log_b(a)',
-    content: '<p>c* = log₂(2) = <strong>1</strong>.</p>' },
-  { title: 'So sánh f(n) với n^c*',
-    content: '<p>f(n) = n = n¹ = n^c*. Đây là trường hợp cân bằng → <strong>Case 2</strong> (với k=0).</p>' },
-  { title: 'Áp dụng công thức Case 2',
-    content: '<p>Theo Case 2: T(n) = Θ(n^c · log^(k+1) n) = Θ(n¹ · log¹ n) = Θ(n log n).</p>' },
-  { title: 'Kết luận',
-    content: '<p>BigO = <strong>O(n log n)</strong>. Đây là lý do MergeSort luôn ổn định O(n log n) trong mọi trường hợp.</p>' }
+  { title: '💡 Ý tưởng + Các bước thực hiện',
+    content: '<p><strong>Ý tưởng:</strong> MergeSort chia mảng làm 2 nửa, đệ quy sắp xếp từng nửa, rồi trộn. Mỗi nửa có kích thước n/2 → 2 lời gọi T(n/2). Trộn 2 mảng mất O(n). Đây là đệ quy chia đều → áp dụng Định lý Master.</p><p><strong>Các bước:</strong></p><ol style="padding-left:22px;"><li>Lập phương trình đệ quy T(n) = 2T(n/2) + O(n).</li><li>Xác định a, b, f(n).</li><li>Tính c* = log_b(a).</li><li>So sánh f(n) với n^c* → chọn Case.</li><li>Áp dụng công thức Case → kết luận.</li></ol>' },
+  { title: '📋 Giả mã',
+    content: '<pre><code>THUẬT TOÁN MergeSort(A, l, r)\nBƯỚC 1: NẾU l &lt; r THÌ:\nBƯỚC 2:     m ← (l + r) / 2\nBƯỚC 3:     MergeSort(A, l, m)        // T(n/2)\nBƯỚC 4:     MergeSort(A, m+1, r)      // T(n/2)\nBƯỚC 5:     Merge(A, l, m, r)         // O(n)\nBƯỚC 6: Kết thúc\n\nTHUẬT TOÁN Merge(A, l, m, r)\nBƯỚC 1: Trộn 2 mảng A[l..m] và A[m+1..r]\nBƯỚC 2: Mất O(n) phép toán</code></pre>' },
+  { title: '🐍 Cài đặt Python',
+    content: '<pre><code>def merge_sort(arr):\n    if len(arr) &lt;= 1:\n        return arr\n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])    # T(n/2)\n    right = merge_sort(arr[mid:])   # T(n/2)\n    return merge(left, right)       # O(n)\n\ndef merge(left, right):\n    result, i, j = [], 0, 0\n    while i &lt; len(left) and j &lt; len(right):\n        if left[i] &lt;= right[j]:\n            result.append(left[i]); i += 1\n        else:\n            result.append(right[j]); j += 1\n    result.extend(left[i:]); result.extend(right[j:])\n    return result\n\nprint(merge_sort([5, 2, 9, 1, 7]))  # [1, 2, 5, 7, 9]</code></pre>' },
+  { title: '📊 Độ phức tạp + Chứng minh',
+    content: '<p><strong>BigO = O(n log n).</strong></p><p><strong>Chứng minh bằng Định lý Master:</strong></p><ul style="padding-left:22px;"><li>T(n) = 2·T(n/2) + O(n).</li><li>a = 2, b = 2, f(n) = n.</li><li>c* = log_b(a) = log₂(2) = 1.</li><li>f(n) = n = n¹ = n^c* → <strong>Case 2</strong> (với k = 0).</li><li>Theo Case 2: T(n) = Θ(n^c · log^(k+1) n) = Θ(n¹ · log¹ n) = Θ(n log n).</li><li>Vậy T(n) = O(n log n) — ổn định trong MỌI trường hợp. ✓</li></ul>' }
 ]);
 
 new StepReveal('ex5-steps', [
-  { title: 'Quan sát lời gọi đệ quy',
-    content: '<p><code>fib(n)</code> gọi <code>fib(n-1)</code> và <code>fib(n-2)</code>. Đây không phải dạng a·T(n/b) — không chia đều!</p>' },
-  { title: 'Vẽ cây đệ quy',
-    content: '<pre><code>            fib(n)\n           /       \\\n       fib(n-1)   fib(n-2)\n       /    \\      /     \\\n   fib(n-2) fib(n-3) fib(n-3) fib(n-4)\n      ...\n   fib(1) fib(0) fib(1) fib(0) ... (cây nhị phân)</code></pre>' },
-  { title: 'Đếm số node lá',
-    content: '<p>Cây đệ quy gần như một cây nhị phân đầy đủ với chiều cao ≈ n. Số node lá ≈ 2^n.</p>' },
-  { title: 'Tính BigO',
-    content: '<p>Tổng số lời gọi hàm ≈ 2·(số lá) ≈ 2^n → T(n) = O(2^n).</p>' },
-  { title: 'Kết luận',
-    content: '<p>BigO = <strong>O(2^n)</strong> — đây là lý do Fibonacci đệ quy cực kỳ chậm với n=40+. Có thể tối ưu về O(n) bằng quy hoạch động.</p>' }
+  { title: '💡 Ý tưởng + Các bước thực hiện',
+    content: '<p><strong>Ý tưởng:</strong> <code>fib(n)</code> gọi <code>fib(n-1)</code> và <code>fib(n-2)</code> — đây <strong>không phải</strong> dạng a·T(n/b) vì không chia đều. Phải dùng <strong>cây đệ quy</strong> để đếm tổng số lời gọi hàm.</p><p><strong>Các bước:</strong></p><ol style="padding-left:22px;"><li>Quan sát lời gọi đệ quy: 2 nhánh không đối xứng.</li><li>Vẽ cây đệ quy.</li><li>Đếm số node lá.</li><li>Ước lượng tổng số node.</li><li>Kết luận BigO.</li></ol>' },
+  { title: '📋 Giả mã',
+    content: '<pre><code>THUẬT TOÁN fib(n)\nBƯỚC 1: NẾU n ≤ 1 THÌ:\nBƯỚC 2:     TRẢ VỀ n\nBƯỚC 3: TRẢ VỀ fib(n-1) + fib(n-2)</code></pre>' },
+  { title: '🐍 Cài đặt Python',
+    content: '<pre><code>def fib(n):\n    if n &lt;= 1:\n        return n\n    return fib(n - 1) + fib(n - 2)\n\n# Test\nprint(fib(10))   # 55\n# Cây đệ quy:\n#              fib(10)\n#            /         \\\n#        fib(9)        fib(8)\n#        /    \\        /     \\\n#    fib(8) fib(7)  fib(7) fib(6)\n#       ... (cây nhị phân, nhiều node trùng)</code></pre>' },
+  { title: '📊 Độ phức tạp + Chứng minh',
+    content: '<p><strong>BigO = O(2^n).</strong></p><p><strong>Chứng minh bằng cây đệ quy:</strong></p><ul style="padding-left:22px;"><li>Mỗi node <code>fib(k)</code> sinh 2 node con <code>fib(k-1)</code>, <code>fib(k-2)</code>.</li><li>Cây gần như nhị phân đầy đủ, chiều cao ≈ n.</li><li>Số node lá (fib(0)/fib(1)) ≈ 2^n.</li><li>Tổng số node ≈ 2·(số lá) ≈ 2^(n+1) = O(2^n).</li><li>Ở mỗi node thực hiện O(1) phép cộng → <code>T(n) = O(2^n)</code>.</li><li>Có thể tối ưu về O(n) bằng quy hoạch động (lưu giá trị fib đã tính). ✓</li></ul>' }
 ]);
 
 new StepReveal('ex6-steps', [
-  { title: 'Nhận diện cấu trúc',
-    content: '<p>1 vòng for chạy n lần, thân là <code>s += i</code> — O(1).</p>' },
-  { title: 'Áp dụng quy tắc for',
-    content: '<p>T(n) = (số lần lặp) × (độ phức tạp thân) = n × O(1).</p>' },
-  { title: 'Rút gọn',
-    content: '<p>T(n) = O(n). Lưu ý: kết quả <code>s = n(n+1)/2</code> không phải O(n²) — chỉ số phép <em>thực hiện</em> là O(n).</p>' },
-  { title: 'Kết luận',
-    content: '<p>BigO = <strong>O(n)</strong> — tuyến tính. (Nếu dùng công thức s = n(n+1)/2 thì tính trong O(1) — đây là tối ưu hóa thuật toán, không phải BigO của đoạn code trên.)</p>' }
+  { title: '💡 Ý tưởng + Các bước thực hiện',
+    content: '<p><strong>Ý tưởng:</strong> 1 vòng for chạy n lần, thân là <code>s += i</code> — O(1). Áp dụng quy tắc for: BigO = n × O(1) = O(n). <strong>Lưu ý:</strong> kết quả <code>s = n(n+1)/2</code> có giá trị ≈ n² nhưng chỉ là <em>giá trị</em>, không phải số phép toán.</p><p><strong>Các bước:</strong></p><ol style="padding-left:22px;"><li>Đếm số lần lặp: n lần.</li><li>Tính chi phí thân: s += i = O(1).</li><li>Nhân lại: n × O(1).</li><li>Rút gọn theo BigO.</li></ol>' },
+  { title: '📋 Giả mã',
+    content: '<pre><code>THUẬT TOÁN sum_to_n(n)\nBƯỚC 1: s ← 0\nBƯỚC 2: FOR i ← 1 TO n DO\nBƯỚC 3:     s ← s + i\nBƯỚC 4: END FOR\nBƯỚC 5: TRẢ VỀ s</code></pre>' },
+  { title: '🐍 Cài đặt Python',
+    content: '<pre><code>def sum_to_n(n):\n    s = 0\n    for i in range(1, n + 1):\n        s += i                    # O(1) mỗi lần\n    return s\n\n# Test\nprint(sum_to_n(100))   # 5050\n# Lưu ý: có thể dùng công thức s = n*(n+1)//2 → O(1)\nprint(100 * 101 // 2)  # 5050</code></pre>' },
+  { title: '📊 Độ phức tạp + Chứng minh',
+    content: '<p><strong>BigO = O(n).</strong></p><p><strong>Chứng minh:</strong></p><ul style="padding-left:22px;"><li>Số lần lặp: <code>n</code> lần (i = 1..n).</li><li>Chi phí thân: <code>s += i</code> là phép cộng gán → O(1).</li><li>Quy tắc for: <code>T(n) = n × O(1) = O(n)</code>.</li><li><strong>Lưu ý quan trọng:</strong> Kết quả <code>s = n(n+1)/2</code> có dạng n² nhưng <em>giá trị kết quả</em> không phải BigO. BigO chỉ phụ thuộc <em>số phép toán thực hiện</em>.</li><li>Nếu dùng công thức <code>s = n*(n+1)//2</code> trực tiếp → chỉ 3 phép toán → O(1). Đây là tối ưu thuật toán.</li></ul>' }
 ]);
 </script>
 
@@ -1209,8 +1201,37 @@ new StepReveal('ex6-steps', [
 print_powers_of_two(16)</code></pre>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-2-1').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-2-1" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức áp dụng:</strong> Vòng lặp với bước nhảy nhân đôi → BigO = O(log n).</p>
-    <p><strong>💡 Cách áp dụng:</strong> Đếm số lần lặp k sao cho i = 2^k ≥ n.</p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p>Ý tưởng: Vòng lặp <code>while i &lt; n</code> với bước nhảy <code>i *= 2</code> (nhân đôi). Đây là dạng "bước nhảy log" → BigO = O(log n).</p>
+    <ol style="padding-left:22px;">
+      <li>Bước 1: Quan sát bước nhảy: i × 2 mỗi lần (1, 2, 4, 8, ...).</li>
+      <li>Bước 2: Lập phương trình i sau k lần lặp: i = 2^k.</li>
+      <li>Bước 3: Giải bất phương trình 2^k ≥ n → k ≥ log₂(n).</li>
+      <li>Bước 4: Tính BigO = log₂(n) × O(1) = O(log n).</li>
+    </ol>
+
+    <p><strong>📋 Giả mã:</strong></p>
+    <pre><code>THUẬT TOÁN print_powers_of_two(n)
+BƯỚC 1: i ← 1
+BƯỚC 2: TRONG KHI i &lt; n DO
+BƯỚC 3:     PRINT(i)
+BƯỚC 4:     i ← i × 2
+BƯỚC 5: Kết thúc</code></pre>
+
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <pre><code>def print_powers_of_two(n):
+    i = 1
+    while i &lt; n:
+        print(i)
+        i *= 2
+
+# Test
+print_powers_of_two(16)
+# Output: 1 2 4 8 (4 lần in)</code></pre>
+
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>BigO = <strong>O(log n)</strong>. Chứng minh: Sau k lần lặp, <code>i = 2^k</code>. Vòng dừng khi <code>i ≥ n</code>, tức <code>2^k ≥ n</code> ⇔ <code>k ≥ log₂(n)</code>. Vậy số lần lặp = ⌈log₂(n)⌉. Thân vòng lặp <code>print(i)</code> = O(1). Tổng = log₂(n) × O(1) = O(log n). Theo định nghĩa BigO: ∃ c = 1, n₀ = 2 sao cho T(n) = log₂(n) ≤ 1·log₂(n) với mọi n ≥ 2. ✓</p>
+
     <p><strong>🧮 Tính toán từng bước:</strong></p>
     <div class="code-block">i nhận giá trị: 1, 2, 4, 8, 16, 32, ..., 2^k
 Sau k lần lặp: i = 2^k.
@@ -1220,6 +1241,7 @@ Vậy số lần lặp = ⌈log₂(n)⌉
 
 Thân vòng lặp: print(i) = O(1)
 Tổng = log₂(n) × O(1) = O(log n)</div>
+
     <p><strong>✓ Kết quả:</strong> BigO = <strong>O(log n)</strong>.</p>
     <p><strong>🔍 Kiểm tra:</strong> Với n = 1024, log₂(1024) = 10 → chỉ 10 lần in. Với n = 1 tỷ, log₂ ≈ 30 → 30 lần in. Rất hiệu quả!</p>
   </div>
@@ -1237,8 +1259,37 @@ Tổng = log₂(n) × O(1) = O(log n)</div>
 print_multiplication_table(4)</code></pre>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-2-2').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-2-2" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức áp dụng:</strong> 2 vòng for lồng nhau, vòng trong chạy theo i → quy tắc nhân + tính tổng.</p>
-    <p><strong>💡 Cách áp dụng:</strong> Vòng ngoài i từ 1→n. Với mỗi i, vòng trong j chạy i lần. Tổng số lần in = 1 + 2 + 3 + ... + n.</p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p>Ý tưởng: 2 vòng for lồng nhau, vòng trong chạy theo i (j từ 1 đến i). Tổng số lần in = 1 + 2 + 3 + ... + n = n(n+1)/2 → bậc n².</p>
+    <ol style="padding-left:22px;">
+      <li>Bước 1: Vòng ngoài i chạy n lần (i = 1..n).</li>
+      <li>Bước 2: Với mỗi i, vòng trong j chạy i lần.</li>
+      <li>Bước 3: Tính tổng số lần in = Σ(i=1..n) i = n(n+1)/2.</li>
+      <li>Bước 4: Bỏ hằng số 1/2 và bậc thấp n → O(n²).</li>
+    </ol>
+
+    <p><strong>📋 Giả mã:</strong></p>
+    <pre><code>THUẬT TOÁN print_multiplication_table(n)
+BƯỚC 1: FOR i ← 1 TO n DO
+BƯỚC 2:     FOR j ← 1 TO i DO
+BƯỚC 3:         PRINT(i × j)
+BƯỚC 4:     END FOR
+BƯỚC 5: END FOR
+BƯỚC 6: Kết thúc</code></pre>
+
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <pre><code>def print_multiplication_table(n):
+    for i in range(1, n + 1):
+        for j in range(1, i + 1):
+            print(i * j)
+
+# Test
+print_multiplication_table(4)
+# Output: 1 | 2 4 | 3 6 9 | 4 8 12 16  (10 lần in = 1+2+3+4)</code></pre>
+
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>BigO = <strong>O(n²)</strong>. Chứng minh: Vòng ngoài i chạy từ 1 đến n. Với mỗi i cố định, vòng trong j chạy từ 1 đến i, tức i lần. Tổng số phép <code>print</code> = Σ(i=1..n) i = n(n+1)/2 = (n²+n)/2. Áp dụng BigO: bỏ hằng số 1/2 và bậc thấp n → <code>T(n) = O(n²)</code>. Theo định nghĩa: ∃ c = 1, n₀ = 1 sao cho T(n) = n(n+1)/2 ≤ n² ≤ 1·n² với mọi n ≥ 1. ✓</p>
+
     <p><strong>🧮 Tính toán từng bước:</strong></p>
     <div class="code-block">Tổng số lần lặp = Σ (i=1..n) i
                 = 1 + 2 + 3 + ... + n
@@ -1247,6 +1298,7 @@ print_multiplication_table(4)</code></pre>
 
 Bỏ hằng số 1/2 và bậc thấp n:
    = n²/2 + n/2 → O(n²) khi n→∞</div>
+
     <p><strong>✓ Kết quả:</strong> BigO = <strong>O(n²)</strong>.</p>
     <p><strong>🔍 Kiểm tra:</strong> n(n+1)/2 cùng bậc với n² → O(n²). Đúng vì dù vòng trong chạy ít hơn n lần (chỉ i lần), tổng vẫn có bậc n².</p>
   </div>
@@ -1257,8 +1309,48 @@ Bỏ hằng số 1/2 và bậc thấp n:
   <p>Giải phương trình đệ quy <code>T(n) = 4T(n/2) + n²</code> bằng định lý Master.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-2-3').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-2-3" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức áp dụng:</strong> Định lý Master với T(n) = a·T(n/b) + f(n).</p>
-    <p><strong>💡 Cách áp dụng:</strong> Xác định a, b, f(n) → tính c* = log_b(a) → so sánh f(n) với n^c* → chọn case.</p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p>Ý tưởng: Đây là phương trình đệ quy dạng <code>T(n) = a·T(n/b) + f(n)</code> (chia đều). Áp dụng Định lý Master: tính c* = log_b(a), so sánh f(n) với n^c* → chọn Case.</p>
+    <ol style="padding-left:22px;">
+      <li>Bước 1: Xác định a = 4, b = 2, f(n) = n².</li>
+      <li>Bước 2: Tính c* = log₂(4) = 2.</li>
+      <li>Bước 3: So sánh f(n) = n² = n^c* → Case 2 (cân bằng), k = 0.</li>
+      <li>Bước 4: Áp dụng công thức Case 2: T(n) = Θ(n^c · log^(k+1) n).</li>
+      <li>Bước 5: Kết luận T(n) = Θ(n² log n).</li>
+    </ol>
+
+    <p><strong>📋 Giả mã:</strong></p>
+    <pre><code>THUẬT TOÁN giải bằng Định lý Master
+BƯỚC 1: Nhận diện T(n) = a·T(n/b) + f(n)
+BƯỚC 2: Tính c* = log_b(a)
+BƯỚC 3: So sánh f(n) với n^c*
+BƯỚC 4:    NẾU f &lt; n^c* → Case 1: T(n) = Θ(n^c*)
+BƯỚC 5:    NẾU f = n^c* · log^k → Case 2: T(n) = Θ(n^c* · log^(k+1))
+BƯỚC 6:    NẾU f &gt; n^c* → Case 3: T(n) = Θ(f(n))</code></pre>
+
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <pre><code>import math
+
+def T(n):
+    """T(n) = 4T(n/2) + n^2 — tính số phép toán"""
+    if n &lt;= 1:
+        return 1
+    return 4 * T(n // 2) + n * n
+
+# Test
+for n in [2, 4, 8, 16, 32]:
+    print(f"T({n}) = {T(n)}, n²·log₂(n) = {n*n*int(math.log2(n))}")</code></pre>
+
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>BigO = <strong>Θ(n² log n)</strong>. Chứng minh bằng Định lý Master:</p>
+    <ul style="padding-left:22px;">
+      <li>T(n) = 4·T(n/2) + n² → a = 4, b = 2, f(n) = n².</li>
+      <li>c* = log_b(a) = log₂(4) = 2.</li>
+      <li>f(n) = n² = n^c* (vì c* = 2) → <strong>Case 2</strong> (cân bằng), với c = 2, k = 0.</li>
+      <li>Theo Case 2: T(n) = Θ(n^c · log^(k+1) n) = Θ(n² · log^(0+1) n) = Θ(n² · log n).</li>
+      <li>Cây đệ quy: mỗi tầng i có chi phí ≈ n² (4^i × (n/2^i)² = n²), có log₂(n) tầng → tổng = n² · log₂(n). ✓</li>
+    </ul>
+
     <p><strong>🧮 Tính toán từng bước:</strong></p>
     <div class="code-block">Bước 1: T(n) = 4·T(n/2) + n²
    → a = 4, b = 2, f(n) = n²
@@ -1272,6 +1364,7 @@ Bước 4: Áp dụng công thức Case 2:
    T(n) = Θ(n^c · log^(k+1) n)
         = Θ(n² · log^(0+1) n)
         = Θ(n² · log n)</div>
+
     <p><strong>✓ Kết quả:</strong> T(n) = <strong>Θ(n² log n)</strong>.</p>
     <p><strong>🔍 Kiểm tra:</strong> Case 2 vì f(n) = n^c* → cân bằng giữa gốc và lá. Mỗi tầng cây đệ quy có chi phí n² (gốc n², 4 con × (n/2)² = n², ...), có log₂(n) tầng → tổng = n² log n. ✓</p>
   </div>
@@ -1282,8 +1375,49 @@ Bước 4: Áp dụng công thức Case 2:
   <p>Giải phương trình đệ quy <code>T(n) = 2T(n/2) + n log n</code>.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-2-4').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-2-4" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức áp dụng:</strong> Định lý Master dạng tổng quát Case 2 với f(n) có thêm log^k n.</p>
-    <p><strong>💡 Cách áp dụng:</strong> f(n) = n·log n = n¹·log¹ n → c = 1, k = 1. So sánh c với c*.</p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p>Ý tưởng: Đây là phương trình đệ quy dạng <code>T(n) = a·T(n/b) + f(n)</code>. Áp dụng Định lý Master dạng tổng quát với f(n) = n·log n = n¹·log¹ n → c = 1, k = 1.</p>
+    <ol style="padding-left:22px;">
+      <li>Bước 1: Xác định a = 2, b = 2, f(n) = n·log n.</li>
+      <li>Bước 2: Tính c* = log₂(2) = 1.</li>
+      <li>Bước 3: f(n) = n·log n = n^1·log^1 n → c = 1 = c*, k = 1 → Case 2.</li>
+      <li>Bước 4: Áp dụng công thức Case 2: T(n) = Θ(n^c · log^(k+1) n).</li>
+      <li>Bước 5: Kết luận T(n) = Θ(n log² n).</li>
+    </ol>
+
+    <p><strong>📋 Giả mã:</strong></p>
+    <pre><code>THUẬT TOÁN giải bằng Định lý Master (dạng có log^k)
+BƯỚC 1: T(n) = a·T(n/b) + f(n), f(n) = n^c · log^k n
+BƯỚC 2: Tính c* = log_b(a)
+BƯỚC 3: So sánh c với c*:
+BƯỚC 4:    NẾU c = c* → Case 2: T(n) = Θ(n^c · log^(k+1) n)
+BƯỚC 5: Áp dụng với c = 1, k = 1 → T(n) = Θ(n · log² n)</code></pre>
+
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <pre><code>import math
+
+def T(n):
+    """T(n) = 2T(n/2) + n·log₂(n) — tính số phép toán"""
+    if n &lt;= 1:
+        return 1
+    return 2 * T(n // 2) + n * int(math.log2(max(n, 2)))
+
+# Test
+for n in [2, 4, 8, 16, 32]:
+    val = T(n)
+    expected = n * (int(math.log2(max(n, 2)))) ** 2
+    print(f"T({n}) = {val}, n·log²(n) = {expected}")</code></pre>
+
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>BigO = <strong>Θ(n log² n)</strong>. Chứng minh bằng Định lý Master:</p>
+    <ul style="padding-left:22px;">
+      <li>T(n) = 2·T(n/2) + n·log n → a = 2, b = 2, f(n) = n·log n.</li>
+      <li>c* = log_b(a) = log₂(2) = 1.</li>
+      <li>f(n) = n·log n = n^1·log^1 n → c = 1 = c*, k = 1 → <strong>Case 2</strong>.</li>
+      <li>Theo Case 2: T(n) = Θ(n^c · log^(k+1) n) = Θ(n¹ · log^(1+1) n) = Θ(n · log² n).</li>
+      <li>Cây đệ quy: tầng i có 2^i node, mỗi node chi phí (n/2^i)·log(n/2^i). Tổng tầng i = n·log(n/2^i) = n·(log n - i). Tổng tất cả = Σ(i=0..log n) n·(log n - i) = n·Σ(log n - i) = O(n log² n). ✓</li>
+    </ul>
+
     <p><strong>🧮 Tính toán từng bước:</strong></p>
     <div class="code-block">Bước 1: T(n) = 2·T(n/2) + n log n
    → a = 2, b = 2, f(n) = n·log n
@@ -1297,6 +1431,7 @@ Bước 4: Áp dụng công thức Case 2:
    T(n) = Θ(n^c · log^(k+1) n)
         = Θ(n¹ · log^(1+1) n)
         = Θ(n · log² n)</div>
+
     <p><strong>✓ Kết quả:</strong> T(n) = <strong>Θ(n log² n)</strong>.</p>
     <p><strong>🔍 Kiểm tra:</strong> Đây là một biến thể của MergeSort khi thao tác trộn tốn O(n log n) thay vì O(n). Cây đệ quy có log₂(n) tầng, mỗi tầng i có chi phí ≈ (n/2^i)·log(n/2^i) × 2^i = n·log(n/2^i). Tổng = Σ n·log(n/2^i) = n·Σ(log n - i) = O(n log² n). ✓</p>
   </div>

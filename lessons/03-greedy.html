@@ -547,11 +547,29 @@ new StepReveal('step-tsp', [
 <h2>1️⃣ Bài toán: Máy ATM (đổi tiền)</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">💡 Ý tưởng</div>
-  <p><strong>Chọn nhiều tờ mệnh giá LỚN NHẤT trước.</strong> Lấy tối đa tờ 100k có thể, phần dư lấy tờ 50k, rồi 20k, rồi 10k.</p>
-  <p><strong>Vì sao?</strong> Mỗi tờ 100k thay thế được 2 tờ 50k → giảm số tờ. Mệnh giá lớn càng ưu tiên thì số tờ càng ít.</p>
+  <div class="callout-title">📋 Phát biểu bài toán</div>
+  <p>Máy ATM có 4 mệnh giá: <strong>100.000đ, 50.000đ, 20.000đ, 10.000đ</strong>. Rút <code>n</code> đồng (n chia hết cho 10.000). Tìm số tờ ít nhất.</p>
 </div>
 
+<!-- ============== PHẦN 1: Ý tưởng + Các bước thực hiện ============== -->
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng + Các bước thực hiện</div>
+  <p><strong>Ý tưởng:</strong> Tối ưu hóa số tờ = ưu tiên mệnh giá lớn nhất trước. Tại mỗi bước, lấy tối đa tờ của mệnh giá hiện tại, rồi chuyển sang mệnh giá nhỏ hơn. Mỗi tờ 100k thay thế được 2 tờ 50k → giảm số tờ. Mệnh giá lớn càng ưu tiên thì số tờ càng ít.</p>
+  <p><strong>Các bước thực hiện:</strong></p>
+  <ol style="padding-left: 20px;">
+    <li>Sắp xếp các mệnh giá theo thứ tự <strong>GIẢM dần</strong>.</li>
+    <li>Với mỗi mệnh giá từ lớn đến nhỏ:
+      <ul style="padding-left: 20px;">
+        <li>Số tờ = số tiền còn lại <code>DIV</code> mệnh giá.</li>
+        <li>Lưu số tờ vào kết quả.</li>
+        <li>Cập nhật số tiền còn lại = số tiền còn lại <code>MOD</code> mệnh giá.</li>
+      </ul>
+    </li>
+    <li>Khi số tiền còn lại = 0, kết thúc.</li>
+  </ol>
+</div>
+
+<!-- ============== PHẦN 2: Giải thích đời thường ============== -->
 <div class="callout callout-life">
   <div class="callout-title">🌍 Giải thích đời thường</div>
   <p>Giống khi bạn rút tiền ở ATM, máy luôn ưu tiên trả tờ mệnh giá lớn trước — ít tờ hơn thì dễ đếm, nhẹ ví, tiện cho khách.</p>
@@ -564,11 +582,17 @@ new StepReveal('step-tsp', [
   <p>Tại sao Greedy đúng cho ATM? Vì hệ mệnh giá tiền Việt Nam là "Canon" — mỗi tờ lớn hơn gấp đôi tờ nhỏ hơn liền kề, nên luôn tối ưu.</p>
 </div>
 
-<div class="callout callout-theory">
-  <div class="callout-title">📋 Phát biểu bài toán</div>
-  <p>Máy ATM có 4 mệnh giá: <strong>100.000đ, 50.000đ, 20.000đ, 10.000đ</strong>. Rút <code>n</code> đồng (n chia hết cho 10.000). Tìm số tờ ít nhất.</p>
-</div>
+<!-- ============== PHẦN 3: Giả mã (Pseudocode) ============== -->
+<h3>📋 Giả mã</h3>
+<pre><code>THUẬT TOÁN ATM(n, tigia[1..m])
+  VÀO: số tiền n, mảng mệnh giá tigia (đã sắp giảm)
+  RA:  mảng soluong[1..m] — số tờ mỗi mệnh giá
+BƯỚC 1: Cho i chạy từ 1 đến m
+BƯỚC 2:   soluong[i] ← n DIV tigia[i]
+BƯỚC 3:   n ← n MOD tigia[i]
+BƯỚC 4: Trả về soluong</code></pre>
 
+<!-- ============== PHẦN 4: Cài đặt Python ============== -->
 <h3>🐍 Mã Python</h3>
 <pre><code>def atm(n, tigia):
     """
@@ -586,6 +610,27 @@ new StepReveal('step-tsp', [
 tigia = [100000, 50000, 20000, 10000]
 print(atm(1290000, tigia))  # [12, 1, 2, 0]</code></pre>
 
+<!-- ============== PHẦN 5: Phân tích + Chứng minh ============== -->
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📊 Phân tích + Chứng minh</div>
+  <p><strong>Phân tích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Vòng lặp <code>for</code>: m lần (với m = số mệnh giá).</li>
+    <li>Mỗi vòng: 2 phép toán (DIV, MOD) — O(1).</li>
+    <li>Tổng: T(n) = m × O(1) = <strong>O(m)</strong>.</li>
+  </ul>
+  <p><strong>CHỨNG MINH:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>m là số mệnh giá (hằng số, vd 4 cho VNĐ).</li>
+    <li>Nên thực tế T(n) = O(1) — không phụ thuộc n.</li>
+    <li>Nếu coi m là biến: T(n) = O(m).</li>
+  </ul>
+  <p><strong>Bộ nhớ:</strong> O(m) cho mảng soluong.</p>
+  <p><strong>Tối ưu?</strong> ✓ Có, <em>với bộ mệnh giá Canon</em> (mỗi mệnh giá lớn là bội số của mệnh giá nhỏ hơn: 100k = 2×50k, 50k = 2×20k + 10k, v.v.).</p>
+</div>
+
+<!-- ============== PHẦN 6: Ví dụ chạy tay ============== -->
 <h3>🎯 Ví dụ chạy tay</h3>
 <div class="callout callout-example">
   <div class="callout-title">🧮 Rút 1.290.000đ — từng bước</div>
@@ -594,14 +639,6 @@ print(atm(1290000, tigia))  # [12, 1, 2, 0]</code></pre>
   <p><strong>Bước 3 (tờ 20k):</strong> 40.000 // 20.000 = <strong>2</strong> tờ. Đã dùng 40.000đ, còn 0đ.</p>
   <p><strong>Bước 4 (tờ 10k):</strong> 0 // 10.000 = <strong>0</strong> tờ.</p>
   <p><strong>→ Phương án X = (12, 1, 2, 0)</strong>. Tổng số tờ = 12 + 1 + 2 + 0 = <strong>15 tờ</strong>.</p>
-</div>
-
-<h3>📊 Phân tích độ phức tạp</h3>
-<div class="callout callout-theory">
-  <div class="callout-title">📐 Thời gian &amp; không gian</div>
-  <p><strong>Thời gian:</strong> O(m) — chỉ 1 vòng for qua m mệnh giá, mỗi bước O(1) (phép chia // và mod %).</p>
-  <p><strong>Bộ nhớ:</strong> O(m) — mảng kết quả soluong[m].</p>
-  <p><strong>Tối ưu?</strong> ✓ Có, <em>với bộ mệnh giá chuẩn</em> (mỗi mệnh giá lớn là bội số của mệnh giá nhỏ hơn: 100k = 2×50k, 50k = 2×20k + 10k, v.v.).</p>
 </div>
 
 <div class="callout callout-warn">
@@ -615,20 +652,37 @@ print(atm(1290000, tigia))  # [12, 1, 2, 0]</code></pre>
 <h2>2️⃣ Bài toán: Người giao hàng (TSP)</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">💡 Ý tưởng</div>
+  <div class="callout-title">📋 Phát biểu bài toán</div>
+  <p>Có <code>n</code> thành phố. Một người đi từ 1 thành phố, qua tất cả <code>n-1</code> thành phố khác (mỗi thành phố đến đúng 1 lần), rồi trở về thành phố ban đầu. Tìm chu trình có tổng độ dài ngắn nhất.</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Vét cạn không khả thi</div>
+  <p>Có <code>(n-1)!/2</code> chu trình Hamilton khác nhau (chia 2 vì chu trình + chiều ngược là 1). Với n=20, có 20!/2 ≈ 1.2×10¹⁸ chu trình → máy tính nhanh nhất cũng mất hàng tỷ năm.</p>
+  <p>→ Phải dùng heuristic như Greedy (không tối ưu nhưng nhanh).</p>
+</div>
+
+<!-- ============== PHẦN 1: Ý tưởng + Các bước thực hiện ============== -->
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng + Các bước thực hiện</div>
+  <p><strong>Ý tưởng:</strong> Tối ưu hóa độ dài chu trình = ưu tiên cạnh ngắn nhất trước. Sắp xếp các cạnh theo độ dài tăng dần, rồi lần lượt xét từng cạnh để đưa vào chu trình — chỉ chọn cạnh không tạo đỉnh bậc 3 và không khép kín chu trình sớm.</p>
+  <p><strong>Các bước thực hiện:</strong></p>
   <ol style="padding-left: 20px;">
-    <li><strong>Sắp xếp</strong> các cạnh theo thứ tự tăng dần của độ dài.</li>
-    <li><strong>Xét</strong> các cạnh từ ngắn nhất đến dài nhất để đưa vào chu trình.</li>
-    <li>Một cạnh được <strong>chọn</strong> nếu thỏa mãn ĐỒNG THỜI 2 điều kiện:
+    <li>Liệt kê tất cả n(n-1)/2 cạnh của đồ thị (chỉ lấy nửa trên vì ma trận đối xứng).</li>
+    <li><strong>Sắp xếp</strong> các cạnh theo độ dài tăng dần.</li>
+    <li>Khởi tạo: <code>bac[1..n] = 0</code> (bậc mỗi đỉnh), Union-Find để phát hiện chu trình.</li>
+    <li>Duyệt từng cạnh (u, v) theo thứ tự đã sắp:
       <ul style="padding-left: 20px;">
-        <li><strong>Không tạo chu trình thiếu</strong> (không khép kín sớm — chỉ được khép kín khi đã đủ n cạnh).</li>
-        <li><strong>Không tạo đỉnh bậc 3</strong> (mỗi đỉnh chỉ có tối đa 2 cạnh — vì chu trình đi vào + ra mỗi đỉnh).</li>
+        <li>Nếu <code>bac[u] ≥ 2</code> hoặc <code>bac[v] ≥ 2</code> → <strong>BỎ</strong> (tạo bậc 3).</li>
+        <li>Nếu (u, v) tạo chu trình khép kín VÀ chưa đủ n-1 cạnh → <strong>BỎ</strong>.</li>
+        <li>Ngược lại → <strong>CHỌN</strong>: tăng <code>bac[u]</code>, <code>bac[v]</code>, cập nhật Union-Find.</li>
       </ul>
     </li>
-    <li><strong>Lặp lại</strong> cho đến khi xây dựng được 1 chu trình (đủ n cạnh).</li>
+    <li>Khi đã chọn đủ n cạnh, dừng — chu trình Hamilton hoàn thành.</li>
   </ol>
 </div>
 
+<!-- ============== PHẦN 2: Giải thích đời thường ============== -->
 <div class="callout callout-life">
   <div class="callout-title">🌍 Giải thích đời thường</div>
   <p>Bạn là shipper, có 5 điểm giao hàng. Bạn muốn đi đường ngắn nhất để tiết kiệm xăng. Cách tham lam: luôn đi đến điểm <strong>GẦN NHẤT</strong> chưa giao. Nhưng đôi khi đi gần trước lại xa tổng thể.</p>
@@ -642,17 +696,24 @@ print(atm(1290000, tigia))  # [12, 1, 2, 0]</code></pre>
   <p>Cảm giác: TSP là bài toán "NP-hard" — chưa ai tìm được thuật toán tối ưu nhanh. Greedy cho "phương án tốt" nhưng chưa chắc "tốt nhất".</p>
 </div>
 
-<div class="callout callout-theory">
-  <div class="callout-title">📋 Phát biểu bài toán</div>
-  <p>Có <code>n</code> thành phố. Một người đi từ 1 thành phố, qua tất cả <code>n-1</code> thành phố khác (mỗi thành phố đến đúng 1 lần), rồi trở về thành phố ban đầu. Tìm chu trình có tổng độ dài ngắn nhất.</p>
-</div>
+<!-- ============== PHẦN 3: Giả mã (Pseudocode) ============== -->
+<h3>📋 Giả mã</h3>
+<pre><code>THUẬT TOÁN TSP_GREEDY(dist[1..n, 1..n])
+  VÀO: ma trận khoảng cách dist n×n
+  RA:  danh sách cạnh chu_trinh — chu trình Hamilton
+BƯỚC 1: E ← tập hợp tất cả cạnh (i, j, dist[i][j]) với i &lt; j
+BƯỚC 2: Sắp xếp E tăng dần theo dist
+BƯỚC 3: Khởi tạo bac[1..n] = 0, Union-Find cha[i] = i
+BƯỚC 4: Cho mỗi cạnh (d, u, v) trong E (theo thứ tự đã sắp):
+          NẾU bac[u] &lt; 2 VÀ bac[v] &lt; 2
+          VÀ (find(u) ≠ find(v) HOẶC |chu_trinh| = n - 1):
+            Thêm (u, v, d) vào chu_trinh
+            bac[u] ← bac[u] + 1;  bac[v] ← bac[v] + 1
+            NẾU find(u) ≠ find(v): union(u, v)
+            NẾU |chu_trinh| = n: DỪNG
+BƯỚC 5: Trả về chu_trinh</code></pre>
 
-<div class="callout callout-warn">
-  <div class="callout-title">⚠️ Vét cạn không khả thi</div>
-  <p>Có <code>(n-1)!/2</code> chu trình Hamilton khác nhau (chia 2 vì chu trình + chiều ngược là 1). Với n=20, có 20!/2 ≈ 1.2×10¹⁸ chu trình → máy tính nhanh nhất cũng mất hàng tỷ năm.</p>
-  <p>→ Phải dùng heuristic như Greedy (không tối ưu nhưng nhanh).</p>
-</div>
-
+<!-- ============== PHẦN 4: Cài đặt Python ============== -->
 <h3>🐍 Mã Python</h3>
 <pre><code>def tsp_greedy(dist, n):
     """
@@ -699,6 +760,29 @@ dist = [
 ]
 print(tsp_greedy(dist, 4))</code></pre>
 
+<!-- ============== PHẦN 5: Phân tích + Chứng minh ============== -->
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📊 Phân tích + Chứng minh</div>
+  <p><strong>Phân tích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Số cạnh: n(n-1)/2 = O(n²).</li>
+    <li>Sắp xếp cạnh: O(n² log n²) = O(n² log n).</li>
+    <li>Duyệt + kiểm tra Union-Find: O(n² × α(n)) ≈ O(n²).</li>
+    <li>Tổng: T(n) = <strong>O(n² log n)</strong>.</li>
+  </ul>
+  <p><strong>CHỨNG MINH:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Sắp xếp chiếm ưu thế: n² cạnh × log(n²) so sánh = n² × 2·log n = O(n² log n).</li>
+    <li>Union-Find với path compression: mỗi phép find/union gần như O(1) (α(n) ≤ 4 ∀ n thực tế).</li>
+    <li>→ Tổng T(n) = O(n² log n) + O(n²) = O(n² log n).</li>
+    <li>Nếu dùng Bucket Sort (giá trị nguyên) cho sắp xếp: T(n) = O(n²).</li>
+  </ul>
+  <p><strong>Bộ nhớ:</strong> O(n²) cho ma trận + O(n²) cho danh sách cạnh + O(n) cho Union-Find = O(n²).</p>
+  <p><strong>Tối ưu?</strong> ✗ <strong>Không</strong> — Greedy TSP chỉ là heuristic, kết quả TỐT nhưng chưa chắc TỐI ƯU.</p>
+</div>
+
+<!-- ============== PHẦN 6: Ví dụ chạy tay ============== -->
 <h3>🎯 Ví dụ chạy tay</h3>
 <div class="callout callout-example">
   <div class="callout-title">🧮 4 thành phố A-B-C-D — từng bước</div>
@@ -711,28 +795,34 @@ print(tsp_greedy(dist, 4))</code></pre>
   <p><strong>→ Chu trình: A → B → D → C → A</strong>. Tổng = <strong>80</strong>.</p>
 </div>
 
-<h3>📊 Phân tích độ phức tạp</h3>
-<div class="callout callout-theory">
-  <div class="callout-title">📐 Thời gian &amp; không gian</div>
-  <p><strong>Sắp xếp cạnh:</strong> có n(n-1)/2 cạnh → O(n² log n).</p>
-  <p><strong>Duyệt + kiểm tra:</strong> O(n²) (mỗi cạnh kiểm tra O(1) với Union-Find).</p>
-  <p>→ Tổng: <strong>O(n² log n)</strong> (chi phí sắp xếp). Nếu dùng Bucket Sort (giá trị nguyên) có thể O(n²).</p>
-  <p><strong>Tối ưu?</strong> ✗ <strong>Không</strong> — Greedy TSP chỉ là heuristic, kết quả TỐT nhưng chưa chắc TỐI ƯU.</p>
-</div>
-
 <!-- ============================== BÀI TOÁN 3: Knapsack vô hạn ============================== -->
 <h2>3️⃣ Bài toán: Cái ba lô (Knapsack) vô hạn</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">💡 Ý tưởng (3 bước)</div>
-  <ol style="padding-left: 20px;">
-    <li><strong>Tính đơn giá</strong> = vᵢ / gᵢ cho mỗi loại (giá trị trên mỗi đơn vị trọng lượng).</li>
-    <li><strong>Sắp xếp</strong> đồ vật theo đơn giá GIẢM dần.</li>
-    <li>Với mỗi đồ vật (theo thứ tự đã sắp), <strong>lấy số lượng tối đa</strong> mà trọng lượng còn lại cho phép: <code>⌊W_còn / gᵢ⌋</code>.</li>
-  </ol>
-  <p><strong>Vì sao?</strong> Đơn giá cao = "hời" nhất (nhiều giá trị / ít trọng lượng) → ưu tiên lấy hết.</p>
+  <div class="callout-title">📋 Phát biểu bài toán</div>
+  <p>Cái ba lô trọng lượng <code>W</code>. Có <code>n</code> loại đồ vật, mỗi loại <code>i</code> có trọng lượng <code>gᵢ</code> và giá trị <code>vᵢ</code>. <strong>Mỗi loại có số lượng KHÔNG HẠN CHẾ.</strong> Tìm cách chọn để tổng trọng lượng ≤ W và tổng giá trị lớn nhất.</p>
 </div>
 
+<!-- ============== PHẦN 1: Ý tưởng + Các bước thực hiện ============== -->
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng + Các bước thực hiện</div>
+  <p><strong>Ý tưởng:</strong> Tối ưu hóa tổng giá trị = ưu tiên vật có đơn giá cao nhất (giá trị trên mỗi đơn vị trọng lượng). Lấy tối đa mỗi loại theo thứ tự đơn giá giảm, phần trọng lượng dư chuyển cho loại kế tiếp.</p>
+  <p><strong>Các bước thực hiện:</strong></p>
+  <ol style="padding-left: 20px;">
+    <li>Tính đơn giá cho mỗi vật: <code>don_gia[i] = v[i] / g[i]</code>.</li>
+    <li><strong>Sắp xếp</strong> đồ vật theo đơn giá <strong>GIẢM dần</strong>.</li>
+    <li>Với mỗi vật theo thứ tự đã sắp:
+      <ul style="padding-left: 20px;">
+        <li>Số lượng lấy = <code>W_còn DIV g[i]</code> (vì vô hạn nên lấy tối đa).</li>
+        <li>Cập nhật W_còn = <code>W_còn MOD g[i]</code>.</li>
+        <li>Cộng dồn giá trị: <code>GT += sl × v[i]</code>.</li>
+      </ul>
+    </li>
+    <li>Khi W_còn = 0 hoặc đã hết vật, dừng.</li>
+  </ol>
+</div>
+
+<!-- ============== PHẦN 2: Giải thích đời thường ============== -->
 <div class="callout callout-life">
   <div class="callout-title">🌍 Giải thích đời thường</div>
   <p>Bạn đi siêu thị, có 1 cái túi tối đa 5kg. Có các loại hàng:</p>
@@ -747,11 +837,21 @@ print(tsp_greedy(dist, 4))</code></pre>
   <p><strong>Lưu ý:</strong> Greedy đúng cho Knapsack VÔ HẠN (mỗi loại lấy bao nhiêu cũng được). Nhưng cho Knapsack 0/1 (mỗi vật chỉ 1 cái) thì Greedy có thể SAI → phải dùng DP.</p>
 </div>
 
-<div class="callout callout-theory">
-  <div class="callout-title">📋 Phát biểu bài toán</div>
-  <p>Cái ba lô trọng lượng <code>W</code>. Có <code>n</code> loại đồ vật, mỗi loại <code>i</code> có trọng lượng <code>gᵢ</code> và giá trị <code>vᵢ</code>. <strong>Mỗi loại có số lượng KHÔNG HẠN CHẾ.</strong> Tìm cách chọn để tổng trọng lượng ≤ W và tổng giá trị lớn nhất.</p>
-</div>
+<!-- ============== PHẦN 3: Giả mã (Pseudocode) ============== -->
+<h3>📋 Giả mã</h3>
+<pre><code>THUẬT TOÁN KNAPSACK_VÔHẠN(dsvat[1..n], W)
+  VÀO: danh sách đồ vật (g[i], v[i]), sức chứa W
+  RA:  mảng sl[1..n] — số lượng mỗi vật, tổng giá trị GT
+BƯỚC 1: Cho mỗi i, tính don_gia[i] ← v[i] / g[i]
+BƯỚC 2: Sắp xếp dsvat theo don_gia GIẢM dần
+BƯỚC 3: GT ← 0;  W_còn ← W
+BƯỚC 4: Cho i chạy từ 1 đến n:
+          sl[i] ← W_còn DIV g[i]
+          W_còn ← W_còn MOD g[i]
+          GT ← GT + sl[i] × v[i]
+BƯỚC 5: Trả về sl, GT</code></pre>
 
+<!-- ============== PHẦN 4: Cài đặt Python ============== -->
 <h3>🐍 Mã Python</h3>
 <pre><code>class DoVat:
     def __init__(self, ten, trong_luong, gia_tri):
@@ -781,6 +881,29 @@ for vat in ket_qua:
     print(f"{vat.ten}: {vat.phuong_an} cái")
 # B: 3 cái, D: 1 cái, C: 1 cái → tổng giá trị = 3*25 + 1*6 + 1*2 = 83</code></pre>
 
+<!-- ============== PHẦN 5: Phân tích + Chứng minh ============== -->
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📊 Phân tích + Chứng minh</div>
+  <p><strong>Phân tích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Tính đơn giá: n phép chia — O(n).</li>
+    <li>Sắp xếp: O(n log n).</li>
+    <li>Chọn (vòng for): n lần, mỗi lần O(1) — O(n).</li>
+    <li>Tổng: T(n) = O(n) + O(n log n) + O(n) = <strong>O(n log n)</strong>.</li>
+  </ul>
+  <p><strong>CHỨNG MINH:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Sắp xếp chiếm ưu thế: với n vật, cần log n × n phép so sánh = O(n log n).</li>
+    <li>Vòng for chỉ n bước, mỗi bước là 1 phép DIV + 1 MOD + 1 phép cộng — tất cả O(1).</li>
+    <li>→ Tổng T(n) = O(n log n) + O(n) = O(n log n) (sắp xếp chiếm ưu thế).</li>
+    <li>Đa thức — nhanh hơn DP O(n·W) rất nhiều (DP phụ thuộc W, không phải đa thức thật).</li>
+  </ul>
+  <p><strong>Bộ nhớ:</strong> O(n) cho mảng don_gia và sl.</p>
+  <p><strong>Tối ưu?</strong> ✓ <strong>Có</strong> — với bài vô hạn, Greedy luôn tối ưu vì có thể lấy tối đa mỗi loại, phần dư tự nhiên chuyển cho loại kế tiếp (đơn giá thấp hơn).</p>
+</div>
+
+<!-- ============== PHẦN 6: Ví dụ chạy tay ============== -->
 <h3>🎯 Ví dụ chạy tay</h3>
 <div class="callout callout-example">
   <div class="callout-title">🧮 W=37, 4 đồ vật B-A-D-C — từng bước</div>
@@ -791,15 +914,6 @@ for vat in ket_qua:
   <p><strong>Bước 5: Lấy D.</strong> g=4 → ⌊7/4⌋ = <strong>1</strong>. TTL=34, còn 3, GT = 75+6 = 81.</p>
   <p><strong>Bước 6: Lấy C.</strong> g=2 → ⌊3/2⌋ = <strong>1</strong>. TTL=36, còn 1, GT = 81+2 = <strong>83</strong>.</p>
   <p><strong>→ Phương án X = (3, 0, 1, 1)</strong> theo thứ tự (B, A, D, C). Tổng GT = <strong>83</strong>, TTL = 36 (dư 1).</p>
-</div>
-
-<h3>📊 Phân tích độ phức tạp</h3>
-<div class="callout callout-theory">
-  <div class="callout-title">📐 Thời gian &amp; không gian</div>
-  <p><strong>Sắp xếp:</strong> O(n log n).</p>
-  <p><strong>Chọn:</strong> O(n) — 1 vòng for qua n vật.</p>
-  <p>→ Tổng: <strong>O(n log n)</strong> (chi phí sắp xếp chiếm ưu thế).</p>
-  <p><strong>Tối ưu?</strong> ✓ <strong>Có</strong> — với bài vô hạn, Greedy luôn tối ưu vì có thể "phân frac" được (lấy tối đa mỗi loại, phần dư tự nhiên chuyển cho loại kế tiếp có đơn giá thấp hơn).</p>
 </div>
 
 <!-- ============================== BIẾN THỂ 0/1 ============================== -->
@@ -840,17 +954,45 @@ for vat in ket_qua:
   <p>Rút <strong>1.550.000đ</strong> từ ATM có mệnh giá 100k, 50k, 20k, 10k. Tìm số tờ ít nhất bằng Greedy.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-3-1').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-3-1" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức:</strong> Greedy ATM — chia lần lượt cho mệnh giá lớn → nhỏ. <code>Xᵢ = ⌊n / tigia[i]⌋</code>, <code>n = n mod tigia[i]</code>.</p>
-    <p><strong>💡 Cách áp dụng:</strong> Mệnh giá đã sắp giảm: [100000, 50000, 20000, 10000]. Chia lần lượt.</p>
-    <p><strong>🧮 Tính toán:</strong></p>
-    <div class="code-block">X₁ = 1.550.000 / 100.000 = 15  (tờ 100k). Còn 1.550.000 - 1.500.000 = 50.000.
-X₂ = 50.000 / 50.000     = 1  (tờ 50k).  Còn 50.000 - 50.000 = 0.
-X₃ = 0 / 20.000          = 0  (tờ 20k).
-X₄ = 0 / 10.000          = 0  (tờ 10k).
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p><strong>Ý tưởng:</strong> Tối ưu số tờ = ưu tiên mệnh giá lớn trước. Tại mỗi bước, lấy tối đa tờ của mệnh giá hiện tại, rồi chuyển sang mệnh giá nhỏ hơn.</p>
+    <ol style="padding-left: 20px;">
+      <li>Sắp xếp mệnh giá giảm dần: <code>[100000, 50000, 20000, 10000]</code>.</li>
+      <li>Với mỗi mệnh giá: số tờ = <code>n DIV mg</code>, cập nhật <code>n = n MOD mg</code>.</li>
+      <li>Khi <code>n = 0</code>, dừng.</li>
+    </ol>
+    <p><strong>📋 Giả mã:</strong></p>
+    <pre><code>THUẬT TOÁN ATM(n, tigia[1..m])
+  VÀO: n = 1.550.000, mảng tigia
+  RA:  soluong[1..m]
+BƯỚC 1: i ← 1
+BƯỚC 2: soluong[i] ← n DIV tigia[i]
+BƯỚC 3: n ← n MOD tigia[i]
+BƯỚC 4: i ← i + 1; nếu i ≤ m, quay BƯỚC 2
+BƯỚC 5: Trả về soluong</code></pre>
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <pre><code>def atm(n, tigia):
+    soluong = []
+    for mg in tigia:
+        so_to = n // mg
+        soluong.append(so_to)
+        n = n % mg
+    return soluong
+
+tigia = [100000, 50000, 20000, 10000]
+print(atm(1550000, tigia))  # [15, 1, 0, 0]</code></pre>
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>BigO = <strong>O(m)</strong>. Chứng minh: vòng lặp <code>for</code> chạy m lần (m = 4 mệnh giá), mỗi lần 2 phép toán DIV, MOD — O(1). T(n) = m × O(1) = O(m). Vì m = 4 (hằng số), thực tế T = O(1). Bộ nhớ O(m).</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
+    <div class="code-block">Mệnh giá đã sắp giảm: [100000, 50000, 20000, 10000].
+Bước 1: X₁ = 1.550.000 DIV 100.000 = 15 (tờ 100k). Còn 1.550.000 MOD 100.000 = 50.000.
+Bước 2: X₂ = 50.000 DIV 50.000     = 1  (tờ 50k).  Còn 50.000 MOD 50.000 = 0.
+Bước 3: X₃ = 0 DIV 20.000          = 0  (tờ 20k).
+Bước 4: X₄ = 0 DIV 10.000          = 0  (tờ 10k).
 
 Phương án X = (15, 1, 0, 0).</div>
     <p><strong>✓ Kết quả:</strong> 15 tờ 100k + 1 tờ 50k = <strong>16 tờ</strong>. Rút đúng 1.550.000đ.</p>
-    <p><strong>🔍 Kiểm tra:</strong> 15·100.000 + 1·50.000 + 0·20.000 + 0·10.000 = 1.500.000 + 50.000 = 1.550.000đ ✓. Độ phức tạp O(m) = O(4) = O(1).</p>
+    <p><strong>🔍 Kiểm tra:</strong> 15·100.000 + 1·50.000 + 0·20.000 + 0·10.000 = 1.500.000 + 50.000 = 1.550.000đ ✓. Tối ưu vì mệnh giá Canon (100k = 2×50k, 50k = 2×20k + 10k).</p>
   </div>
 </div>
 
@@ -859,9 +1001,42 @@ Phương án X = (15, 1, 0, 0).</div>
   <p>Ba lô W=20. 3 vật: A(g=5, v=10), B(g=10, v=15), C(g=3, v=4). Mỗi loại không hạn chế. Tìm tổng giá trị lớn nhất.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-3-2').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-3-2" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức:</strong> Greedy Knapsack vô hạn — sắp xếp theo đơn giá GIẢM, lấy tối đa mỗi loại.</p>
-    <p><strong>💡 Cách áp dụng:</strong> Đơn giá = v/g. Sắp giảm rồi lấy lần lượt.</p>
-    <p><strong>🧮 Tính toán:</strong></p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p><strong>Ý tưởng:</strong> Tối ưu GT = ưu tiên đơn giá cao nhất. Lấy tối đa mỗi loại theo thứ tự đơn giá giảm.</p>
+    <ol style="padding-left: 20px;">
+      <li>Tính đơn giá <code>v/g</code> cho mỗi vật.</li>
+      <li>Sắp xếp vật theo đơn giá giảm dần.</li>
+      <li>Với mỗi vật: <code>sl = W DIV g</code>, <code>W = W MOD g</code>, <code>GT += sl × v</code>.</li>
+    </ol>
+    <p><strong>📋 Giả mã:</strong></p>
+    <pre><code>THUẬT TOÁN KNAPSACK_VÔHẠN(dsvat, W=20)
+  VÀO: 3 vật A(g=5,v=10), B(g=10,v=15), C(g=3,v=4)
+  RA:  sl[1..3], tổng GT
+BƯỚC 1: don_gia[i] ← v[i] / g[i]
+BƯỚC 2: Sắp dsvat giảm theo don_gia
+BƯỚC 3: GT ← 0; W_còn ← W
+BƯỚC 4: sl[i] ← W_còn DIV g[i]
+         W_còn ← W_còn MOD g[i]
+         GT ← GT + sl[i] × v[i]
+BƯỚC 5: Trả về sl, GT</code></pre>
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <pre><code>def knap_greedy(items, W):
+    # items: list of (name, g, v)
+    items = sorted(items, key=lambda x: x[2]/x[1], reverse=True)
+    sl = []
+    GT = 0
+    for name, g, v in items:
+        n = W // g
+        sl.append((name, n))
+        W = W % g
+        GT += n * v
+    return sl, GT
+
+items = [("A", 5, 10), ("B", 10, 15), ("C", 3, 4)]
+print(knap_greedy(items, 20))  # ([('A', 4), ('B', 0), ('C', 0)], 40)</code></pre>
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>BigO = <strong>O(n log n)</strong>. Chứng minh: tính đơn giá O(n), sắp xếp O(n log n) chiếm ưu thế (n phần tử × log n phép so sánh), vòng for O(n) với mỗi bước 1 phép DIV + 1 MOD + 1 cộng = O(1). Tổng O(n log n). Bộ nhớ O(n). Tối ưu: ✓ — vì mỗi vật có số lượng vô hạn, lấy tối đa vật "hời" nhất luôn tốt nhất.</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
     <div class="code-block">Tính đơn giá:
   A: 10/5 = 2.0   ← cao nhất
   B: 15/10 = 1.5
@@ -874,7 +1049,7 @@ Bước 2: Còn 0 → không lấy B, C.
 
 Phương án X = (4, 0, 0) theo thứ tự (A, B, C).</div>
     <p><strong>✓ Kết quả:</strong> Chọn <strong>4 vật A</strong>. TTL = 20 (=W, đầy ba lô). GT = <strong>40</strong>.</p>
-    <p><strong>🔍 Kiểm tra:</strong> 4·5 = 20 ≤ 20 ✓. GT = 4·10 = 40. So sánh: nếu lấy 2B + 0A + 0C: TTL=20, GT=30 (thua). Nếu lấy 0A + 2B + 0C = 30. Nếu lấy 6C + 1A: TTL = 18+5=23 > 20 (sai). → 4A là tối ưu ✓.</p>
+    <p><strong>🔍 Kiểm tra:</strong> 4·5 = 20 ≤ 20 ✓. GT = 4·10 = 40. So sánh: nếu lấy 2B + 0A + 0C: TTL=20, GT=30 (thua). Nếu lấy 0A + 2B + 0C = 30. Nếu lấy 6C + 1A: TTL = 18+5=23 &gt; 20 (sai). → 4A là tối ưu ✓.</p>
   </div>
 </div>
 
@@ -889,9 +1064,59 @@ D    20   25   30   -</code></pre>
   <p>Tìm chu trình Hamilton bằng Greedy.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-3-3').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-3-3" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức:</strong> Greedy TSP — sắp cạnh tăng dần, chọn cạnh nếu không bậc 3 + không khép kín sớm.</p>
-    <p><strong>💡 Cách áp dụng:</strong> Liệt kê 6 cạnh, sắp tăng, xét lần lượt.</p>
-    <p><strong>🧮 Tính toán:</strong></p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p><strong>Ý tưởng:</strong> Ưu tiên cạnh ngắn nhất trước. Sắp cạnh tăng dần, chọn cạnh nếu không tạo bậc 3 và không khép kín sớm.</p>
+    <ol style="padding-left: 20px;">
+      <li>Liệt kê 6 cạnh, sắp tăng dần.</li>
+      <li>Duyệt từng cạnh, kiểm tra: không tạo bậc 3 + không khép kín sớm.</li>
+      <li>Đủ n cạnh (4 cạnh) thì dừng.</li>
+    </ol>
+    <p><strong>📋 Giả mã:</strong></p>
+    <pre><code>THUẬT TOÁN TSP_GREEDY(dist, n=4)
+  VÀO: ma trận 4×4
+  RA:  chu_trinh (4 cạnh)
+BƯỚC 1: E ← tập cạnh (i, j, dist[i][j]) với i &lt; j
+BƯỚC 2: Sắp E tăng theo dist
+BƯỚC 3: bac[1..4] = 0; Union-Find cha[i] = i
+BƯỚC 4: Mỗi cạnh (d, u, v):
+          NẾU bac[u] &lt; 2 VÀ bac[v] &lt; 2
+          VÀ (find(u) ≠ find(v) HOẶC |chu_trinh| = n - 1):
+            Thêm vào chu_trinh; bac[u]++; bac[v]++; union
+            NẾU |chu_trinh| = n: DỪNG
+BƯỚC 5: Trả về chu_trinh</code></pre>
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <pre><code>def tsp_greedy(dist, n):
+    edges = []
+    for i in range(n):
+        for j in range(i+1, n):
+            edges.append((dist[i][j], i, j))
+    edges.sort()
+    chu_trinh = []
+    bac = [0]*n
+    cha = list(range(n))
+    def find(u):
+        while cha[u] != u:
+            cha[u] = cha[cha[u]]
+            u = cha[u]
+        return u
+    for d, u, v in edges:
+        if bac[u] &lt; 2 and bac[v] &lt; 2:
+            ru, rv = find(u), find(v)
+            if ru != rv or len(chu_trinh) == n-1:
+                chu_trinh.append((u, v, d))
+                bac[u] += 1
+                bac[v] += 1
+                if ru != rv:
+                    cha[ru] = rv
+                if len(chu_trinh) == n:
+                    break
+    return chu_trinh
+
+dist = [[0,10,15,20],[10,0,35,25],[15,35,0,30],[20,25,30,0]]
+print(tsp_greedy(dist, 4))  # [(0,1,10),(0,2,15),(1,3,25),(2,3,30)]</code></pre>
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>BigO = <strong>O(n² log n)</strong>. Chứng minh: có n²/2 cạnh, sắp xếp O(n² log n). Duyệt + Union-Find O(n² × α(n)) ≈ O(n²) (vì path compression cho find/union gần O(1)). Tổng O(n² log n). Bộ nhớ O(n²). KHÔNG tối ưu — chỉ heuristic.</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
     <div class="code-block">Sắp xếp cạnh tăng dần:
   AB=10, AC=15, AD=20, BD=25, CD=30, BC=35.
 
@@ -903,7 +1128,7 @@ Bước 5: CD=30. C: 1→2, D: 1→2. Khép kín (đủ 4 đỉnh) → CHỌN.
         Đã đủ 4 cạnh = n → dừng.
 Bước 6: BC=35. Đã đủ → không xét.</div>
     <p><strong>✓ Kết quả:</strong> Chu trình <strong>A → B → D → C → A</strong>. Tổng = 10 + 25 + 30 + 15 = <strong>80</strong>.</p>
-    <p><strong>🔍 Kiểm tra:</strong> Mỗi đỉnh đúng 2 cạnh (A: AB,AC; B: AB,BD; C: AC,CD; D: BD,CD) ✓. Đủ 4 cạnh = 4 đỉnh ✓. Tổng = 80. Lưu ý: Greedy thường không tối ưu — có thể chu trình khác (vd A→C→D→B→A = 15+30+25+10 = 80, bằng!) hoặc A→B→C→D→A = 10+35+30+20 = 95 (dài hơn) → trong TH này Greedy đúng.</p>
+    <p><strong>🔍 Kiểm tra:</strong> Mỗi đỉnh đúng 2 cạnh (A: AB,AC; B: AB,BD; C: AC,CD; D: BD,CD) ✓. Đủ 4 cạnh = 4 đỉnh ✓. Tổng = 80. Greedy thường không tối ưu nhưng TH này trùng với tối ưu (A→C→D→B→A = 15+30+25+10 = 80, bằng!).</p>
   </div>
 </div>
 
@@ -912,20 +1137,71 @@ Bước 6: BC=35. Đã đủ → không xét.</div>
   <p>W=10. 3 vật (mỗi vật 1 cái): A(g=6, v=12), B(g=5, v=9), C(g=5, v=9). Giải bằng Greedy và DP. So sánh.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-3-4').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-3-4" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức:</strong></p>
-    <ul style="padding-left:20px;">
-      <li><strong>Greedy 0/1:</strong> Sắp giảm theo đơn giá, lấy vật đầu tiên vừa W_còn.</li>
-      <li><strong>DP 0/1:</strong> <code>dp[i][w] = max(dp[i-1][w], dp[i-1][w-gᵢ] + vᵢ)</code> nếu <code>gᵢ ≤ w</code>.</li>
-    </ul>
-    <p><strong>💡 Cách áp dụng:</strong> Tính đơn giá cho Greedy. Duyệt bảng DP cho DP.</p>
-    <p><strong>🧮 Tính toán GREEDY:</strong></p>
-    <div class="code-block">Đơn giá: A=12/6=2.0, B=9/5=1.8, C=9/5=1.8.
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p><strong>Ý tưởng:</strong> Greedy — sắp đơn giá giảm, lấy vật đầu tiên vừa W_còn. DP — bảng <code>dp[i][w] = max(dp[i-1][w], dp[i-1][w-g]+v)</code>.</p>
+    <p><strong>Các bước GREEDY:</strong></p>
+    <ol style="padding-left: 20px;">
+      <li>Tính đơn giá cho mỗi vật.</li>
+      <li>Sắp giảm theo đơn giá.</li>
+      <li>Lần lượt lấy vật đầu tiên có <code>g ≤ W_còn</code>.</li>
+    </ol>
+    <p><strong>Các bước DP:</strong></p>
+    <ol style="padding-left: 20px;">
+      <li>Khởi tạo <code>dp[0][w] = 0 ∀w</code>.</li>
+      <li>Cho <code>i=1..n, w=0..W</code>: <code>dp[i][w] = max(dp[i-1][w], dp[i-1][w-g[i]] + v[i])</code> nếu <code>g[i] ≤ w</code>.</li>
+      <li><code>dp[n][W]</code> là GT tối ưu. Truy vết tìm vật đã chọn.</li>
+    </ol>
+    <p><strong>📋 Giả mã:</strong></p>
+    <pre><code>THUẬT TOÁN GREEDY_01(dsvat, W)
+  Sắp dsvat giảm theo don_gia
+  GT ← 0
+  Cho mỗi vật: NẾU g ≤ W_còn: lấy; W_còn -= g; GT += v
+
+THUẬT TOÁN DP_01(dsvat, W)
+  Khởi tạo dp[0..n][0..W] = 0
+  Cho i = 1..n, w = 0..W:
+    dp[i][w] ← dp[i-1][w]
+    NẾU g[i] ≤ w: dp[i][w] ← max(dp[i][w], dp[i-1][w-g[i]] + v[i])
+  Trả về dp[n][W]</code></pre>
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <pre><code>def greedy_01(items, W):
+    items = sorted(items, key=lambda x: x[2]/x[1], reverse=True)
+    GT = 0
+    sel = []
+    for name, g, v in items:
+        if g &lt;= W:
+            W -= g
+            GT += v
+            sel.append(name)
+    return GT, sel
+
+def dp_01(items, W):
+    n = len(items)
+    dp = [[0]*(W+1) for _ in range(n+1)]
+    for i in range(1, n+1):
+        for w in range(W+1):
+            dp[i][w] = dp[i-1][w]
+            g, v = items[i-1][1], items[i-1][2]
+            if g &lt;= w:
+                dp[i][w] = max(dp[i][w], dp[i-1][w-g] + v)
+    return dp[n][W]
+
+items = [("A",6,12),("B",5,9),("C",5,9)]
+print(greedy_01(items, 10))  # (12, ['A'])
+print(dp_01(items, 10))      # 18</code></pre>
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p><strong>Greedy:</strong> BigO = <strong>O(n log n)</strong>. Chứng minh: sắp xếp O(n log n) chiếm ưu thế, vòng for O(n) với mỗi bước O(1). Bộ nhớ O(n).</p>
+    <p><strong>DP:</strong> BigO = <strong>O(n·W)</strong>. Chứng minh: bảng dp có (n+1)×(W+1) ô, mỗi ô tính O(1). Tổng O(n·W). Pseudo-polynomial (phụ thuộc giá trị W). Bộ nhớ O(n·W).</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
+    <div class="code-block">GREEDY:
+Đơn giá: A=12/6=2.0, B=9/5=1.8, C=9/5=1.8.
 Sắp giảm: A (2.0) → B (1.8) → C (1.8).
 W=10. Lấy A (g=6 ≤ 10), còn 4, GT=12.
 Lấy B? g=5 > 4 → bỏ. Lấy C? g=5 > 4 → bỏ.
-→ Greedy: GT = 12 (chỉ A).</div>
-    <p><strong>🧮 Tính toán DP (bảng dp[i][w]):</strong></p>
-    <div class="code-block">Xét dp[3][10] (chọn từ 3 vật, sức chứa 10):
+→ Greedy: GT = 12 (chỉ A).
+
+DP (bảng dp[i][w]):
+Xét dp[3][10]:
 - Không lấy A:  dp[2][10] = ?
 - Lấy A (g=6): dp[2][4] + 12
 
@@ -943,9 +1219,9 @@ dp[3][10]:
     <ul style="padding-left:20px;">
       <li><strong>Greedy:</strong> chỉ A. GT = 12. TTL = 6 (dư 4).</li>
       <li><strong>DP:</strong> B + C. GT = 18. TTL = 10 (đầy ba lô).</li>
-      <li>→ DP <strong>tốt hơn</strong> Greedy (18 > 12). Greedy sai!</li>
+      <li>→ DP <strong>tốt hơn</strong> Greedy (18 &gt; 12). Greedy sai!</li>
     </ul>
-    <p><strong>🔍 Kiểm tra:</strong> B+C có g=10 ≤ 10, GT=18 ✓. A có GT=12 ✓. Tổ hợp A+B = g=11 > 10 (sai). A+C = g=11 > 10 (sai). A+B+C = g=16 > 10 (sai). Vậy GT tối ưu = 18 → DP đúng, Greedy sai.</p>
+    <p><strong>🔍 Kiểm tra:</strong> B+C có g=10 ≤ 10, GT=18 ✓. A có GT=12 ✓. Tổ hợp A+B = g=11 &gt; 10 (sai). A+C = g=11 &gt; 10 (sai). A+B+C = g=16 &gt; 10 (sai). Vậy GT tối ưu = 18 → DP đúng, Greedy sai.</p>
   </div>
 </div>
 

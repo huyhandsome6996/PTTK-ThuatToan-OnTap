@@ -267,13 +267,16 @@ class StepReveal {
     });
     this.container.appendChild(list);
 
+    // Use bracket notation — container.id may contain dashes (e.g. 'ex1-steps')
+    // which break `window.ex1-steps.next()` syntax.
+    const id = this.container.id;
     const ctrl = document.createElement('div');
     ctrl.className = 'visualizer-controls';
     ctrl.innerHTML = `
-      <button class="btn btn-secondary" onclick="window.${this.container.id}.prev()">← Trước</button>
-      <button class="btn btn-success" onclick="window.${this.container.id}.next()">Sau →</button>
-      <button class="btn btn-ghost" onclick="window.${this.container.id}.showAll()">Hiện tất cả</button>
-      <button class="btn btn-secondary" onclick="window.${this.container.id}.reset()">↺ Làm lại</button>
+      <button class="btn btn-secondary" onclick="window['${id}'].prev()">← Trước</button>
+      <button class="btn btn-success" onclick="window['${id}'].next()">Sau →</button>
+      <button class="btn btn-ghost" onclick="window['${id}'].showAll()">Hiện tất cả</button>
+      <button class="btn btn-secondary" onclick="window['${id}'].reset()">↺ Làm lại</button>
     `;
     this.container.appendChild(ctrl);
 

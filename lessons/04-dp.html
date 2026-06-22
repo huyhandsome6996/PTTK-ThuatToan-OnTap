@@ -455,8 +455,15 @@ window.addEventListener('DOMContentLoaded', () => {
 <h2>1️⃣ Bài toán: Tính số tổ hợp C(n, k)</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">💡 Ý tưởng</div>
-  <p>Tính $C(n, k) = \frac{n!}{k!(n-k)!}$ bằng công thức giai thừa dễ bị <strong>tràn số</strong> vì $n!$ tăng cực nhanh (vd $20! \approx 2.4 \times 10^{18}$). DP tránh được vấn đề: tính từng $C(i, j)$ nhỏ trước, dùng công thức truy hồi với <strong>phép cộng</strong> — không cần giai thừa, không tràn.</p>
+  <div class="callout-title">💡 Ý tưởng + Các bước thực hiện</div>
+  <p><strong>Ý tưởng:</strong> $C(n, k)$ có công thức truy hồi $C(n, k) = C(n-1, k-1) + C(n-1, k)$. Để tính $C(n, k)$ phải tính $C(n-1, *)$, và nhiều giá trị con bị tính lại nhiều lần (vd $C(5, 2)$ cần $C(4, 1)$ và $C(4, 2)$; cả 2 đều cần $C(3, *)$...) → dùng DP <strong>ghi nhớ</strong> vào bảng 2D. Tính bằng <strong>phép cộng</strong> (không cần giai thừa) → tránh tràn số vì $n!$ tăng cực nhanh (vd $20! \approx 2.4 \times 10^{18}$).</p>
+  <p><strong>Các bước thực hiện:</strong></p>
+  <ol style="padding-left: 20px;">
+    <li>Khởi tạo bảng $C[0..n][0..n]$ toàn 0.</li>
+    <li>Điền $C[i][0] = 1$ và $C[i][i] = 1$ với mọi $i$ (điều kiện biên).</li>
+    <li>Với $i$ từ 2 đến $n$, với $j$ từ 1 đến $i-1$: $C[i][j] = C[i-1][j-1] + C[i-1][j]$.</li>
+    <li>Trả về $C[n][k]$.</li>
+  </ol>
 </div>
 
 <div class="callout callout-life">
@@ -496,6 +503,18 @@ window.addEventListener('DOMContentLoaded', () => {
   <p>Cộng lại: $C(n, k) = C(n-1, k-1) + C(n-1, k)$. ✓ Đây chính là <strong>tam giác Pascal</strong>.</p>
 </div>
 
+<h3>📋 Giả mã</h3>
+<pre><code>THUẬT TOÁN Comb_DP(n, k)
+  VÀO: n, k (0 ≤ k ≤ n)
+  RA: C(n, k) — số tổ hợp chập k của n
+BƯỚU 1: Khởi tạo bảng C[0..n][0..n] = 0
+BƯỚU 2: Cho i chạy từ 0 đến n
+BƯỚU 3:   C[i][0] = 1; C[i][i] = 1          // gán giá trị biên
+BƯỚU 4: Cho i chạy từ 2 đến n
+BƯỚU 5:   Cho j chạy từ 1 đến i - 1
+BƯỚU 6:     C[i][j] = C[i-1][j-1] + C[i-1][j]   // công thức truy hồi
+BƯỚU 7: Trả về C[n][k]</code></pre>
+
 <h3>🐍 Mã Python</h3>
 <pre><code>def comb_dp(n, k):
     """Tính C(n, k) bằng quy hoạch động (tam giác Pascal)."""
@@ -513,6 +532,23 @@ window.addEventListener('DOMContentLoaded', () => {
 print(comb_dp(5, 2))  # 10
 print(comb_dp(6, 3))  # 20</code></pre>
 
+<div class="callout callout-theory">
+  <div class="callout-title">📊 Phân tích + Chứng minh</div>
+  <p><strong>Phân tích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Vòng ngoài $i$: chạy $n$ lần.</li>
+    <li>Vòng trong $j$: chạy $i-1$ lần cho mỗi $i$.</li>
+    <li>Tổng phép toán: $\sum_{i=2}^{n}(i-1) = 1 + 2 + ... + (n-1) = \frac{n(n-1)}{2}$.</li>
+  </ul>
+  <p><strong>CHỨNG MINH:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Mỗi ô $(i, j)$ chỉ được tính <strong>1 lần</strong> (do DP ghi nhớ vào bảng), mỗi lần tốn $O(1)$ (1 phép cộng).</li>
+    <li>Số ô cần tính = phần tam giác dưới đường chéo = $\frac{n(n-1)}{2}$.</li>
+    <li>Vậy $T(n) = \frac{n(n-1)}{2} = O(n^2)$. ∎</li>
+  </ul>
+  <p><strong>Độ phức tạp thời gian:</strong> $T(n) = O(n^2)$. <strong>Bộ nhớ:</strong> $O(n^2)$ cho bảng 2D. <strong>Cải tiến:</strong> chỉ cần lưu dòng trước đó → bảng 1D $O(n)$ (cập nhật từ phải qua trái để không ghi đè giá trị cũ).</p>
+</div>
+
 <h3>🎯 Ví dụ chạy tay</h3>
 <div class="callout callout-example">
   <div class="callout-title">📝 Chạy tay C(5, 2) — tam giác Pascal đến dòng 5</div>
@@ -525,19 +561,19 @@ print(comb_dp(6, 3))  # 20</code></pre>
   <p><strong>✓ Kết quả:</strong> $C(5, 2) = 10$. ✓ Tổng cộng $\frac{5 \cdot 4}{2} = 10$ phép cộng.</p>
 </div>
 
-<h3>📊 Phân tích độ phức tạp</h3>
-<div class="callout callout-theory">
-  <p><strong>Số phép tính:</strong> $\sum_{i=1}^{n}(i-1) = 0+1+2+...+(n-1) = \frac{n(n-1)}{2}$.</p>
-  <p><strong>Độ phức tạp thời gian:</strong> $T(n) = \frac{n(n-1)}{2}$ = <strong>O(n²)</strong>.</p>
-  <p><strong>Độ phức tạp bộ nhớ:</strong> O(n²) cho bảng 2D. <strong>Cải tiến:</strong> chỉ cần lưu dòng trước đó → bảng 1D O(n) (cập nhật từ phải qua trái để không ghi đè giá trị cũ).</p>
-</div>
-
 <!-- ============================== BÀI TOÁN 2: LIS ============================== -->
 <h2>2️⃣ Bài toán: Dãy con tăng dài nhất (LIS)</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">💡 Ý tưởng</div>
-  <p>LIS có <strong>cấu trúc con tối ưu</strong>: LIS của cả dãy chứa LIS của tiền tố. Tại vị trí $i$, ta cần biết LIS dài nhất kết thúc tại các vị trí $j < i$ (với $a[j] < a[i]$) → đây là <strong>bài toán con đã giải</strong>. DP lưu $F[i]$ = độ dài LIS kết thúc tại $a[i]$, tính từ $i=0$ đến $i=n-1$.</p>
+  <div class="callout-title">💡 Ý tưởng + Các bước thực hiện</div>
+  <p><strong>Ý tưởng:</strong> LIS có <strong>cấu trúc con tối ưu</strong>: LIS của cả dãy chứa LIS của tiền tố. Tại vị trí $i$, ta cần biết LIS dài nhất kết thúc tại các vị trí $j < i$ (với $a[j] < a[i]$) → đây là <strong>bài toán con đã giải</strong>. Nhiều $i$ cùng dùng lại $F[j]$ của các $j$ cũ → có sự lặp lại → DP lưu $F[i]$ = độ dài LIS kết thúc tại $a[i]$, tính từ $i=0$ đến $i=n-1$.</p>
+  <p><strong>Các bước thực hiện:</strong></p>
+  <ol style="padding-left: 20px;">
+    <li>Khởi tạo $F[i] = 1$ với mọi $i$ (mỗi phần tử là LIS độ dài 1 của chính nó), $prev[i] = -1$.</li>
+    <li>Với $i$ từ 1 đến $n-1$, với $j$ từ 0 đến $i-1$: nếu $a[j] < a[i]$ và $F[j] + 1 > F[i]$ → cập nhật $F[i] = F[j] + 1$, $prev[i] = j$.</li>
+    <li>Tìm $maxIdx$ = vị trí có $F$ lớn nhất. Đáp số = $F[maxIdx]$.</li>
+    <li>Truy vết ngược từ $maxIdx$ qua mảng $prev$ để ra dãy LIS.</li>
+  </ol>
 </div>
 
 <div class="callout callout-life">
@@ -564,6 +600,19 @@ print(comb_dp(6, 3))  # 20</code></pre>
   <p><strong>Giải thích:</strong> Tại $a[i]$, ta nối $a[i]$ vào sau LIS dài nhất kết thúc tại $a[j]$ nào đó (với $a[j] < a[i]$). Lấy $F[j]$ lớn nhất rồi cộng 1.</p>
 </div>
 
+<h3>📋 Giả mã</h3>
+<pre><code>THUẬT TOÁN LIS(a, n)
+  VÀO: dãy a[0..n-1]
+  RA: độ dài LIS của a (và dãy LIS nếu cần truy vết)
+BƯỚU 1: Khởi tạo F[i] = 1, prev[i] = -1 cho mọi i = 0..n-1
+BƯỚU 2: Cho i chạy từ 1 đến n - 1
+BƯỚU 3:   Cho j chạy từ 0 đến i - 1
+BƯỚU 4:     Nếu a[j] &lt; a[i] và F[j] + 1 &gt; F[i] thì:
+BƯỚU 5:       F[i] = F[j] + 1
+BƯỚU 6:       prev[i] = j              // ghi nhận để truy vết
+BƯỚU 7: maxIdx = vị trí có F lớn nhất
+BƯỚU 8: Trả về F[maxIdx] (truy vết qua prev nếu cần dãy LIS)</code></pre>
+
 <h3>🐍 Mã Python</h3>
 <pre><code>def lis(a):
     """Tìm độ dài dãy con tăng dài nhất."""
@@ -579,6 +628,23 @@ print(comb_dp(6, 3))  # 20</code></pre>
 # Test
 a = [1, 2, 3, 4, 9, 10, 5, 6, 7, 8]
 print(lis(a))  # 8 (dãy 1,2,3,4,5,6,7,8)</code></pre>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📊 Phân tích + Chứng minh</div>
+  <p><strong>Phân tích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Vòng ngoài $i$: chạy $n-1$ lần (từ 1 đến $n-1$).</li>
+    <li>Vòng trong $j$: chạy $i$ lần cho mỗi $i$.</li>
+    <li>Tổng phép so sánh: $\sum_{i=1}^{n-1} i = 1 + 2 + ... + (n-1) = \frac{n(n-1)}{2}$.</li>
+  </ul>
+  <p><strong>CHỨNG MINH:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Mỗi cặp $(i, j)$ với $j &lt; i$ chỉ được xét <strong>1 lần</strong>, mỗi lần tốn $O(1)$ (1 phép so sánh + 1 phép gán nếu cần).</li>
+    <li>Số cặp $(i, j)$ với $j &lt; i$ = $\frac{n(n-1)}{2}$ (tổ hợp chập 2 của $n$).</li>
+    <li>Vậy $T(n) = \frac{n(n-1)}{2} = O(n^2)$. ∎</li>
+  </ul>
+  <p><strong>Độ phức tạp thời gian:</strong> $T(n) = O(n^2)$. <strong>Bộ nhớ:</strong> $O(n)$ cho mảng $F$ (cộng thêm $O(n)$ cho mảng $prev$ nếu cần truy vết). <strong>Cải tiến:</strong> dùng Binary Search tìm $j$ nhanh → $O(n \log n)$ (nâng cao).</p>
+</div>
 
 <h3>🎯 Ví dụ chạy tay</h3>
 <div class="callout callout-example">
@@ -597,19 +663,24 @@ print(lis(a))  # 8 (dãy 1,2,3,4,5,6,7,8)</code></pre>
   <p><strong>✓ Kết quả:</strong> $\max(F) = F[9] = 8$. LIS = $\{1, 2, 3, 4, 5, 6, 7, 8\}$. ✓</p>
 </div>
 
-<h3>📊 Phân tích độ phức tạp</h3>
-<div class="callout callout-theory">
-  <p><strong>Thời gian:</strong> 2 vòng lặp for lồng nhau kích thước $n$ → <strong>O(n²)</strong>.</p>
-  <p><strong>Bộ nhớ:</strong> O(n) cho mảng $F$ (cộng thêm O(n) cho mảng $prev$ nếu cần truy vết dãy LIS).</p>
-  <p><strong>Cải tiến:</strong> Dùng Binary Search tìm $j$ nhanh → <strong>O(n log n)</strong> (nâng cao, ít gặp trong đề thi cơ bản).</p>
-</div>
-
 <!-- ============================== BÀI TOÁN 3: LCS ============================== -->
 <h2>3️⃣ Bài toán: Dãy con chung dài nhất (LCS)</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">💡 Ý tưởng</div>
-  <p>LCS có <strong>cấu trúc con tối ưu</strong>: LCS của $A[1..i], B[1..j]$ được tính từ LCS của các tiền tố nhỏ hơn $A[1..i-1], B[1..j-1]$. Có <strong>bài toán con chồng lặp</strong>: nhiều ô trong bảng cần cùng 1 ô con. DP lập bảng 2D $F[i, j]$ = độ dài LCS của $A[1..i]$ và $B[1..j]$.</p>
+  <div class="callout-title">💡 Ý tưởng + Các bước thực hiện</div>
+  <p><strong>Ý tưởng:</strong> LCS có <strong>cấu trúc con tối ưu</strong>: LCS của $A[1..i], B[1..j]$ được tính từ LCS của các tiền tố nhỏ hơn $A[1..i-1], B[1..j-1]$. Có <strong>bài toán con chồng lặp</strong>: nhiều ô trong bảng cùng dùng chung 1 ô con → nếu dùng đệ quy sẽ tính lặp. DP lập bảng 2D $F[i, j]$ = độ dài LCS của $A[1..i]$ và $B[1..j]$.</p>
+  <p><strong>Các bước thực hiện:</strong></p>
+  <ol style="padding-left: 20px;">
+    <li>Khởi tạo bảng $F[0..n][0..m] = 0$ (biên: 1 dãy rỗng → LCS = 0).</li>
+    <li>Với $i$ từ 1 đến $n$, với $j$ từ 1 đến $m$:
+      <ul style="padding-left: 20px; margin-top: 4px;">
+        <li>Nếu $A[i] = B[j]$: $F[i][j] = F[i-1][j-1] + 1$ (khớp → đi chéo).</li>
+        <li>Ngược lại: $F[i][j] = \max(F[i-1][j], F[i][j-1])$ (bỏ 1 trong 2).</li>
+      </ul>
+    </li>
+    <li>Trả về $F[n][m]$.</li>
+    <li>Truy vết: từ $F[n][m]$ ngược về $F[0][0]$, đi chéo khi $A[i] = B[j]$ để ra dãy LCS.</li>
+  </ol>
 </div>
 
 <div class="callout callout-life">
@@ -644,6 +715,19 @@ print(lis(a))  # 8 (dãy 1,2,3,4,5,6,7,8)</code></pre>
   </ul>
 </div>
 
+<h3>📋 Giả mã</h3>
+<pre><code>THUẬT TOÁN LCS(A[1..n], B[1..m])
+  VÀO: hai dãy A (kích thước n) và B (kích thước m)
+  RA: độ dài LCS của A và B (và dãy LCS nếu cần truy vết)
+BƯỚU 1: Khởi tạo F[0..n][0..m] = 0   // F[i, 0] = F[0, j] = 0 (biên)
+BƯỚU 2: Cho i chạy từ 1 đến n
+BƯỚU 3:   Cho j chạy từ 1 đến m
+BƯỚU 4:     Nếu A[i] = B[j] thì:
+BƯỚU 5:       F[i][j] = F[i-1][j-1] + 1          // đi chéo
+BƯỚU 6:     Ngược lại:
+BƯỚU 7:       F[i][j] = max(F[i-1][j], F[i][j-1]) // bỏ A[i] hoặc B[j]
+BƯỚU 8: Trả về F[n][m] (truy vết đi chéo khi khớp)</code></pre>
+
 <h3>🐍 Mã Python</h3>
 <pre><code>def lcs(a, b):
     """Tìm độ dài dãy con chung dài nhất của a và b."""
@@ -665,6 +749,23 @@ a = [1, 2, 3, 4, 5, 6, 7]
 b = [2, 4, 3, 5, 6, 8, 7, 1, 10]
 print(lcs(a, b))  # 5 (dãy 2, 4, 5, 6, 7)</code></pre>
 
+<div class="callout callout-theory">
+  <div class="callout-title">📊 Phân tích + Chứng minh</div>
+  <p><strong>Phân tích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Vòng ngoài $i$: chạy $n$ lần.</li>
+    <li>Vòng trong $j$: chạy $m$ lần cho mỗi $i$.</li>
+    <li>Tổng phép toán: $n \cdot m$ ô, mỗi ô $O(1)$.</li>
+  </ul>
+  <p><strong>CHỨNG MINH:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Mỗi ô $(i, j)$ trong bảng $(n+1) \times (m+1)$ chỉ được tính <strong>1 lần</strong>, mỗi lần tốn $O(1)$ (1 phép so sánh + 1 phép max/cộng).</li>
+    <li>Số ô cần tính = $(n+1)(m+1) \approx n \cdot m$.</li>
+    <li>Vậy $T(n, m) = n \cdot m = O(n \cdot m)$. ∎</li>
+  </ul>
+  <p><strong>Độ phức tạp thời gian:</strong> $T(n, m) = O(n \cdot m)$. <strong>Bộ nhớ:</strong> $O(n \cdot m)$ cho bảng 2D. <strong>Cải tiến:</strong> 2 dòng ($O(\min(n, m))$) — cập nhật từ phải qua trái. <strong>Truy vết:</strong> đi từ $F[n][m]$ ngược về $F[0][0]$, mất $O(n+m)$ bước.</p>
+</div>
+
 <h3>🎯 Ví dụ chạy tay</h3>
 <div class="callout callout-example">
   <div class="callout-title">📝 Chạy tay LCS của A={1,2,3,4,5,6,7}, B={2,4,3,5,6,8,7,1,10}</div>
@@ -679,19 +780,24 @@ print(lcs(a, b))  # 5 (dãy 2, 4, 5, 6, 7)</code></pre>
   <p><strong>✓ Kết quả + Truy vết:</strong> Độ dài LCS = <strong>5</strong>. Truy vết đi chéo: $7 \to 6 \to 5 \to 4 \to 2$. LCS = $\{2, 4, 5, 6, 7\}$. ✓</p>
 </div>
 
-<h3>📊 Phân tích độ phức tạp</h3>
-<div class="callout callout-theory">
-  <p><strong>Thời gian:</strong> 2 vòng lặp lồng nhau kích thước $n$ và $m$ → <strong>O(n·m)</strong>.</p>
-  <p><strong>Bộ nhớ:</strong> O(n·m) cho bảng $F$ 2D. Có thể tối ưu về O(min(n,m)) bằng 2 dòng (cập nhật từ phải qua trái).</p>
-  <p><strong>Truy vết:</strong> đi từ $F[n][m]$ ngược về $F[0][0]$, mất O(n+m) bước.</p>
-</div>
-
 <!-- ============================== BÀI TOÁN 4: 0/1 KNAPSACK ============================== -->
 <h2>4️⃣ Bài toán: Cái ba lô 0/1 (0/1 Knapsack)</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">💡 Ý tưởng</div>
-  <p>0/1 Knapsack có <strong>cấu trúc con tối ưu</strong>: tại vật $k$, quyết định chọn/không chọn dựa trên lời giải tối ưu của $k-1$ vật đầu. <strong>Greedy không tối ưu</strong> (vì mỗi vật chỉ 1 cái, không thể bù bằng tỉ lệ $v/g$). Phải dùng DP: lập bảng $F[k, V]$ = GT lớn nhất khi xét $k$ vật đầu, TTL còn $V$.</p>
+  <div class="callout-title">💡 Ý tưởng + Các bước thực hiện</div>
+  <p><strong>Ý tưởng:</strong> 0/1 Knapsack có <strong>cấu trúc con tối ưu</strong>: tại vật $k$, quyết định chọn/không chọn dựa trên lời giải tối ưu của $k-1$ vật đầu. <strong>Greedy không tối ưu</strong> (vì mỗi vật chỉ 1 cái, không thể bù bằng tỉ lệ $v/g$). Phải dùng DP: lập bảng $F[k, V]$ = GT lớn nhất khi xét $k$ vật đầu, TTL còn $V$.</p>
+  <p><strong>Các bước thực hiện:</strong></p>
+  <ol style="padding-left: 20px;">
+    <li>Khởi tạo bảng $F[0..n][0..W] = 0$ (biên: $F[0][V] = 0$ — không có vật nào).</li>
+    <li>Với $k$ từ 1 đến $n$, với $V$ từ 0 đến $W$:
+      <ul style="padding-left: 20px; margin-top: 4px;">
+        <li>Mặc định: $F[k][V] = F[k-1][V]$ (không chọn vật $k$).</li>
+        <li>Nếu $g_k \le V$: xét $chon = F[k-1][V-g_k] + v_k$. Nếu $chon > F[k][V]$ → cập nhật.</li>
+      </ul>
+    </li>
+    <li>Trả về $F[n][W]$.</li>
+    <li>Truy vết: từ $F[n][W]$ ngược về $F[0][0]$, nếu $F[k][V] \ne F[k-1][V]$ → vật $k$ được chọn, giảm $V$ đi $g_k$.</li>
+  </ol>
 </div>
 
 <div class="callout callout-life">
@@ -741,6 +847,19 @@ print(lcs(a, b))  # 5 (dãy 2, 4, 5, 6, 7)</code></pre>
   <p>Lấy max của 2 lựa chọn.</p>
 </div>
 
+<h3>📋 Giả mã</h3>
+<pre><code>THUẬT TOÁN Knapsack_01(g[1..n], v[1..n], W)
+  VÀO: trọng lượng g, giá trị v của n vật; sức chứa W
+  RA: tổng giá trị lớn nhất đạt được
+BƯỚU 1: Khởi tạo F[0..n][0..W] = 0   // F[0, V] = 0 (không có vật)
+BƯỚU 2: Cho k chạy từ 1 đến n
+BƯỚU 3:   Cho V chạy từ 0 đến W
+BƯỚU 4:     F[k][V] = F[k-1][V]                  // mặc định: không chọn vật k
+BƯỚU 5:     Nếu g[k] ≤ V thì:
+BƯỚU 6:       chon = F[k-1][V - g[k]] + v[k]      // thử chọn vật k
+BƯỚU 7:       Nếu chon &gt; F[k][V] thì F[k][V] = chon
+BƯỚU 8: Trả về F[n][W] (truy vết từ F[n][W] ngược lên nếu cần)</code></pre>
+
 <h3>🐍 Mã Python</h3>
 <pre><code>def knapsack_01(weights, values, W):
     """Cái ba lô 0/1: mỗi vật chỉ có 1 cái."""
@@ -763,6 +882,23 @@ values = [4, 5, 6, 3, 1]
 W = 10
 print(knapsack_01(weights, values, W))  # 13</code></pre>
 
+<div class="callout callout-theory">
+  <div class="callout-title">📊 Phân tích + Chứng minh</div>
+  <p><strong>Phân tích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Vòng ngoài $k$: chạy $n$ lần.</li>
+    <li>Vòng trong $V$: chạy $W+1$ lần cho mỗi $k$.</li>
+    <li>Tổng phép toán: $n \cdot (W+1)$ ô, mỗi ô $O(1)$.</li>
+  </ul>
+  <p><strong>CHỨNG MINH:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Mỗi ô $(k, V)$ trong bảng $(n+1) \times (W+1)$ chỉ được tính <strong>1 lần</strong>, mỗi lần tốn $O(1)$ (1 phép so sánh + 1 phép max/cộng).</li>
+    <li>Số ô cần tính = $(n+1)(W+1) \approx n \cdot W$.</li>
+    <li>Vậy $T(n, W) = n \cdot W = O(n \cdot W)$. ∎</li>
+  </ul>
+  <p><strong>Độ phức tạp thời gian:</strong> $T(n, W) = O(n \cdot W)$. <strong>Bộ nhớ:</strong> $O(n \cdot W)$ cho bảng 2D (cải tiến 1 dòng: $O(W)$ — cập nhật từ phải qua trái). <strong>Lưu ý:</strong> Đây là độ phức tạp <em>giả đa thức</em> (pseudo-polynomial) — phụ thuộc vào $W$ (số nguyên). Nếu $W$ rất lớn thì không khả thi.</p>
+</div>
+
 <h3>🎯 Ví dụ chạy tay</h3>
 <div class="callout callout-example">
   <div class="callout-title">📝 Chạy tay 0/1 Knapsack W=10, 5 vật (g,v)=(3,4),(4,5),(5,6),(2,3),(1,1)</div>
@@ -773,13 +909,6 @@ print(knapsack_01(weights, values, W))  # 13</code></pre>
   <p><strong>k=4 (vật 4, g=2, v=3):</strong> <strong style="color: var(--success);">$F[4][10] = \max(F[3][10]=11, F[3][8]+3=10+3) = 13$</strong> (chọn 1+3+4: TTL=10, GT=13).</p>
   <p><strong>k=5 (vật 5, g=1, v=1):</strong> $F[5][10] = \max(F[4][10]=13, F[4][9]+1=12+1) = 13$ (tie — có thể chọn hoặc không chọn vật 5).</p>
   <p><strong>✓ Kết quả + Truy vết:</strong> GT max = <strong>13</strong> tại $F[5][10]$. Truy vết: $F[5][10]=F[4][10]=13$ → không chọn vật 5; $F[4][10] \ne F[3][10]=11$ → chọn vật 4, $V=8$; $F[3][8] \ne F[2][8]=9$ → chọn vật 3, $V=3$; $F[2][3]=F[1][3]$ → không chọn vật 2; $F[1][3] \ne F[0][3]$ → chọn vật 1, $V=0$. → <strong>Chọn vật 1, 3, 4</strong>: GT = 4+6+3 = 13, TTL = 3+5+2 = 10 = $W$. ✓</p>
-</div>
-
-<h3>📊 Phân tích độ phức tạp</h3>
-<div class="callout callout-theory">
-  <p><strong>Thời gian:</strong> 2 vòng lặp lồng nhau $n$ và $W$ → <strong>O(n·W)</strong>.</p>
-  <p><strong>Bộ nhớ:</strong> O(n·W) cho bảng 2D. Có thể tối ưu về O(W) bằng 1 dòng (cập nhật từ phải qua trái).</p>
-  <p><strong>Lưu ý:</strong> Đây là độ phức tạp <em>giả đa thức</em> (pseudo-polynomial) — phụ thuộc vào $W$ (số nguyên). Nếu $W$ rất lớn thì không khả thi.</p>
 </div>
 
 <div class="callout callout-tip">
@@ -795,8 +924,20 @@ print(knapsack_01(weights, values, W))  # 13</code></pre>
 <h2>5️⃣ Bài toán: Phân tích số</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">💡 Ý tưởng</div>
-  <p>"Đếm số cách phân tích $n$" là bài toán <strong>đếm</strong> điển hình → dấu hiệu nhận biết DP. Có <strong>bài toán con chồng lặp</strong>: phân tích $v$ thành tổng các số $\le m$ phụ thuộc vào phân tích $v$ thành tổng $\le m-1$ và $\le m$ (với $v-m$). DP lập bảng $F[m, v]$.</p>
+  <div class="callout-title">💡 Ý tưởng + Các bước thực hiện</div>
+  <p><strong>Ý tưởng:</strong> "Đếm số cách phân tích $n$" là bài toán <strong>đếm</strong> điển hình → dấu hiệu nhận biết DP. Có <strong>bài toán con chồng lặp</strong>: phân tích $v$ thành tổng các số $\le m$ phụ thuộc vào phân tích $v$ thành tổng $\le m-1$ và $\le m$ (với $v-m$) — nếu dùng đệ quy sẽ tính lặp. DP lập bảng $F[m, v]$ = số cách phân tích $v$ thành tổng các số nguyên dương $\le m$.</p>
+  <p><strong>Các bước thực hiện:</strong></p>
+  <ol style="padding-left: 20px;">
+    <li>Khởi tạo bảng $F[0..n][0..n] = 0$.</li>
+    <li>Gán biên: $F[m][0] = 1$ với mọi $m$ (1 cách: không dùng số nào).</li>
+    <li>Với $m$ từ 1 đến $n$, với $v$ từ 1 đến $n$:
+      <ul style="padding-left: 20px; margin-top: 4px;">
+        <li>$F[m][v] = F[m-1][v]$ (không dùng số $m$).</li>
+        <li>Nếu $m \le v$: $F[m][v] += F[m][v-m]$ (dùng thêm 1 lần số $m$).</li>
+      </ul>
+    </li>
+    <li>Trả về $F[n][n]$.</li>
+  </ol>
 </div>
 
 <div class="callout callout-life">
@@ -838,6 +979,19 @@ print(knapsack_01(weights, values, W))  # 13</code></pre>
   <p><strong>Biên:</strong> $F[m, 0] = 1$ với mọi $m$ (1 cách: không dùng số nào). $F[1, v] = 1$ với mọi $v$ (chỉ 1 cách: toàn số 1).</p>
 </div>
 
+<h3>📋 Giả mã</h3>
+<pre><code>THUẬT TOÁN PhanTichSo(n)
+  VÀO: số nguyên dương n
+  RA: số cách phân tích n thành tổng các số nguyên dương (thứ tự không quan trọng)
+BƯỚU 1: Khởi tạo F[0..n][0..n] = 0
+BƯỚU 2: Cho m chạy từ 0 đến n: F[m][0] = 1   // 1 cách: không dùng số nào
+BƯỚU 3: Cho m chạy từ 1 đến n
+BƯỚU 4:   Cho v chạy từ 1 đến n
+BƯỚU 5:     F[m][v] = F[m-1][v]                // không dùng m
+BƯỚU 6:     Nếu m ≤ v thì:
+BƯỚU 7:       F[m][v] = F[m][v] + F[m][v-m]    // dùng thêm 1 lần m
+BƯỚU 8: Trả về F[n][n]</code></pre>
+
 <h3>🐍 Mã Python</h3>
 <pre><code>def phan_tich_so(n):
     """Đếm số cách phân tích n thành tổng các số nguyên dương."""
@@ -855,6 +1009,23 @@ print(knapsack_01(weights, values, W))  # 13</code></pre>
 # Test
 print(phan_tich_so(5))  # 7</code></pre>
 
+<div class="callout callout-theory">
+  <div class="callout-title">📊 Phân tích + Chứng minh</div>
+  <p><strong>Phân tích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Vòng ngoài $m$: chạy $n$ lần.</li>
+    <li>Vòng trong $v$: chạy $n$ lần cho mỗi $m$.</li>
+    <li>Tổng phép toán: $n \cdot n = n^2$ ô, mỗi ô $O(1)$.</li>
+  </ul>
+  <p><strong>CHỨNG MINH:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Mỗi ô $(m, v)$ trong bảng $(n+1) \times (n+1)$ chỉ được tính <strong>1 lần</strong>, mỗi lần tốn $O(1)$ (1 phép gán + 1 phép cộng nếu $m \le v$).</li>
+    <li>Số ô cần tính = $(n+1)^2 \approx n^2$.</li>
+    <li>Vậy $T(n) = n^2 = O(n^2)$. ∎</li>
+  </ul>
+  <p><strong>Độ phức tạp thời gian:</strong> $T(n) = O(n^2)$. <strong>Bộ nhớ:</strong> $O(n^2)$ cho bảng 2D. <strong>Cải tiến:</strong> $O(n)$ bằng 1 dòng (cập nhật từ trái qua phải, vì $F[m][v]$ dùng $F[m][v-m]$ cùng dòng).</p>
+</div>
+
 <h3>🎯 Ví dụ chạy tay</h3>
 <div class="callout callout-example">
   <div class="callout-title">📝 Chạy tay phân tích số n=5</div>
@@ -864,12 +1035,6 @@ print(phan_tich_so(5))  # 7</code></pre>
   <p><strong>Bước 3 — m=4:</strong> $F[4][v] = F[3][v] + F[4][v-4]$ nếu $v \ge 4$.<br>$F[4][4] = 4+1 = 5$. $F[4][5] = 5+1 = 6$.</p>
   <p><strong>Bước 4 — m=5:</strong> $F[5][5] = F[4][5] + F[5][0] = 6 + 1 = 7$.</p>
   <p><strong>✓ Kết quả:</strong> <strong>Số cách phân tích 5 = 7</strong>. Đúng với 7 cách đã liệt kê ở trên. ✓</p>
-</div>
-
-<h3>📊 Phân tích độ phức tạp</h3>
-<div class="callout callout-theory">
-  <p><strong>Thời gian:</strong> 2 vòng lặp kích thước $n$ → <strong>O(n²)</strong>.</p>
-  <p><strong>Bộ nhớ:</strong> O(n²) cho bảng 2D. Có thể tối ưu về O(n) bằng 1 dòng (cập nhật từ trái qua phải, vì $F[m][v]$ dùng $F[m][v-m]$ cùng dòng).</p>
 </div>
 
 <!-- ============================== 5 VÍ DỤ MẪU STEP REVEAL ============================== -->
@@ -958,9 +1123,40 @@ new StepReveal('ex5', [
   <p>Tính $C(6, 3)$ bằng DP. Vẽ tam giác Pascal đến dòng 6.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-4-1').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-4-1" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức:</strong> $C(n, k) = C(n-1, k-1) + C(n-1, k)$, với $C(n, 0) = C(n, n) = 1$.</p>
-    <p><strong>💡 Cách áp dụng:</strong> Lập bảng $C[7][7]$, điền từ dòng 0 đến dòng 6. Mỗi ô tính bằng tổng 2 ô trên (trái-trái và trái).</p>
-    <p><strong>🧮 Tính toán:</strong></p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p>$C(6, 3)$ tuân theo công thức truy hồi $C(n, k) = C(n-1, k-1) + C(n-1, k)$. Để tính $C(6, 3)$ cần tính $C(5, 2)$ và $C(5, 3)$, mỗi cái lại cần $C(4, *)$ → có sự lặp lại → dùng DP ghi nhớ vào bảng 2D. Tính bằng <strong>phép cộng</strong> (không cần giai thừa) → tránh tràn số.</p>
+    <ol style="padding-left: 20px;">
+      <li>Khởi tạo bảng $C[0..6][0..6] = 0$.</li>
+      <li>Gán biên: $C[i][0] = 1$, $C[i][i] = 1$ với mọi $i$.</li>
+      <li>Điền bảng theo dòng từ trên xuống, mỗi ô = tổng 2 ô trên (trái-trái và trái).</li>
+      <li>Trả về $C[6][3]$.</li>
+    </ol>
+
+    <p><strong>📋 Giả mã:</strong></p>
+    <div class="code-block">THUẬT TOÁN Comb_DP(6, 3)
+BƯỚU 1: C[0..6][0..6] = 0
+BƯỚU 2: Cho i = 0..6: C[i][0] = 1; C[i][i] = 1
+BƯỚU 3: Cho i = 2..6, j = 1..i-1:
+BƯỚU 4:   C[i][j] = C[i-1][j-1] + C[i-1][j]
+BƯỚU 5: Trả về C[6][3]</div>
+
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <div class="code-block">def comb_dp(n, k):
+    C = [[0] * (n + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        C[i][0] = C[i][i] = 1
+        for j in range(1, i):
+            C[i][j] = C[i - 1][j - 1] + C[i - 1][j]
+    return C[n][k]
+
+print(comb_dp(6, 3))  # 20</div>
+
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>Thời gian: $\sum_{i=2}^{6}(i-1) = 1+2+3+4+5 = 15$ phép cộng = $O(n^2)$.<br>
+    <strong>Chứng minh:</strong> Mỗi ô $(i, j)$ tính <strong>1 lần</strong> với $O(1)$ (1 phép cộng); số ô = $\frac{6 \cdot 5}{2} = 15$. Vậy $T(6) = 15 = O(n^2)$.<br>
+    Bộ nhớ: $O(n^2)$ cho bảng 2D (cải tiến 1D: $O(n)$).</p>
+
+    <p><strong>🧮 Tính toán từng bước (tam giác Pascal đến dòng 6):</strong></p>
     <div class="code-block">Dòng 0: 1
 Dòng 1: 1  1
 Dòng 2: 1  2  1
@@ -978,9 +1174,50 @@ Dòng 6: 1  6 15 20 15  6  1   ← C(6,3) = 20</div>
   <p>Tìm LIS của dãy $a = \{3, 1, 4, 1, 5, 9, 2, 6, 5\}$. Truy vết dãy LIS.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-4-2').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-4-2" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức:</strong> $F[i] = \\max(F[j]) + 1$ với $j < i$ và $a[j] < a[i]$. $F[0] = 1$.</p>
-    <p><strong>💡 Cách áp dụng:</strong> Với mỗi $i$, quét tất cả $j < i$ thỏa $a[j] < a[i]$, lấy $F[j]$ lớn nhất + 1.</p>
-    <p><strong>🧮 Tính toán F[i]:</strong></p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p>LIS có <strong>cấu trúc con tối ưu</strong>: LIS kết thúc tại $a[i]$ chứa LIS kết thúc tại $a[j]$ nào đó ($j &lt; i$, $a[j] &lt; a[i]$). Có bài toán con lặp lại (nhiều $i$ cùng xét lại các $j$ cũ) → dùng DP. Với mỗi $i$, quét tất cả $j &lt; i$ thỏa $a[j] &lt; a[i]$, lấy $F[j]$ lớn nhất + 1.</p>
+    <ol style="padding-left: 20px;">
+      <li>Khởi tạo $F[i] = 1$ (mỗi phần tử là LIS độ dài 1 của chính nó), $prev[i] = -1$.</li>
+      <li>Với $i$ từ 1 đến $n-1$, với $j$ từ 0 đến $i-1$: nếu $a[j] &lt; a[i]$ và $F[j] + 1 &gt; F[i]$ → cập nhật $F[i] = F[j] + 1$, $prev[i] = j$.</li>
+      <li>Tìm $maxIdx$ = vị trí có $F$ max. Đáp số = $F[maxIdx]$.</li>
+      <li>Truy vết ngược từ $maxIdx$ qua mảng $prev$ để ra dãy LIS.</li>
+    </ol>
+
+    <p><strong>📋 Giả mã:</strong></p>
+    <div class="code-block">THUẬT TOÁN LIS(a, n)
+BƯỚU 1: F[i] = 1, prev[i] = -1 cho mọi i
+BƯỚU 2: Cho i = 1..n-1, j = 0..i-1:
+BƯỚU 3:   Nếu a[j] &lt; a[i] và F[j]+1 &gt; F[i]:
+BƯỚU 4:     F[i] = F[j] + 1; prev[i] = j
+BƯỚU 5: maxIdx = vị trí F max
+BƯỚU 6: Trả về F[maxIdx]; truy vết qua prev</div>
+
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <div class="code-block">def lis(a):
+    n = len(a)
+    F = [1] * n
+    prev = [-1] * n
+    for i in range(n):
+        for j in range(i):
+            if a[j] &lt; a[i] and F[j] + 1 &gt; F[i]:
+                F[i] = F[j] + 1
+                prev[i] = j
+    maxIdx = F.index(max(F))
+    seq, cur = [], maxIdx
+    while cur != -1:
+        seq.append(a[cur]); cur = prev[cur]
+    seq.reverse()
+    return max(F), seq
+
+print(lis([3, 1, 4, 1, 5, 9, 2, 6, 5]))
+# (4, [1, 4, 5, 9]) hoặc (4, [1, 4, 5, 6])</div>
+
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>Thời gian: $\sum_{i=1}^{n-1} i = \frac{n(n-1)}{2}$ phép so sánh = $O(n^2)$.<br>
+    <strong>Chứng minh:</strong> Mỗi cặp $(i, j)$ với $j &lt; i$ được xét <strong>1 lần</strong> với $O(1)$ (1 so sánh + 1 gán nếu cần); số cặp = $\frac{n(n-1)}{2}$. Vậy $T(n) = O(n^2)$.<br>
+    Bộ nhớ: $O(n)$ cho $F$ và $prev$. Cải tiến Binary Search: $O(n \log n)$.</p>
+
+    <p><strong>🧮 Tính toán từng bước (bảng F[i]):</strong></p>
     <div class="code-block">i=0, a=3: F[0] = 1
 i=1, a=1: không có j (a[j]<1) → F[1] = 1
 i=2, a=4: j=0 (3<4) F=1, j=1 (1<4) F=1 → max=1 → F[2] = 2
@@ -1003,9 +1240,51 @@ max F = 4 tại i=5 hoặc i=7</div>
   <p>Tìm LCS của $A = \{1, 3, 5, 7, 9\}$ và $B = \{3, 4, 5, 6, 7, 8\}$. Truy vết LCS.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-4-3').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-4-3" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức:</strong> $F[i,j] = F[i-1,j-1]+1$ nếu $A[i]=B[j]$; ngược lại $F[i,j] = \\max(F[i-1,j], F[i,j-1])$.</p>
-    <p><strong>💡 Cách áp dụng:</strong> Lập bảng $F[6][7]$. Điền từng ô từ trái qua phải, trên xuống dưới.</p>
-    <p><strong>🧮 Tính toán các ô quan trọng:</strong></p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p>LCS có <strong>cấu trúc con tối ưu</strong>: LCS của $A[1..i], B[1..j]$ được tính từ LCS của các tiền tố nhỏ hơn. Có <strong>bài toán con lặp</strong> (nhiều ô cùng dùng 1 ô con) → dùng DP bảng 2D. Điền từng ô từ trái qua phải, trên xuống dưới.</p>
+    <ol style="padding-left: 20px;">
+      <li>Khởi tạo bảng $F[0..5][0..6] = 0$ (biên: 1 dãy rỗng → LCS = 0).</li>
+      <li>Với $i$ từ 1 đến 5, $j$ từ 1 đến 6: nếu $A[i] = B[j]$ → $F[i][j] = F[i-1][j-1] + 1$; ngược lại $F[i][j] = \max(F[i-1][j], F[i][j-1])$.</li>
+      <li>Trả về $F[5][6]$.</li>
+      <li>Truy vết: từ $F[5][6]$ ngược về $F[0][0]$, đi chéo khi $A[i] = B[j]$ để ra dãy LCS.</li>
+    </ol>
+
+    <p><strong>📋 Giả mã:</strong></p>
+    <div class="code-block">THUẬT TOÁN LCS(A[1..n], B[1..m])
+BƯỚU 1: F[0..n][0..m] = 0
+BƯỚU 2: Cho i = 1..n, j = 1..m:
+BƯỚU 3:   Nếu A[i] = B[j]: F[i][j] = F[i-1][j-1] + 1
+BƯỚU 4:   Ngược lại: F[i][j] = max(F[i-1][j], F[i][j-1])
+BƯỚU 5: Trả về F[n][m]; truy vết đi chéo khi khớp</div>
+
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <div class="code-block">def lcs(a, b):
+    n, m = len(a), len(b)
+    F = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            if a[i - 1] == b[j - 1]:
+                F[i][j] = F[i - 1][j - 1] + 1
+            else:
+                F[i][j] = max(F[i - 1][j], F[i][j - 1])
+    seq, i, j = [], n, m
+    while i &gt; 0 and j &gt; 0:
+        if a[i - 1] == b[j - 1]:
+            seq.append(a[i - 1]); i -= 1; j -= 1
+        elif F[i - 1][j] &gt;= F[i][j - 1]: i -= 1
+        else: j -= 1
+    seq.reverse()
+    return F[n][m], seq
+
+print(lcs([1, 3, 5, 7, 9], [3, 4, 5, 6, 7, 8]))
+# (3, [3, 5, 7])</div>
+
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>Thời gian: $n \cdot m = 5 \cdot 6 = 30$ ô = $O(n \cdot m)$.<br>
+    <strong>Chứng minh:</strong> Mỗi ô $(i, j)$ tính <strong>1 lần</strong> với $O(1)$ (1 so sánh + 1 max/cộng); số ô = $(n+1)(m+1) \approx nm$. Vậy $T(n, m) = O(nm)$.<br>
+    Bộ nhớ: $O(nm)$ cho bảng 2D (cải tiến 2 dòng: $O(\min(n, m))$). Truy vết: $O(n+m)$.</p>
+
+    <p><strong>🧮 Tính toán từng bước (các ô khớp A[i] = B[j]):</strong></p>
     <div class="code-block">A = [1, 3, 5, 7, 9], B = [3, 4, 5, 6, 7, 8]
 
 Các ô khớp (A[i]=B[j]):
@@ -1030,9 +1309,52 @@ Truy vết từ F[5][6] = 3:
   <p>0/1 Knapsack: $W = 8$, 3 vật: A(g=3, v=4), B(g=4, v=5), C(g=5, v=6). Tìm tổ hợp tối ưu.</p>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-4-4').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-4-4" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
-    <p><strong>📌 Công thức:</strong> $F[k, V] = \\max(F[k-1, V], \\; F[k-1, V-g_k] + v_k)$.</p>
-    <p><strong>💡 Cách áp dụng:</strong> Liệt kê tất cả tổ hợp con của 3 vật (2³ = 8 trường hợp), tính tổng TTL và GT, chọn tổ hợp có GT max mà TTL ≤ W. Hoặc lập bảng DP $F[4][9]$.</p>
-    <p><strong>🧮 Tính toán (liệt kê tổ hợp):</strong></p>
+    <p><strong>💡 Ý tưởng + Các bước thực hiện:</strong></p>
+    <p>0/1 Knapsack có <strong>cấu trúc con tối ưu</strong>: quyết định tại vật $k$ dựa trên lời giải tối ưu của $k-1$ vật đầu. <strong>Greedy không tối ưu</strong> (vì mỗi vật chỉ 1 cái, không thể bù bằng tỉ lệ $v/g$). Phải dùng DP. Có thể lập bảng DP $F[4][9]$ hoặc liệt kê tổ hợp (vì $n=3$ nhỏ, $2^3 = 8$ trường hợp).</p>
+    <ol style="padding-left: 20px;">
+      <li>Khởi tạo $F[0..3][0..8] = 0$.</li>
+      <li>Với $k$ từ 1 đến 3, với $V$ từ 0 đến 8: $F[k][V] = F[k-1][V]$; nếu $g_k \le V$ và $F[k-1][V-g_k] + v_k > F[k][V]$ → cập nhật.</li>
+      <li>Trả về $F[3][8]$.</li>
+      <li>Truy vết từ $F[3][8]$ ngược lên để biết vật nào được chọn.</li>
+    </ol>
+
+    <p><strong>📋 Giả mã:</strong></p>
+    <div class="code-block">THUẬT TOÁN Knapsack_01(g, v, n, W)
+BƯỚU 1: F[0..n][0..W] = 0
+BƯỚU 2: Cho k = 1..n, V = 0..W:
+BƯỚU 3:   F[k][V] = F[k-1][V]   // không chọn vật k
+BƯỚU 4:   Nếu g[k] ≤ V:
+BƯỚU 5:     chon = F[k-1][V-g[k]] + v[k]
+BƯỚU 6:     Nếu chon > F[k][V]: F[k][V] = chon
+BƯỚU 7: Trả về F[n][W]; truy vết nếu cần</div>
+
+    <p><strong>🐍 Cài đặt Python:</strong></p>
+    <div class="code-block">def knapsack_01(weights, values, W):
+    n = len(weights)
+    F = [[0] * (W + 1) for _ in range(n + 1)]
+    for k in range(1, n + 1):
+        for V in range(W + 1):
+            F[k][V] = F[k - 1][V]
+            if weights[k - 1] &lt;= V:
+                cand = F[k - 1][V - weights[k - 1]] + values[k - 1]
+                if cand &gt; F[k][V]:
+                    F[k][V] = cand
+    chosen, V = [], W
+    for k in range(n, 0, -1):
+        if F[k][V] != F[k - 1][V]:
+            chosen.append(k); V -= weights[k - 1]
+    chosen.reverse()
+    return F[n][W], chosen
+
+print(knapsack_01([3, 4, 5], [4, 5, 6], 8))
+# (10, [1, 3]) — chọn vật 1 và vật 3</div>
+
+    <p><strong>📊 Độ phức tạp + Chứng minh:</strong></p>
+    <p>Thời gian: $n \cdot (W+1) = 3 \cdot 9 = 27$ ô = $O(n \cdot W)$.<br>
+    <strong>Chứng minh:</strong> Mỗi ô $(k, V)$ tính <strong>1 lần</strong> với $O(1)$ (1 so sánh + 1 max/cộng); số ô = $(n+1)(W+1) \approx nW$. Vậy $T(n, W) = O(nW)$.<br>
+    Bộ nhớ: $O(nW)$ cho bảng 2D (cải tiến 1 dòng: $O(W)$). Đây là độ phức tạp <em>giả đa thức</em>.</p>
+
+    <p><strong>🧮 Tính toán từng bước (liệt kê tổ hợp + DP bảng):</strong></p>
     <div class="code-block">Tổ hợp        TTL    GT    Có chọn? (TTL ≤ 8)
 {}              0     0    ✓
 {A}            3     4    ✓
