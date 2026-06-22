@@ -531,43 +531,50 @@ new StepReveal('step-tsp', [
 </script>
 
 <!-- ============================== BÀI TOÁN 1: ATM ============================== -->
-<h2>1️⃣ Bài toán 1: Máy ATM</h2>
+<h2>1️⃣ Bài toán: Máy ATM (đổi tiền)</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">📝 Phát biểu</div>
-  <p>Máy ATM có 4 mệnh giá: <strong>100.000đ, 50.000đ, 20.000đ, 10.000đ</strong>. Rút <code>n</code> đồng (n chia hết cho 10.000). Tìm số tờ ít nhất.</p>
-</div>
-
-<div class="callout callout-tip">
-  <div class="callout-title">💡 Ý tưởng Greedy</div>
+  <div class="callout-title">💡 Ý tưởng</div>
   <p><strong>Chọn nhiều tờ mệnh giá LỚN NHẤT trước.</strong> Lấy tối đa tờ 100k có thể, phần dư lấy tờ 50k, rồi 20k, rồi 10k.</p>
   <p><strong>Vì sao?</strong> Mỗi tờ 100k thay thế được 2 tờ 50k → giảm số tờ. Mệnh giá lớn càng ưu tiên thì số tờ càng ít.</p>
 </div>
 
-<h3>🧮 Ví dụ: n = 1.290.000đ</h3>
-<div class="code-block">X₁ = 1.290.000 / 100.000 = 12 (tờ 100k)   ← còn 90.000
-X₂ = 90.000 / 50.000     = 1  (tờ 50k)    ← còn 40.000
-X₃ = 40.000 / 20.000     = 2  (tờ 20k)    ← còn 0
-X₄ = 0 / 10.000          = 0  (tờ 10k)
-
-Phương án X = (12, 1, 2, 0)
-Tổng số tờ = 15</div>
-
-<h3>📝 Giả mã (C)</h3>
-<pre><code>void ATM(int n, int *tigia, int *soluong, int m) {
-    // n: số tiền cần rút
-    // tigia[]: mảng mệnh giá giảm dần
-    // soluong[]: mảng kết quả (số tờ mỗi loại)
-    // m: số mệnh giá
-    for (int i = 0; i &lt; m; i++) {
-        soluong[i] = n / tigia[i];   // lấy tối đa tờ mệnh giá i
-        n = n % tigia[i];            // phần dư
-    }
-}</code></pre>
-
 <div class="callout callout-theory">
-  <div class="callout-title">📐 Phân tích độ phức tạp</div>
-  <p><strong>Thời gian:</strong> O(m) — chỉ 1 vòng for qua m mệnh giá, mỗi bước O(1) (phép chia + mod).</p>
+  <div class="callout-title">📋 Phát biểu bài toán</div>
+  <p>Máy ATM có 4 mệnh giá: <strong>100.000đ, 50.000đ, 20.000đ, 10.000đ</strong>. Rút <code>n</code> đồng (n chia hết cho 10.000). Tìm số tờ ít nhất.</p>
+</div>
+
+<h3>🐍 Mã Python</h3>
+<pre><code>def atm(n, tigia):
+    """
+    n: số tiền cần rút (chia hết cho mệnh giá nhỏ nhất)
+    tigia: list mệnh giá giảm dần, vd [100000, 50000, 20000, 10000]
+    """
+    soluong = []                       # mảng kết quả: số tờ mỗi mệnh giá
+    for menh_gia in tigia:
+        so_to = n // menh_gia          # lấy tối đa tờ mệnh giá hiện tại
+        soluong.append(so_to)          # lưu vào kết quả
+        n = n % menh_gia               # phần dư cho mệnh giá kế tiếp
+    return soluong
+
+# Test: rút 1.290.000đ
+tigia = [100000, 50000, 20000, 10000]
+print(atm(1290000, tigia))  # [12, 1, 2, 0]</code></pre>
+
+<h3>🎯 Ví dụ chạy tay</h3>
+<div class="callout callout-example">
+  <div class="callout-title">🧮 Rút 1.290.000đ — từng bước</div>
+  <p><strong>Bước 1 (tờ 100k):</strong> 1.290.000 // 100.000 = <strong>12</strong> tờ. Đã dùng 1.200.000đ, còn 90.000đ.</p>
+  <p><strong>Bước 2 (tờ 50k):</strong> 90.000 // 50.000 = <strong>1</strong> tờ. Đã dùng 50.000đ, còn 40.000đ.</p>
+  <p><strong>Bước 3 (tờ 20k):</strong> 40.000 // 20.000 = <strong>2</strong> tờ. Đã dùng 40.000đ, còn 0đ.</p>
+  <p><strong>Bước 4 (tờ 10k):</strong> 0 // 10.000 = <strong>0</strong> tờ.</p>
+  <p><strong>→ Phương án X = (12, 1, 2, 0)</strong>. Tổng số tờ = 12 + 1 + 2 + 0 = <strong>15 tờ</strong>.</p>
+</div>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Thời gian &amp; không gian</div>
+  <p><strong>Thời gian:</strong> O(m) — chỉ 1 vòng for qua m mệnh giá, mỗi bước O(1) (phép chia // và mod %).</p>
   <p><strong>Bộ nhớ:</strong> O(m) — mảng kết quả soluong[m].</p>
   <p><strong>Tối ưu?</strong> ✓ Có, <em>với bộ mệnh giá chuẩn</em> (mỗi mệnh giá lớn là bội số của mệnh giá nhỏ hơn: 100k = 2×50k, 50k = 2×20k + 10k, v.v.).</p>
 </div>
@@ -580,21 +587,10 @@ Tổng số tờ = 15</div>
 </div>
 
 <!-- ============================== BÀI TOÁN 2: TSP ============================== -->
-<h2>2️⃣ Bài toán 2: Người giao hàng (TSP)</h2>
+<h2>2️⃣ Bài toán: Người giao hàng (TSP)</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">📝 Phát biểu</div>
-  <p>Có <code>n</code> thành phố. Một người đi từ 1 thành phố, qua tất cả <code>n-1</code> thành phố khác (mỗi thành phố đến đúng 1 lần), rồi trở về thành phố ban đầu. Tìm chu trình có tổng độ dài ngắn nhất.</p>
-</div>
-
-<div class="callout callout-warn">
-  <div class="callout-title">⚠️ Vét cạn không khả thi</div>
-  <p>Có <code>(n-1)!/2</code> chu trình Hamilton khác nhau (chia 2 vì chu trình + chiều ngược là 1). Với n=20, có 20!/2 ≈ 1.2×10¹⁸ chu trình → máy tính nhanh nhất cũng mất hàng tỷ năm.</p>
-  <p>→ Phải dùng heuristic như Greedy (không tối ưu nhưng nhanh).</p>
-</div>
-
-<div class="callout callout-tip">
-  <div class="callout-title">💡 Ý tưởng Greedy</div>
+  <div class="callout-title">💡 Ý tưởng</div>
   <ol style="padding-left: 20px;">
     <li><strong>Sắp xếp</strong> các cạnh theo thứ tự tăng dần của độ dài.</li>
     <li><strong>Xét</strong> các cạnh từ ngắn nhất đến dài nhất để đưa vào chu trình.</li>
@@ -608,22 +604,78 @@ Tổng số tờ = 15</div>
   </ol>
 </div>
 
-<h3>📝 Giả mã (C)</h3>
-<pre><code>void TSP() {
-    Chu_Trinh = ∅;       // tập cạnh của chu trình
-    Gia = 0.0;            // tổng độ dài
-    while (E != ∅) {      // E = tập cạnh còn chưa xét
-        e = cạnh ngắn nhất trong E;
-        if (cạnh e có thể chọn) {  // không bậc 3, không khép kín sớm
-            Chu_Trinh = Chu_Trinh + [e];
-            Gia = Gia + do_dai(e);
-        }
-        E = E - [e];      // loại e khỏi E (dù chọn hay không)
-    }
-}</code></pre>
-
 <div class="callout callout-theory">
-  <div class="callout-title">📐 Phân tích độ phức tạp</div>
+  <div class="callout-title">📋 Phát biểu bài toán</div>
+  <p>Có <code>n</code> thành phố. Một người đi từ 1 thành phố, qua tất cả <code>n-1</code> thành phố khác (mỗi thành phố đến đúng 1 lần), rồi trở về thành phố ban đầu. Tìm chu trình có tổng độ dài ngắn nhất.</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Vét cạn không khả thi</div>
+  <p>Có <code>(n-1)!/2</code> chu trình Hamilton khác nhau (chia 2 vì chu trình + chiều ngược là 1). Với n=20, có 20!/2 ≈ 1.2×10¹⁸ chu trình → máy tính nhanh nhất cũng mất hàng tỷ năm.</p>
+  <p>→ Phải dùng heuristic như Greedy (không tối ưu nhưng nhanh).</p>
+</div>
+
+<h3>🐍 Mã Python</h3>
+<pre><code>def tsp_greedy(dist, n):
+    """
+    dist: ma trận khoảng cách n×n
+    Greedy: sắp xếp cạnh tăng dần, chọn nếu không tạo chu trình thiếu + bậc ≤ 2
+    """
+    edges = []
+    for i in range(n):
+        for j in range(i + 1, n):
+            edges.append((dist[i][j], i, j))   # thu thập cạnh (độ dài, u, v)
+    edges.sort()                                # sắp xếp theo độ dài tăng dần
+
+    chu_trinh = []
+    bac = [0] * n                               # bậc mỗi đỉnh
+    cha = list(range(n))                        # Union-Find
+
+    def find(u):
+        while cha[u] != u:
+            cha[u] = cha[cha[u]]                # path compression
+            u = cha[u]
+        return u
+
+    for d, u, v in edges:
+        if bac[u] &lt; 2 and bac[v] &lt; 2:
+            ru, rv = find(u), find(v)
+            # Chọn cạnh nếu không tạo chu trình thiếu
+            # (trừ khi đây là cạnh cuối cùng khép chu trình)
+            if ru != rv or len(chu_trinh) == n - 1:
+                chu_trinh.append((u, v, d))
+                bac[u] += 1
+                bac[v] += 1
+                if ru != rv:
+                    cha[ru] = rv
+                if len(chu_trinh) == n:
+                    break
+    return chu_trinh
+
+# Test: 4 thành phố
+dist = [
+    [0, 10, 15, 20],
+    [10, 0, 35, 25],
+    [15, 35, 0, 30],
+    [20, 25, 30, 0]
+]
+print(tsp_greedy(dist, 4))</code></pre>
+
+<h3>🎯 Ví dụ chạy tay</h3>
+<div class="callout callout-example">
+  <div class="callout-title">🧮 4 thành phố A-B-C-D — từng bước</div>
+  <p><strong>Sắp xếp cạnh tăng dần:</strong> AB=10 → AC=15 → AD=20 → BD=25 → CD=30 → BC=35.</p>
+  <p><strong>Bước 1: AB=10.</strong> Bậc A=1, B=1. Chưa khép kín → <strong>CHỌN</strong>. Tổng = 10.</p>
+  <p><strong>Bước 2: AC=15.</strong> A: 1→2, C: 0→1. Chưa khép kín → <strong>CHỌN</strong>. Tổng = 25.</p>
+  <p><strong>Bước 3: AD=20.</strong> A đã bậc 2 → <strong>BỎ</strong> (tạo bậc 3).</p>
+  <p><strong>Bước 4: BD=25.</strong> B: 1→2, D: 0→1. Chưa khép kín → <strong>CHỌN</strong>. Tổng = 50.</p>
+  <p><strong>Bước 5: CD=30.</strong> C: 1→2, D: 1→2. Khép kín (đủ 4 đỉnh, đây là cạnh cuối) → <strong>CHỌN</strong>. Tổng = 80. Đủ 4 cạnh → dừng.</p>
+  <p><strong>→ Chu trình: A → B → D → C → A</strong>. Tổng = <strong>80</strong>.</p>
+</div>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Thời gian &amp; không gian</div>
   <p><strong>Sắp xếp cạnh:</strong> có n(n-1)/2 cạnh → O(n² log n).</p>
   <p><strong>Duyệt + kiểm tra:</strong> O(n²) (mỗi cạnh kiểm tra O(1) với Union-Find).</p>
   <p>→ Tổng: <strong>O(n² log n)</strong> (chi phí sắp xếp). Nếu dùng Bucket Sort (giá trị nguyên) có thể O(n²).</p>
@@ -631,15 +683,10 @@ Tổng số tờ = 15</div>
 </div>
 
 <!-- ============================== BÀI TOÁN 3: Knapsack vô hạn ============================== -->
-<h2>3️⃣ Bài toán 3: Cái ba lô (Knapsack) vô hạn</h2>
+<h2>3️⃣ Bài toán: Cái ba lô (Knapsack) vô hạn</h2>
 
 <div class="callout callout-theory">
-  <div class="callout-title">📝 Phát biểu</div>
-  <p>Cái ba lô trọng lượng <code>W</code>. Có <code>n</code> loại đồ vật, mỗi loại <code>i</code> có trọng lượng <code>gᵢ</code> và giá trị <code>vᵢ</code>. <strong>Mỗi loại có số lượng KHÔNG HẠN CHẾ.</strong> Tìm cách chọn để tổng trọng lượng ≤ W và tổng giá trị lớn nhất.</p>
-</div>
-
-<div class="callout callout-tip">
-  <div class="callout-title">💡 Ý tưởng Greedy (3 bước)</div>
+  <div class="callout-title">💡 Ý tưởng (3 bước)</div>
   <ol style="padding-left: 20px;">
     <li><strong>Tính đơn giá</strong> = vᵢ / gᵢ cho mỗi loại (giá trị trên mỗi đơn vị trọng lượng).</li>
     <li><strong>Sắp xếp</strong> đồ vật theo đơn giá GIẢM dần.</li>
@@ -648,37 +695,55 @@ Tổng số tờ = 15</div>
   <p><strong>Vì sao?</strong> Đơn giá cao = "hời" nhất (nhiều giá trị / ít trọng lượng) → ưu tiên lấy hết.</p>
 </div>
 
-<h3>🧮 Ví dụ: W=37, 4 đồ vật</h3>
-<table>
-  <tr><th>Đồ vật</th><th>Trọng lượng g</th><th>Giá trị v</th><th>Đơn giá v/g</th></tr>
-  <tr><td>B</td><td>10</td><td>25</td><td><strong>2.5</strong></td></tr>
-  <tr><td>A</td><td>15</td><td>30</td><td>2.0</td></tr>
-  <tr><td>D</td><td>4</td><td>6</td><td>1.5</td></tr>
-  <tr><td>C</td><td>2</td><td>2</td><td>1.0</td></tr>
-</table>
-<p style="margin-top:8px;">Đã sắp xếp theo đơn giá giảm: <strong>B → A → D → C</strong>.</p>
-
-<div class="code-block">Bước 1: Chọn 3 vật B.   TTL = 3·10 = 30. Còn 37-30 = 7.   GT = 3·25 = 75.
-Bước 2: Không chọn A (g=15 > 7).                                  GT = 75.
-Bước 3: Chọn 1 vật D.   TTL = 30+4 = 34.  Còn 7-4 = 3.  GT = 75+6 = 81.
-Bước 4: Chọn 1 vật C.   TTL = 34+2 = 36.  Còn 3-2 = 1.  GT = 81+2 = 83.
-
-Phương án X = (3, 0, 1, 1) theo thứ tự (B, A, D, C).
-Tổng giá trị = 83. Tổng trọng lượng = 36 (dư 1).</div>
-
-<h3>📝 Giả mã (C)</h3>
-<pre><code>void Greedy(Danh_sach_do_vat dsdv, float W) {
-    // Sắp xếp mảng dsdv theo đơn giá GIẢM dần
-    // (don_gia = v / g)
-    sap_xep_giam(dsdv);  // O(n log n)
-    for (int i = 0; i &lt; n; i++) {
-        dsdv[i].Phuong_an = W / dsdv[i].Trong_luong;  // số lượng tối đa
-        W = W - dsdv[i].Phuong_an * dsdv[i].Trong_luong;
-    }
-}</code></pre>
-
 <div class="callout callout-theory">
-  <div class="callout-title">📐 Phân tích độ phức tạp</div>
+  <div class="callout-title">📋 Phát biểu bài toán</div>
+  <p>Cái ba lô trọng lượng <code>W</code>. Có <code>n</code> loại đồ vật, mỗi loại <code>i</code> có trọng lượng <code>gᵢ</code> và giá trị <code>vᵢ</code>. <strong>Mỗi loại có số lượng KHÔNG HẠN CHẾ.</strong> Tìm cách chọn để tổng trọng lượng ≤ W và tổng giá trị lớn nhất.</p>
+</div>
+
+<h3>🐍 Mã Python</h3>
+<pre><code>class DoVat:
+    def __init__(self, ten, trong_luong, gia_tri):
+        self.ten = ten
+        self.trong_luong = trong_luong
+        self.gia_tri = gia_tri
+        self.don_gia = gia_tri / trong_luong      # giá trị / trọng lượng
+        self.phuong_an = 0                        # số lượng được chọn
+
+def knapsack_greedy(dsvat, W):
+    """Sắp xếp theo đơn giá giảm dần, chọn tối đa mỗi vật."""
+    dsvat.sort(key=lambda x: x.don_gia, reverse=True)  # sắp đơn giá giảm
+    for vat in dsvat:
+        vat.phuong_an = W // vat.trong_luong     # số lượng tối đa lấy được
+        W -= vat.phuong_an * vat.trong_luong     # phần trọng lượng còn lại
+    return dsvat
+
+# Test: W=37, 4 đồ vật B, A, D, C
+ds = [
+    DoVat("B", 10, 25),  # don_gia = 2.5
+    DoVat("A", 15, 30),  # don_gia = 2.0
+    DoVat("D", 4, 6),    # don_gia = 1.5
+    DoVat("C", 2, 2),    # don_gia = 1.0
+]
+ket_qua = knapsack_greedy(ds, 37)
+for vat in ket_qua:
+    print(f"{vat.ten}: {vat.phuong_an} cái")
+# B: 3 cái, D: 1 cái, C: 1 cái → tổng giá trị = 3*25 + 1*6 + 1*2 = 83</code></pre>
+
+<h3>🎯 Ví dụ chạy tay</h3>
+<div class="callout callout-example">
+  <div class="callout-title">🧮 W=37, 4 đồ vật B-A-D-C — từng bước</div>
+  <p><strong>Bước 1: Tính đơn giá.</strong> B: 25/10 = <strong>2.5</strong>; A: 30/15 = <strong>2.0</strong>; D: 6/4 = <strong>1.5</strong>; C: 2/2 = <strong>1.0</strong>.</p>
+  <p><strong>Bước 2: Sắp giảm.</strong> Thứ tự xét: B (2.5) → A (2.0) → D (1.5) → C (1.0).</p>
+  <p><strong>Bước 3: Lấy tối đa B.</strong> W=37, g=10 → ⌊37/10⌋ = <strong>3</strong>. TTL=30, còn 7, GT = 3·25 = 75.</p>
+  <p><strong>Bước 4: Xét A.</strong> g=15 &gt; 7 → <strong>0</strong> cái. Còn 7, GT = 75.</p>
+  <p><strong>Bước 5: Lấy D.</strong> g=4 → ⌊7/4⌋ = <strong>1</strong>. TTL=34, còn 3, GT = 75+6 = 81.</p>
+  <p><strong>Bước 6: Lấy C.</strong> g=2 → ⌊3/2⌋ = <strong>1</strong>. TTL=36, còn 1, GT = 81+2 = <strong>83</strong>.</p>
+  <p><strong>→ Phương án X = (3, 0, 1, 1)</strong> theo thứ tự (B, A, D, C). Tổng GT = <strong>83</strong>, TTL = 36 (dư 1).</p>
+</div>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Thời gian &amp; không gian</div>
   <p><strong>Sắp xếp:</strong> O(n log n).</p>
   <p><strong>Chọn:</strong> O(n) — 1 vòng for qua n vật.</p>
   <p>→ Tổng: <strong>O(n log n)</strong> (chi phí sắp xếp chiếm ưu thế).</p>
@@ -944,14 +1009,13 @@ new Quiz('quiz-greedy', [
    - Tiêu chí tham lam: chọn theo đơn giá vᵢ/gᵢ GIẢM dần.
    - Lấy tối đa mỗi loại: xᵢ = ⌊W_còn / gᵢ⌋.
 
-3. GIẢ MÃ:
-   void Greedy(Danh_sach_do_vat dsdv, float W) {
-       sap_xep_giam(dsdv);  // theo đơn giá
-       for (int i = 0; i &lt; n; i++) {
-           dsdv[i].Phuong_an = W / dsdv[i].Trong_luong;
-           W = W - dsdv[i].Phuong_an * dsdv[i].Trong_luong;
-       }
-   }
+3. MÃ PYTHON:
+   def greedy(dsdv, W):
+       # Sắp xếp danh sách đồ vật theo đơn giá GIẢM dần
+       dsdv.sort(key=lambda x: x.don_gia, reverse=True)
+       for vat in dsdv:
+           vat.phuong_an = W // vat.trong_luong          # số lượng tối đa
+           W = W - vat.phuong_an * vat.trong_luong       # phần TTL còn lại
 
 4. CHẠY TAY VÍ DỤ:
    W=37, 4 vật: B(10,25), A(15,30), D(4,6), C(2,2).

@@ -138,48 +138,98 @@
 <h2>🔁 4. Phân tích vòng lặp for</h2>
 
 <h3>4.1 Một vòng for đơn giản</h3>
-<pre><code>for i = 1 to n:        # n lần lặp
-    print(i)            # O(1)
-# Tổng: n × O(1) = O(n)</code></pre>
-<p><strong>Vì sao:</strong> Thân vòng lặp là <code>print</code> — chi phí cố định O(1). Vòng lặp chạy <code>n</code> lần → nhân lại → <strong>O(n)</strong>.</p>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ: Vòng for chạy n lần</div>
+  <pre><code>def count_to_n(n):
+    # Vòng for chạy từ 1 đến n (n lần lặp)
+    for i in range(1, n + 1):
+        print(i)            # O(1) — chi phí cố định
+
+# Phân tích: n × O(1) = O(n)
+# Test
+count_to_n(5)</code></pre>
+  <p><strong>Phân tích:</strong> Thân vòng lặp là <code>print</code> — chi phí cố định O(1). Vòng lặp chạy <code>n</code> lần → nhân lại → <strong>O(n)</strong>.</p>
+</div>
 
 <h3>4.2 Hai vòng for lồng nhau</h3>
-<pre><code>for i = 1 to n:        # n lần
-    for j = 1 to n:     # n lần
-        print(i, j)     # O(1)
-# Tổng: n × n × O(1) = O(n²)</code></pre>
-<p><strong>Vì sao:</strong> Quy tắc nhân: O(n) × O(n) × O(1) = <strong>O(n²)</strong>. Số cặp (i,j) = n².</p>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ: 2 vòng for lồng nhau</div>
+  <pre><code>def print_pairs(n):
+    # 2 vòng for lồng nhau, mỗi vòng n lần
+    for i in range(1, n + 1):       # vòng ngoài: n lần
+        for j in range(1, n + 1):   # vòng trong: n lần
+            print(i, j)             # O(1)
 
-<h3>4.3 Vòng for với bước nhảy log</h3>
-<pre><code>for i = 1; i &lt; n; i *= 2:    # i: 1, 2, 4, 8, ..., &lt; n
-    print(i)                  # O(1)
-# Tổng: log₂(n) × O(1) = O(log n)</code></pre>
-<p><strong>Vì sao:</strong> Sau k lần lặp, <code>i = 2^k</code>. Vòng dừng khi <code>2^k ≥ n</code>, tức <code>k ≥ log₂(n)</code>. Vậy có đúng <code>⌈log₂(n)⌉</code> lần lặp → <strong>O(log n)</strong>.</p>
+# Phân tích: n × n × O(1) = O(n²)
+# Test
+print_pairs(3)</code></pre>
+  <p><strong>Phân tích:</strong> Quy tắc nhân: O(n) × O(n) × O(1) = <strong>O(n²)</strong>. Số cặp (i,j) = n².</p>
+</div>
 
-<h3>4.4 Vòng for giảm nửa</h3>
-<pre><code>for i = n; i &gt;= 1; i /= 2:   # i: n, n/2, n/4, ..., 1
-    print(i)                  # O(1)
-# Tổng: log₂(n) lần → O(log n)</code></pre>
-<p><strong>Vì sao:</strong> Sau k lần, <code>i = n / 2^k</code>. Dừng khi <code>i &lt; 1</code> ⇔ <code>2^k &gt; n</code> ⇔ <code>k &gt; log₂(n)</code>. Cũng <strong>O(log n)</strong>.</p>
+<h3>4.3 Vòng lặp với bước nhảy log (i *= 2)</h3>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ: Vòng lặp nhân đôi i</div>
+  <pre><code>def print_powers_of_two(n):
+    # Bước nhảy log: i nhân đôi mỗi lần
+    i = 1
+    while i < n:                   # i: 1, 2, 4, 8, ..., &lt; n
+        print(i)                   # O(1)
+        i *= 2                     # nhân đôi i
+
+# Phân tích: log₂(n) × O(1) = O(log n)
+# Test
+print_powers_of_two(16)</code></pre>
+  <p><strong>Phân tích:</strong> Sau k lần lặp, <code>i = 2^k</code>. Vòng dừng khi <code>2^k ≥ n</code>, tức <code>k ≥ log₂(n)</code>. Vậy có đúng <code>⌈log₂(n)⌉</code> lần lặp → <strong>O(log n)</strong>.</p>
+</div>
+
+<h3>4.4 Vòng lặp giảm nửa (i //= 2)</h3>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ: Vòng lặp chia đôi i</div>
+  <pre><code>def print_halves(n):
+    # Vòng lặp giảm nửa: i chia đôi mỗi lần
+    i = n
+    while i >= 1:                  # i: n, n/2, n/4, ..., 1
+        print(i)                   # O(1)
+        i //= 2                    # chia đôi (lấy phần nguyên)
+
+# Phân tích: log₂(n) lần → O(log n)
+# Test
+print_halves(16)</code></pre>
+  <p><strong>Phân tích:</strong> Sau k lần, <code>i = n / 2^k</code>. Dừng khi <code>i &lt; 1</code> ⇔ <code>2^k &gt; n</code> ⇔ <code>k &gt; log₂(n)</code>. Cũng <strong>O(log n)</strong>.</p>
+</div>
 
 <!-- ============================== 5. VÒNG LẶP WHILE ============================== -->
 <h2>🔄 5. Phân tích vòng lặp while</h2>
 
 <h3>5.1 While chia đôi</h3>
-<pre><code>n = input
-while n &gt; 0:
-    n = n / 2          # chia đôi mỗi lần
-# Sau k lần: n / 2^k ≤ 0 (≈) → k ≈ log₂(n)
-# → O(log n)</code></pre>
-<p><strong>Vì sao:</strong> Mỗi lần lặp <code>n</code> giảm đi một nửa. Để <code>n</code> giảm từ giá trị ban đầu xuống 1 cần <code>log₂(n)</code> lần chia.</p>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ: While chia đôi n</div>
+  <pre><code>def halve_until_zero(n):
+    # Chia đôi n mỗi lần cho đến khi n = 0
+    while n > 0:
+        n = n // 2                 # chia đôi (lấy phần nguyên)
+
+# Phân tích: sau k lần, n / 2^k ≤ 1 → k ≈ log₂(n) → O(log n)
+# Test
+halve_until_zero(100)
+print("Hoàn thành")</code></pre>
+  <p><strong>Phân tích:</strong> Mỗi lần lặp <code>n</code> giảm đi một nửa. Để <code>n</code> giảm từ giá trị ban đầu xuống 1 cần <code>log₂(n)</code> lần chia.</p>
+</div>
 
 <h3>5.2 While giảm 1</h3>
-<pre><code>n = input
-while n &gt; 0:
-    n = n - 1          # giảm 1 mỗi lần
-# Cần n lần để n = 0
-# → O(n)</code></pre>
-<p><strong>Vì sao:</strong> Mỗi lần chỉ trừ 1 → cần đúng <code>n</code> lần để từ <code>n</code> về 0.</p>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ: While giảm n đi 1</div>
+  <pre><code>def dec_until_zero(n):
+    # Giảm n đi 1 mỗi lần cho đến khi n = 0
+    while n > 0:
+        n = n - 1                   # giảm 1
+
+# Phân tích: cần đúng n lần → O(n)
+# Test
+dec_until_zero(100)
+print("Hoàn thành")</code></pre>
+  <p><strong>Phân tích:</strong> Mỗi lần chỉ trừ 1 → cần đúng <code>n</code> lần để từ <code>n</code> về 0.</p>
+</div>
 
 <div class="callout callout-tip">
   <div class="callout-title">💡 Mẹo nhớ nhanh</div>
@@ -197,11 +247,22 @@ while n &gt; 0:
   <div class="callout-title">🔑 Quy tắc</div>
   <p>Thay <strong>lời gọi hàm</strong> bằng <strong>độ phức tạp của hàm đó</strong> trong biểu thức.</p>
   <p><strong>Ví dụ:</strong> Hàm <code>A</code> gọi hàm <code>B</code> (vốn O(n²)) <strong>3 lần</strong>:</p>
-  <pre><code>def A(n):
-    B(n)         # O(n²)
-    B(n)         # O(n²)
-    B(n)         # O(n²)
-# T_A(n) = 3 · O(n²) = O(n²)   (hằng số 3 bị bỏ)</code></pre>
+  <pre><code>def B(n):
+    # Hàm con có độ phức tạp O(n²) — ví dụ: duyệt mảng 2 chiều
+    for i in range(n):
+        for j in range(n):
+            pass                   # thao tác O(1)
+
+def A(n):
+    # Hàm A gọi B 3 lần liên tiếp
+    B(n)                           # O(n²)
+    B(n)                           # O(n²)
+    B(n)                           # O(n²)
+
+# Phân tích: T_A(n) = 3 · O(n²) = O(n²)  (hằng số 3 bị bỏ)
+# Test
+A(10)
+print("Hoàn thành — BigO = O(n²)")</code></pre>
   <p><strong>Vì sao bỏ được hằng 3?</strong> Vì BigO bỏ hằng số — <code>3·n²</code> và <code>n²</code> có cùng tốc độ tăng khi <code>n→∞</code>.</p>
 </div>
 
@@ -350,12 +411,12 @@ while n &gt; 0:
 
     <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
       <select id="bigo-pattern">
-        <option value="single-for">Vòng for đơn: for i in 1..n: O(1)</option>
-        <option value="nested-for">2 vòng for lồng: for i: for j: O(1)</option>
-        <option value="triple-for">3 vòng for lồng: for i: for j: for k: O(1)</option>
-        <option value="log-for">Vòng for log: for i*=2</option>
-        <option value="while-half">While n/=2</option>
-        <option value="while-dec">While n-=1</option>
+        <option value="single-for">Vòng for đơn: for i in range(n): O(1)</option>
+        <option value="nested-for">2 vòng for lồng: for i in range(n): for j in range(n)</option>
+        <option value="triple-for">3 vòng for lồng: for i: for j: for k</option>
+        <option value="log-for">Vòng lặp log: while i &lt; n: i *= 2</option>
+        <option value="while-half">While n //= 2</option>
+        <option value="while-dec">While n -= 1</option>
         <option value="merge">Đệ quy: T(n)=2T(n/2)+n</option>
         <option value="binsearch">Đệ quy: T(n)=T(n/2)+1</option>
         <option value="fib">Đệ quy: T(n)=T(n-1)+T(n-2)</option>
@@ -391,6 +452,11 @@ while n &gt; 0:
       <input type="radio" name="yscale" value="log" style="margin-left: 12px;"> Log (xem rõ hàm nhỏ)
     </div>
 
+    <div style="text-align:center; margin-top: 10px;">
+      <button class="btn" onclick="drawBigoChart()">🔄 Vẽ lại biểu đồ</button>
+    </div>
+
+    <div id="bigo-chart-info" class="result-box" style="margin-top: 12px;"></div>
     <svg id="bigo-chart" width="100%" height="380" viewBox="0 0 700 380" style="margin-top: 12px;"></svg>
   </div>
 
@@ -605,6 +671,12 @@ function drawBigoChart() {
   }
   if (yMax === 0) yMax = 1;
 
+  // Update info box
+  const info = document.getElementById('bigo-chart-info');
+  if (info) {
+    info.innerHTML = `<strong>📊 Đang vẽ ${activeFns.length} hàm</strong> tại n = 1..${N_MAX} — chế độ trục Y: <strong>${scale === 'log' ? 'Log' : 'Tuyến tính'}</strong>. Bật/tắt checkbox hoặc đổi trục Y để so sánh.`;
+  }
+
   // Background
   const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   bg.setAttribute('x', padding); bg.setAttribute('y', padding);
@@ -805,7 +877,7 @@ function drawRecursionTree() {
   // Draw nodes per level
   levels.forEach((lv, li) => {
     const y = padding + (li + 1) * levelH;
-    // Limit nodes drawn (avoid clutter when a^level > 12)
+    // Limit nodes drawn (prevent clutter when a^level > 12)
     const maxDraw = 12;
     const drawCount = Math.min(lv.count, maxDraw);
     const stepX = (W - padding * 2) / Math.max(drawCount, 1);
@@ -889,50 +961,93 @@ window.addEventListener('DOMContentLoaded', drawRecursionTree);
 
 <div class="callout callout-example">
   <div class="callout-title">📝 Ví dụ 1: Vòng for đơn giản</div>
-  <pre><code>for i in 1..n:
-    print(i)</code></pre>
+  <pre><code>def print_numbers(n):
+    for i in range(1, n + 1):
+        print(i)
+
+# Test
+print_numbers(5)</code></pre>
   <div id="ex1-steps"></div>
 </div>
 
 <div class="callout callout-example">
   <div class="callout-title">📝 Ví dụ 2: 2 vòng for lồng</div>
-  <pre><code>for i in 1..n:
-    for j in 1..n:
-        print(i, j)</code></pre>
+  <pre><code>def print_pairs(n):
+    for i in range(1, n + 1):
+        for j in range(1, n + 1):
+            print(i, j)
+
+# Test
+print_pairs(3)</code></pre>
   <div id="ex2-steps"></div>
 </div>
 
 <div class="callout callout-example">
-  <div class="callout-title">📝 Ví dụ 3: Vòng for log</div>
-  <pre><code>for i = 1; i &lt; n; i *= 2:
-    print(i)</code></pre>
+  <div class="callout-title">📝 Ví dụ 3: Vòng lặp nhân đôi i</div>
+  <pre><code>def print_powers(n):
+    i = 1
+    while i < n:
+        print(i)
+        i *= 2
+
+# Test
+print_powers(16)</code></pre>
   <div id="ex3-steps"></div>
 </div>
 
 <div class="callout callout-example">
   <div class="callout-title">📝 Ví dụ 4: MergeSort — áp dụng định lý Master</div>
   <pre><code>def merge_sort(arr):
-    if len(arr) &lt;= 1: return arr
+    # Đệ quy: T(n) = 2·T(n/2) + O(n)
+    if len(arr) <= 1:
+        return arr
     mid = len(arr) // 2
-    left = merge_sort(arr[:mid])   # T(n/2)
-    right = merge_sort(arr[mid:])  # T(n/2)
-    return merge(left, right)      # O(n)</code></pre>
+    left = merge_sort(arr[:mid])    # T(n/2)
+    right = merge_sort(arr[mid:])   # T(n/2)
+    return merge(left, right)       # O(n)
+
+def merge(left, right):
+    # Trộn 2 mảng đã sắp — chi phí O(n)
+    result, i, j = [], 0, 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+# Test
+print(merge_sort([5, 2, 9, 1, 7]))   # [1, 2, 5, 7, 9]</code></pre>
   <div id="ex4-steps"></div>
 </div>
 
 <div class="callout callout-example">
   <div class="callout-title">📝 Ví dụ 5: Fibonacci đệ quy — cây đệ quy</div>
   <pre><code>def fib(n):
-    if n &lt;= 1: return n
-    return fib(n-1) + fib(n-2)</code></pre>
+    # Đệ quy không chia đều: T(n) = T(n-1) + T(n-2) + O(1)
+    if n <= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+# Test
+print(fib(10))   # 55</code></pre>
   <div id="ex5-steps"></div>
 </div>
 
 <div class="callout callout-example">
   <div class="callout-title">📝 Ví dụ 6: Tính tổng 1..n</div>
-  <pre><code>s = 0
-for i in 1..n:
-    s += i</code></pre>
+  <pre><code>def sum_to_n(n):
+    s = 0
+    for i in range(1, n + 1):
+        s += i                    # O(1) mỗi lần
+    return s
+
+# Test
+print(sum_to_n(100))   # 5050</code></pre>
   <div id="ex6-steps"></div>
 </div>
 
@@ -941,7 +1056,7 @@ new StepReveal('ex1-steps', [
   { title: 'Nhận diện cấu trúc',
     content: '<p>Đây là 1 vòng <code>for</code> chạy từ 1 đến <code>n</code>. Thân vòng lặp là <code>print(i)</code> — chi phí cố định O(1).</p>' },
   { title: 'Đếm số lần lặp',
-    content: '<p>Vòng lặp <code>for i in 1..n</code> chạy đúng <strong>n</strong> lần (i = 1, 2, ..., n).</p>' },
+    content: '<p>Vòng lặp <code>for i in range(1, n+1)</code> chạy đúng <strong>n</strong> lần (i = 1, 2, ..., n).</p>' },
   { title: 'Áp dụng quy tắc for',
     content: '<p>Độ phức tạp = (số lần lặp) × (độ phức tạp thân) = <code>n × O(1)</code>.</p>' },
   { title: 'Rút gọn',
@@ -1018,8 +1133,14 @@ new StepReveal('ex6-steps', [
 <div class="callout callout-example">
   <div class="callout-title">📝 Bài 1</div>
   <p>Tính BigO của đoạn mã sau:</p>
-  <pre><code>for i = 1; i &lt; n; i *= 2:
-    print(i)</code></pre>
+  <pre><code>def print_powers_of_two(n):
+    i = 1
+    while i < n:
+        print(i)
+        i *= 2
+
+# Test
+print_powers_of_two(16)</code></pre>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-2-1').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-2-1" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
     <p><strong>📌 Công thức áp dụng:</strong> Vòng lặp với bước nhảy nhân đôi → BigO = O(log n).</p>
@@ -1041,9 +1162,13 @@ Tổng = log₂(n) × O(1) = O(log n)</div>
 <div class="callout callout-example">
   <div class="callout-title">📝 Bài 2</div>
   <p>Tính BigO của đoạn mã:</p>
-  <pre><code>for i in 1..n:
-    for j in 1..i:
-        print(i * j)</code></pre>
+  <pre><code>def print_multiplication_table(n):
+    for i in range(1, n + 1):
+        for j in range(1, i + 1):
+            print(i * j)
+
+# Test
+print_multiplication_table(4)</code></pre>
   <button class="btn btn-ghost" onclick="document.getElementById('ans-2-2').classList.toggle('hidden')">Xem đáp án</button>
   <div id="ans-2-2" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
     <p><strong>📌 Công thức áp dụng:</strong> 2 vòng for lồng nhau, vòng trong chạy theo i → quy tắc nhân + tính tổng.</p>
