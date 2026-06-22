@@ -54,6 +54,17 @@
   <p>• Vì vậy BigO là <strong>thước đo độc lập phần cứng</strong> — chỉ nói về "bản chất" của thuật toán.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>BigO là cách nói "khi dữ liệu lớn lên, thuật toán chậm thêm bao nhiêu?" — giống như hỏi "khi khách hàng tăng gấp 10, nhân viên xử lý kịp không?". BigO cho biết tốc độ <strong>TĂNG</strong> của thời gian, không phải thời gian tuyệt đối.</p>
+  <p><strong>Ví dụ:</strong> 2 nhân viên làm 100 hồ sơ. NV A mất 100 phút (1 phút/hồ sơ). NV B cũng 100 phút nhưng mỗi hồ sơ có 10 bước. Cả 2 cùng 100 phút cho 100 hồ sơ. Nhưng nếu <strong>1000 hồ sơ</strong>:</p>
+  <ul style="padding-left: 22px;">
+    <li>NV A: 1000 phút (tỉ lệ thuận) → <code>O(n)</code>.</li>
+    <li>NV B: 100 000 phút (bình phương) → <code>O(n²)</code>.</li>
+  </ul>
+  <p>NV A xử lý kịp, NV B thì "chết". <strong>Cảm giác:</strong> BigO cho biết thuật toán có "scale" (mở rộng) được không khi dữ liệu lớn.</p>
+</div>
+
 <!-- ============================== 2. CÁC HÀM BIGO ============================== -->
 <h2>📊 2. Các hàm BigO theo thứ tự tăng</h2>
 
@@ -105,6 +116,20 @@
   <p>• <strong>Bậc cao ăn thịt bậc thấp</strong>: n³ luôn thắng n²·1000 khi n đủ lớn.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường — từng hàm BigO</div>
+  <p>Mỗi hàm BigO ứng với một "cách tăng" khác nhau trong đời sống:</p>
+  <ul style="padding-left: 22px;">
+    <li><strong>O(1):</strong> Giống như hỏi "bạn tên gì?" — dù có 1 người hay 1 triệu người, bạn vẫn trả lời trong 1 giây. Không phụ thuộc số người.</li>
+    <li><strong>O(log n):</strong> Giống tìm tên trong danh bạ điện thoại — bạn mở giữa sách, xem tên đó trước hay sau tên cần tìm, bỏ nửa, mở giữa nửa còn lại... Mỗi lần loại bỏ 1 nửa. 1000 tên → 10 lần mở. 1 triệu tên → 20 lần mở.</li>
+    <li><strong>O(n):</strong> Giống đếm số người trong phòng — bạn đi qua từng người 1 lần, hỏi tên. 100 người thì 100 lần hỏi. 1000 người thì 1000 lần.</li>
+    <li><strong>O(n log n):</strong> Giống Merge Sort — chia đôi danh sách (log n lần chia), mỗi lần chia phải trộn n phần tử. Tổng = n × log n.</li>
+    <li><strong>O(n²):</strong> Giống so sánh mỗi người với mỗi người khác trong phòng để tìm cặp đôi hợp nhau. 100 người → 100×100 = 10 000 lần so sánh.</li>
+    <li><strong>O(2^n):</strong> Giống thử mọi tổ hợp có thể có — 10 người trong phòng, có bao nhiêu nhóm con? 2^10 = 1024 nhóm. 20 người → 1 triệu nhóm. Tăng cực nhanh.</li>
+    <li><strong>O(n!):</strong> Giống thử mọi thứ tự xếp hàng — 10 người có 10! = 3.6 triệu cách xếp. 20 người → nhiều hơn số nguyên tử trong vũ trụ.</li>
+  </ul>
+</div>
+
 <!-- ============================== 3. QUY TẮC ============================== -->
 <h2>📐 3. Quy tắc tính BigO</h2>
 
@@ -116,12 +141,24 @@
   <p><strong>Ứng dụng:</strong> Nếu thuật toán có 2 khối thực hiện nối tiếp nhau (for rồi lại for), lấy max.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường — Quy tắc cộng</div>
+  <p>Giống bạn làm 2 công việc nối tiếp: rửa bát (10 phút) + quét nhà (20 phút). Tổng thời gian = 20 phút (lấy cái lâu nhất). Khi nói BigO, ta chỉ quan tâm cái chậm nhất vì nó "nuốt" cái kia.</p>
+  <p><strong>Ví dụ:</strong> Vòng for <code>O(n)</code> nối tiếp vòng for <code>O(n²)</code> → tổng <code>O(n²)</code> (lấy bậc cao). Khi n = 1 triệu, cái <code>n²</code> lấn át hoàn toàn <code>n</code>.</p>
+</div>
+
 <div class="callout callout-theory">
   <div class="callout-title">✖️ Quy tắc nhân</div>
   <p>Nếu <code>T(n) = T₁(n) × T₂(n)</code> thì:</p>
   <p style="text-align:center; font-size:1.15rem;"><code>T(n) = O(T₁(n) × T₂(n))</code></p>
   <p><strong>Vì sao?</strong> Đây là trường hợp <strong>vòng lặp lồng nhau</strong>: thân vòng lặp ngoài mất T₁, mỗi lần lặp lại chạy vòng trong T₂ → tổng = T₁·T₂.</p>
   <p><strong>Ví dụ:</strong> 2 vòng for lồng nhau, mỗi vòng n lần, thân O(1) &rarr; <code>O(n·n·1) = O(n²)</code>.</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường — Quy tắc nhân</div>
+  <p>Giống 2 vòng lặp lồng nhau — với mỗi khách hàng (n người), bạn hỏi từng câu hỏi (m câu). Tổng = n × m câu hỏi.</p>
+  <p><strong>Ví dụ:</strong> 100 khách × 10 câu hỏi = 1000 câu. Tăng khách gấp 10 → 10 000 câu (gấp 10). Tăng câu hỏi gấp 10 → cũng 10 000 câu (vẫn gấp 10). Vì nhân nên chỉ cần MỘT trong hai cái tăng là kết quả tăng theo.</p>
 </div>
 
 <div class="callout callout-theory">
@@ -198,6 +235,16 @@ print_halves(16)</code></pre>
   <p><strong>Phân tích:</strong> Sau k lần, <code>i = n / 2^k</code>. Dừng khi <code>i &lt; 1</code> ⇔ <code>2^k &gt; n</code> ⇔ <code>k &gt; log₂(n)</code>. Cũng <strong>O(log n)</strong>.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường — Vòng lặp for</div>
+  <ul style="padding-left: 22px;">
+    <li><strong>Vòng for đơn giản:</strong> đi qua từng người trong hàng. 100 người → 100 bước. Đó là <code>O(n)</code>.</li>
+    <li><strong>Vòng for lồng:</strong> mỗi người lại đi qua từng người khác. 100 người × 100 người = 10 000 bước. <code>O(n²)</code>.</li>
+    <li><strong>Vòng for <code>i *= 2</code>:</strong> đi qua hàng nhưng mỗi bước nhảy qua 1 nửa. 100 người → chỉ 7 bước (vì 2^7 = 128 &gt; 100). <code>O(log n)</code>.</li>
+  </ul>
+  <p><strong>Mẹo nhớ:</strong> bước nhảy "+1" thì tuyến tính (O(n)); bước nhảy "×2" hay "/2" thì log (O(log n)); lồng nhau thì nhân.</p>
+</div>
+
 <!-- ============================== 5. VÒNG LẶP WHILE ============================== -->
 <h2>🔄 5. Phân tích vòng lặp while</h2>
 
@@ -238,6 +285,13 @@ print("Hoàn thành")</code></pre>
   <p>• Biến <strong>nhân đôi</strong> mỗi lần (từ 1 lên n) → <code>O(log n)</code>.</p>
   <p>• Vòng lặp <strong>lồng</strong> nhau → <strong>nhân</strong> độ phức tạp.</p>
   <p>• Vòng lặp <strong>nối tiếp</strong> nhau → <strong>cộng</strong> (lấy max).</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường — Vòng lặp while</div>
+  <p>Vòng while tương tự for nhưng không biết trước số lần. Phải nhìn <strong>điều kiện dừng</strong> và <strong>bước nhảy</strong> của biến để đếm.</p>
+  <p><strong>Ví dụ <code>while n /= 2</code>:</strong> Cắt đôi ổ bánh mỗi lần. Bắt đầu 1000 miếng → 500 → 250 → 125 → ... → 1. Có 10 lần cắt (vì 2^10 = 1024). Vậy <code>O(log n)</code>.</p>
+  <p><strong>Ví dụ <code>while n -= 1</code>:</strong> Bóc từng mút cam, bắt đầu 100 mút → 99 → 98 → ... → 0. Phải bóc đúng 100 lần. Vậy <code>O(n)</code>.</p>
 </div>
 
 <!-- ============================== 6. CHƯƠNG TRÌNH CON KHÔNG ĐỆ QUY ============================== -->
@@ -391,6 +445,18 @@ print("Hoàn thành — BigO = O(n²)")</code></pre>
   <tr><td>"Karatsuba-like"</td><td>a=3, b=2, f=O(n)</td><td>log₂3 ≈ 1.58</td><td>f = n &lt; n^1.58</td><td>1</td><td>Θ(n^1.58)</td></tr>
   <tr><td>Trộn nặng</td><td>a=2, b=2, f=O(n²)</td><td>log₂2 = 1</td><td>f = n² &gt; n¹</td><td>3</td><td>Θ(n²)</td></tr>
 </table>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường — Đệ quy &amp; Định lý Master</div>
+  <p>Đệ quy giống câu chuyện "ông gửi cho cha, cha lại gửi cho cháu, cháu lại gửi cho cháu cháu...". Mỗi lần gửi, bài toán nhỏ đi. Phương trình <code>T(n) = a·T(n/b) + f(n)</code> cho biết:</p>
+  <ul style="padding-left: 22px;">
+    <li><code>a</code>: chia thành mấy bài toán con (ví dụ MergeSort chia 2 → a = 2).</li>
+    <li><code>b</code>: mỗi bài toán con nhỏ gấp mấy lần (MergeSort n/2 → b = 2).</li>
+    <li><code>f(n)</code>: công sức để CHIA và TRỘN (MergeSort tốn <code>O(n)</code>).</li>
+  </ul>
+  <p>Định lý Master giống "công thức sẵn" — không cần giải từng bước, chỉ cần tra <code>a</code>, <code>b</code>, <code>f(n)</code> → biết ngay <code>T(n)</code>.</p>
+  <p><strong>Ví dụ:</strong> MergeSort <code>T(n) = 2T(n/2) + n</code>. Ta có a = 2, b = 2, log<sub>b</sub>(a) = 1, f(n) = n = n^1. Case 2 → <code>T(n) = O(n log n)</code>. Không cần giải, tra xong!</p>
+</div>
 
 <!-- ============================== 8. MÔ PHỎNG TƯƠNG TÁC ============================== -->
 <h2>🎮 8. Mô phỏng tương tác — 4 công cụ học BigO</h2>
@@ -1405,6 +1471,18 @@ new Quiz('quiz-bigo', [
   <p>• Khi gặp nhiều vòng lặp → phân tích <strong>từng vòng</strong> rồi kết hợp (nhân nếu lồng, max nếu nối).</p>
   <p>• Phương trình <code>T(n) = T(n-1) + O(n)</code> → O(n²) (QuickSort xấu, Selection Sort).</p>
   <p>• Phương trình <code>T(n) = 2T(n/2) + O(n)</code> → O(n log n) (MergeSort, QuickSort tốt).</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường — Mẹo "đoán" BigO nhanh</div>
+  <p>Khi gặp code lạ, hãy tưởng tượng: <em>"Nếu dữ liệu tăng gấp 10, code này chậm thêm mấy lần?"</em></p>
+  <ul style="padding-left: 22px;">
+    <li>Nếu chậm gấp 10 → <code>O(n)</code>.</li>
+    <li>Nếu chậm gấp 100 → <code>O(n²)</code>.</li>
+    <li>Nếu chỉ chậm thêm vài bước → <code>O(log n)</code>.</li>
+    <li>Nếu chậm gấp 2^10 = 1024 → <code>O(2^n)</code> — chết rồi.</li>
+  </ul>
+  <p>Đây là cách nhanh nhất để "đoán" BigO mà không cần tính toán chi tiết. Khi còn time, mới quay lại chứng minh chặt chẽ bằng quy tắc cộng/nhân hoặc định lý Master.</p>
 </div>
 
 <div class="nav-bottom">

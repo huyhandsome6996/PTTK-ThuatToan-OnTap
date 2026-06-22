@@ -58,6 +58,12 @@
   <p>Muốn nhanh hơn (O(n)) phải dùng thuật toán <strong>không so sánh</strong> như BinSort, Bucket Sort (dựa vào giá trị khóa).</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Sắp xếp là việc "xếp lại cho đúng thứ tự" — giống như bạn xếp sách trong tủ theo tên tác giả, xếp bài trên tay theo số, xếp học sinh theo chiều cao. Máy tính cũng vậy, nhưng phải có thuật toán cụ thể vì máy không "nhìn" được toàn bộ cùng lúc.</p>
+  <p><strong>Ví dụ:</strong> Giả sử bạn có 1000 tờ giấy ghi tên học sinh lộn xộn, cần xếp theo ABC. Bạn làm thế nào? Đó chính là bài toán sắp xếp — có nhiều cách, mỗi cách có tốc độ khác nhau.</p>
+</div>
+
 <!-- ============================== BẢNG TỔNG QUAN ============================== -->
 <h2>📊 Bảng tổng quan 8 thuật toán</h2>
 
@@ -452,6 +458,13 @@ window.addEventListener('DOMContentLoaded', sortInit);
   <p>Sau bước <code>i</code>, <code>i</code> phần tử đầu tiên đã được sắp xếp đúng vị trí.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Giống như khi bạn xếp lại bộ bài trên tay — bạn nhìn toàn bộ bài, tìm lá nhỏ nhất, đặt vào vị trí đầu tiên. Rồi tìm lá nhỏ nhì trong phần còn lại, đặt vào vị trí thứ 2. Cứ vậy đến hết. Mỗi bước đều đặt chắc chắn 1 phần tử vào đúng vị trí.</p>
+  <p><strong>Ví dụ:</strong> Bạn có 5 tờ tiền lộn xộn [50k, 10k, 100k, 20k, 5k]. Bạn tìm tờ nhỏ nhất (5k) → đặt đầu. Tìm tiếp tờ nhỏ nhất trong 4 tờ còn lại (10k) → đặt vị trí 2. Cứ vậy đến hết.</p>
+  <p><strong>Cảm giác:</strong> chậm nhưng chắc, mỗi bước đều chắc chắn đặt đúng 1 phần tử vào vị trí đúng.</p>
+</div>
+
 <h3>🐍 Mã Python</h3>
 <pre><code>def selection_sort(a):
     n = len(a)
@@ -497,6 +510,13 @@ print(selection_sort(arr))
   <div class="callout-title">💡 Ý tưởng</div>
   <p>Ở mỗi bước, <strong>lấy phần tử tiếp theo</strong> và <strong>chèn nó vào vị trí thích hợp</strong> trong đoạn đã sắp xếp.</p>
   <p>Giống như sắp bài trên tay — cứ rút 1 lá rồi chèn vào đúng vị trí trong số các lá đã có.</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Giống cách bạn xếp bài Tiến lên trên tay — khi rút được 1 lá mới, bạn so sánh với các lá đã có từ phải sang trái, chèn vào đúng vị trí.</p>
+  <p><strong>Ví dụ:</strong> Bạn đang cầm [3, 5, 8] (đã sắp), rút được lá 4. Bạn so 4 với 8 → 4 &lt; 8 → đẩy 8 sang phải. So 4 với 5 → 4 &lt; 5 → đẩy 5 sang phải. So 4 với 3 → 4 &gt; 3 → dừng, chèn 4 vào vị trí đó. Được [3, 4, 5, 8].</p>
+  <p><strong>Cảm giác:</strong> rất nhanh nếu bài đã gần sắp, chậm nếu bài lộn xộn.</p>
 </div>
 
 <h3>🐍 Mã Python</h3>
@@ -553,6 +573,13 @@ print(insertion_sort(arr))
   <p>Sau mỗi lần duyệt, phần tử lớn nhất "nổi" lên cuối dãy (như bong bóng nổi lên).</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Giống như các bọt khí trong ly nước — bọt lớn sẽ nổi lên trên trước. Bạn đi từ cuối dãy lên, so sánh từng cặp kế bên, nếu sai thứ tự thì đổi. Sau 1 lần đi, phần tử lớn nhất đã "nổi" lên cuối.</p>
+  <p><strong>Ví dụ:</strong> Sắp xếp học sinh theo chiều cao thành hàng. Bạn đi từ cuối hàng lên, so từng đôi kế bên — ai thấp hơn đứng trước. Đi 1 lượt → học sinh cao nhất đã ở cuối. Đi lượt tiếp → cao nhì ở áp chót. Cứ vậy.</p>
+  <p><strong>Cảm giác:</strong> đơn giản nhất để hiểu, nhưng chậm nhất trong thực tế.</p>
+</div>
+
 <h3>🐍 Mã Python (có tối ưu flag)</h3>
 <pre><code>def bubble_sort(a):
     n = len(a)
@@ -604,6 +631,13 @@ print(bubble_sort(arr))
   <p>1. <strong>Chọn pivot</strong> (trục) — thường là phần tử giữa.</p>
   <p>2. <strong>Phân hoạch (Partition)</strong>: Sắp xếp sao cho mọi phần tử bên trái pivot ≤ pivot, mọi phần tử bên phải ≥ pivot.</p>
   <p>3. <strong>Đệ quy</strong> sắp xếp 2 phần bên trái và bên phải pivot.</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Giống chia nhóm trong lớp. Bạn chọn 1 bạn làm "chuẩn" (pivot) — ai thấp hơn thì đứng bên trái, ai cao hơn thì đứng bên phải. Rồi trong mỗi nhóm lại chọn bạn chuẩn khác, chia tiếp. Đến khi mỗi nhóm còn 1 người thì xong.</p>
+  <p><strong>Ví dụ:</strong> 7 bạn cao [1.6m, 1.5m, 1.8m, 1.4m, 1.9m, 1.45m, 1.7m]. Chọn bạn 1.4m làm chuẩn → ai thấp hơn (1.4m) đứng trái, cao hơn đứng phải. Nhưng 1.4m là thấp nhất → nhóm trái rỗng, nhóm phải 6 bạn. Đây là <strong>TRƯỜNG HỢP XẤU</strong> — chia lệch. Nếu chọn 1.6m làm chuẩn → chia 2 nhóm gần bằng nhau → <strong>TỐT</strong>.</p>
+  <p><strong>Cảm giác:</strong> rất nhanh nếu chọn chuẩn tốt, rất chậm nếu chọn chuẩn tệ.</p>
 </div>
 
 <h3>🐍 Mã Python</h3>
@@ -669,6 +703,13 @@ print(quick_sort(arr, 0, len(arr) - 1))
   <div class="callout-title">💡 Ý tưởng (Chia để trị)</div>
   <p><strong>Chia để trị.</strong> Chia mảng làm 2 nửa, đệ quy sắp xếp mỗi nửa, rồi <strong>trộn (merge)</strong> 2 nửa đã sắp.</p>
   <p>Khác QuickSort: Merge Sort chia <em>cơ học</em> (chia đôi index) chứ không cần pivot → luôn chia đều → luôn O(n log n).</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Giống cách trưởng phòng tổng hợp báo cáo. Sếp chia 2 nhóm nhân viên, mỗi nhóm làm nửa danh sách. Mỗi nhóm lại chia tiếp thành 2 nhóm nhỏ hơn... Đến khi mỗi nhóm chỉ còn 1 người (1 người thì đã "sắp" sẵn). Rồi <strong>TRỘN</strong> các nhóm đã sắp từ dưới lên trên.</p>
+  <p><strong>Ví dụ:</strong> Sắp [5, 3, 8, 1]. Chia làm 2: [5,3] và [8,1]. Chia tiếp: [5], [3], [8], [1] (mỗi nhóm 1 phần tử — đã sắp sẵn). Trộn [5] + [3] → [3, 5]. Trộn [8] + [1] → [1, 8]. Trộn [3,5] + [1,8] → [1, 3, 5, 8].</p>
+  <p><strong>Cảm giác:</strong> luôn ổn định, không sợ trường hợp xấu, nhưng tốn thêm giấy (bộ nhớ).</p>
 </div>
 
 <h3>🐍 Mã Python</h3>
@@ -760,6 +801,13 @@ Hết left → extend 8      → [1, 3, 5, 8]</code></pre>
   <p><strong>Giai đoạn 2 — Rút gốc:</strong> Lần lượt lấy phần tử lớn nhất (gốc heap) ra, đặt vào cuối mảng, rồi phục hồi tính chất heap cho phần còn lại.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Giống cách tổ chức giải đấu thể thao. Bạn tạo 1 "cây phân cấp" — người mạnh nhất ở đỉnh. Lần lượt lấy người ở đỉnh ra (đã là mạnh nhất), đặt vào cuối hàng. Sau đó "phục hồi" cây để người mạnh nhất mới nổi lên đỉnh. Cứ vậy đến khi hết.</p>
+  <p><strong>Ví dụ:</strong> Tổ chức pyramid — CEO ở trên, dưới là 2 VP, mỗi VP có 2 manager... CEO luôn là người "lớn nhất". Lần lượt "sa thải" CEO (đưa vào danh sách đã sắp), rồi bầu CEO mới từ những người còn lại.</p>
+  <p><strong>Cảm giác:</strong> ổn định, không phụ thuộc dữ liệu, nhưng code phức tạp hơn QuickSort.</p>
+</div>
+
 <h3>🐍 Mã Python (0-indexed)</h3>
 <pre><code>def heapify(a, n, i):
     """Phục hồi tính chất max-heap cho cây con gốc i."""
@@ -830,6 +878,13 @@ L4: swap a[1]↔a[2] → [1, |3, 4, 5, 10] ✓ HOÀN THÀNH</code></pre>
   <p>Tạo mảng đếm <code>b[1..k]</code>, đếm số lần xuất hiện của từng giá trị, rồi viết lại mảng theo thứ tự.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Giống cách phân loại thư. Bạn có 10 ngăn (xô) đánh số 0-9. Mỗi bức thư có 1 con số trên envelope. Bạn bỏ thư vào ngăn tương ứng. Cuối cùng đi lấy thư theo thứ tự ngăn 0, 1, 2, ... → đã sắp!</p>
+  <p><strong>Ví dụ:</strong> Có 5 tờ tiền mệnh giá [50k, 10k, 100k, 20k, 5k]. Tạo 100 ngăn (1k, 2k, ..., 100k). Bỏ mỗi tờ vào ngăn tương ứng. Cuối cùng đi lấy từ ngăn 1k đến 100k → [5k, 10k, 20k, 50k, 100k].</p>
+  <p><strong>Cảm giác:</strong> cực nhanh NHƯNG chỉ dùng được khi mệnh giá là số nguyên trong phạm vi nhỏ.</p>
+</div>
+
 <h3>🐍 Mã Python</h3>
 <pre><code>def bin_sort(a, k):
     """k = giá trị lớn nhất có thể có trong a."""
@@ -884,6 +939,13 @@ i=8: b[8]=1 → a = [1, 3, 3, 5, 8]   ✓ HOÀN THÀNH</code></pre>
     <li>Sắp xếp từng xô (dùng Insertion Sort — xô thường ít phần tử).</li>
     <li>Nối các xô lại theo thứ tự.</li>
   </ol>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Giống cách phân loại học sinh theo điểm thi. Điểm từ 0-10, chia 10 xô (xô 0: điểm 0-1, xô 1: điểm 1-2, ...). Mỗi học sinh bỏ vào xô tương ứng. Trong mỗi xô lại sắp (dùng Insertion Sort vì ít người). Cuối cùng nối các xô lại.</p>
+  <p><strong>Ví dụ:</strong> 10 học sinh điểm [7.8, 1.7, 3.9, 2.6, 7.2, 9.4, 2.1, 1.2, 2.3, 6.8]. Chia 10 xô [0-1), [1-2), ..., [9-10). Bỏ mỗi bạn vào xô. Sắp từng xô. Nối lại → [1.2, 1.7, 2.1, 2.3, 2.6, 3.9, 6.8, 7.2, 7.8, 9.4].</p>
+  <p><strong>Cảm giác:</strong> cực nhanh khi điểm phân bố đều, chậm khi mọi người đều được 1 điểm (cùng rơi 1 xô).</p>
 </div>
 
 <h3>🐍 Mã Python</h3>

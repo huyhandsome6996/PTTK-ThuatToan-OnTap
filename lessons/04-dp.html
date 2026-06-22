@@ -46,6 +46,14 @@
   </table>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Quy hoạch động giống cách bạn <strong>ôn thi</strong> — khi giải được 1 dạng bài, bạn <strong>GHI NHỚ</strong> cách giải, lần sau gặp bài tương tự không phải giải lại từ đầu. Vừa nhanh vừa đỡ mệt!</p>
+  <p><strong>Khác biệt với chia để trị:</strong> chia để trị giống chia bài cho 2 người — mỗi người làm nửa. Nhưng nếu 2 người đôi khi làm <strong>CÙNG 1 bài con</strong> → bị lặp → chậm. DP thì <strong>GHI NHỚ</strong> để không lặp.</p>
+  <p><strong>Ví dụ:</strong> Tính Fibonacci $F(10) = F(9) + F(8)$. Mà $F(9) = F(8) + F(7)$. Để tính $F(10)$ ta cần $F(8)$, để tính $F(9)$ ta cũng cần $F(8)$. Nếu đệ quy không nhớ → tính $F(8)$ tới 2 lần (rồi $F(7)$, $F(6)$... còn lặp nhiều hơn nữa). DP tính $F(8)$ đúng 1 lần rồi nhớ → lần sau tra bảng là ra.</p>
+  <p><strong>Cảm giác:</strong> DP = <em>"lười nhưng thông minh"</em> — đã tính rồi thì nhớ, đừng tính lại. Bạn không tự hỏi "3×4 bằng bao nhiêu" mỗi lần gặp, vì bạn đã thuộc lòng rồi. DP làm y hệt thế.</p>
+</div>
+
 <h3>📋 Phương pháp chung 3 bước</h3>
 <ol class="steps">
   <li><span class="step-title">Phân rã</span>Chia bài toán thành các bài toán con nhỏ hơn. Mỗi bài toán lớn được biểu diễn qua bài toán con.</li>
@@ -451,6 +459,25 @@ window.addEventListener('DOMContentLoaded', () => {
   <p>Tính $C(n, k) = \frac{n!}{k!(n-k)!}$ bằng công thức giai thừa dễ bị <strong>tràn số</strong> vì $n!$ tăng cực nhanh (vd $20! \approx 2.4 \times 10^{18}$). DP tránh được vấn đề: tính từng $C(i, j)$ nhỏ trước, dùng công thức truy hồi với <strong>phép cộng</strong> — không cần giai thừa, không tràn.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>$C(n, k)$ = số cách chọn $k$ người từ $n$ người. Ví dụ có 5 bạn, chọn 2 bạn làm nhóm trưởng — có bao nhiêu cách? Đó chính là $C(5, 2)$.</p>
+  <p><strong>Công thức $C(n, k) = C(n-1, k-1) + C(n-1, k)$ nghĩa gì?</strong> Xét 1 bạn cụ thể (gọi là An). Có 2 trường hợp:</p>
+  <ul style="padding-left: 20px;">
+    <li><strong>An ĐƯỢC chọn</strong> → còn cần chọn $k-1$ người từ $n-1$ người còn lại → $C(n-1, k-1)$ cách.</li>
+    <li><strong>An KHÔNG được chọn</strong> → phải chọn đủ $k$ người từ $n-1$ người còn lại → $C(n-1, k)$ cách.</li>
+  </ul>
+  <p>Tổng 2 trường hợp = $C(n, k)$. Đơn giản vậy thôi!</p>
+  <p><strong>Ví dụ đời thường:</strong> 5 bạn {An, Bình, Cường, Dũng, Em}. Chọn 2 bạn. Xét An:</p>
+  <ul style="padding-left: 20px;">
+    <li>An được chọn → còn chọn 1 từ {B, C, D, E} → <strong>4 cách</strong> (AB, AC, AD, AE).</li>
+    <li>An không được chọn → chọn 2 từ {B, C, D, E} → <strong>6 cách</strong> (BC, BD, BE, CD, CE, DE).</li>
+    <li>Tổng = 4 + 6 = <strong>10</strong> = $C(5, 2)$. ✓</li>
+  </ul>
+  <p>Bảng DP (tam giác Pascal) giống việc tính dần từ trên xuống — dòng 0: $C(0,0)=1$. Dòng 1: $C(1,0)=C(1,1)=1$. Dòng 2: 1, 2, 1. Cứ vậy, mỗi ô = tổng 2 ô trên.</p>
+  <p><strong>Cảm giác:</strong> giống xếp hình domino — mỗi ô được xây từ 2 ô phía trên. Bạn chỉ cần biết 2 ô trên là ghép được ô dưới.</p>
+</div>
+
 <div class="callout callout-example">
   <div class="callout-title">📋 Phát biểu</div>
   <p>Cho $n, k$ với $0 \le k \le n$. Tính số tổ hợp chập $k$ của $n$ — số cách chọn $k$ phần tử từ $n$ phần tử (không phân biệt thứ tự).</p>
@@ -511,6 +538,15 @@ print(comb_dp(6, 3))  # 20</code></pre>
 <div class="callout callout-theory">
   <div class="callout-title">💡 Ý tưởng</div>
   <p>LIS có <strong>cấu trúc con tối ưu</strong>: LIS của cả dãy chứa LIS của tiền tố. Tại vị trí $i$, ta cần biết LIS dài nhất kết thúc tại các vị trí $j < i$ (với $a[j] < a[i]$) → đây là <strong>bài toán con đã giải</strong>. DP lưu $F[i]$ = độ dài LIS kết thúc tại $a[i]$, tính từ $i=0$ đến $i=n-1$.</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Bạn có 1 dãy số. Tìm dãy con <strong>DÀI NHẤT</strong> mà các số <strong>TĂNG DẦN</strong> (không cần liền nhau, nhưng phải giữ thứ tự ban đầu).</p>
+  <p><strong>Ví dụ đời thường:</strong> Giống bạn đọc 1 cuốn sách, đánh dấu các trang có nội dung hay. Các trang được đánh dấu có thể không liền nhau nhưng phải theo thứ tự tăng dần. Tìm dãy trang đánh dấu dài nhất mà nội dung "tăng dần" (mỗi trang sau hay hơn trang trước).</p>
+  <p><strong>Ví dụ:</strong> Dãy $\text{[1, 2, 3, 4, 9, 10, 5, 6, 7, 8]}$. LIS = $\text{[1, 2, 3, 4, 5, 6, 7, 8]}$ (độ dài 8) — bỏ 9, 10 vì sau 10 thì 5 không tăng được nữa, nên ta "chuyển hướng" sang nhánh 5, 6, 7, 8 dài hơn.</p>
+  <p><strong>Cách DP:</strong> $F[i]$ = độ dài LIS kết thúc tại vị trí $i$. Với mỗi $i$, nhìn lại tất cả $j < i$, nếu $a[j] < a[i]$ thì có thể nối $a[i]$ sau $a[j]$ → $F[i] = \max(F[j] + 1)$. Cứ vậy đi từ trái sang phải.</p>
+  <p><strong>Cảm giác:</strong> giống xây tháp — mỗi viên gạch mới phải đặt trên viên gạch cao nhất có thể (nhưng nhỏ hơn nó). Bạn không xếp gạch to lên gạch nhỏ được, phải xếp gạch nhỏ lên gạch nhỏ hơn nữa.</p>
 </div>
 
 <div class="callout callout-example">
@@ -574,6 +610,19 @@ print(lis(a))  # 8 (dãy 1,2,3,4,5,6,7,8)</code></pre>
 <div class="callout callout-theory">
   <div class="callout-title">💡 Ý tưởng</div>
   <p>LCS có <strong>cấu trúc con tối ưu</strong>: LCS của $A[1..i], B[1..j]$ được tính từ LCS của các tiền tố nhỏ hơn $A[1..i-1], B[1..j-1]$. Có <strong>bài toán con chồng lặp</strong>: nhiều ô trong bảng cần cùng 1 ô con. DP lập bảng 2D $F[i, j]$ = độ dài LCS của $A[1..i]$ và $B[1..j]$.</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>2 người viết 2 dãy số. Tìm dãy con <strong>DÀI NHẤT</strong> mà cả 2 đều có (giữ thứ tự, không cần liền nhau).</p>
+  <p><strong>Ví dụ đời thường:</strong> 2 bạn học sinh so sánh bài làm. Bạn A làm theo thứ tự $\text{[1,2,3,4,5,6,7]}$, bạn B làm $\text{[2,4,3,5,6,8,7,1,10]}$. Họ cùng làm những bài nào? Tìm dãy dài nhất các bài <strong>CÙNG LÀM THEO CÙNG THỨ TỰ</strong>.</p>
+  <p>Trong ví dụ trên: A và B cùng làm $\text{[2, 4, 5, 6, 7]}$ (5 bài) — đây chính là LCS. (Lưu ý: dù B có làm bài 3 trước bài 5, nhưng A làm bài 3 trước bài 5, nên thứ tự [3, 5] cũng có thể — nhưng [2,4,5,6,7] dài hơn.)</p>
+  <p><strong>Cách DP:</strong> $F[i,j]$ = độ dài LCS của $A[1..i]$ và $B[1..j]$.</p>
+  <ul style="padding-left: 20px;">
+    <li>Nếu $A[i] = B[j]$ → $F[i,j] = F[i-1,j-1] + 1$ (hai phần tử khớp, thêm 1 vào LCS).</li>
+    <li>Nếu $A[i] \ne B[j]$ → $F[i,j] = \max(F[i-1,j], F[i,j-1])$ (bỏ $A[i]$ hoặc bỏ $B[j]$, lấy lựa chọn tốt hơn).</li>
+  </ul>
+  <p><strong>Cảm giác:</strong> giống so sánh 2 chuỗi DNA — tìm đoạn giống nhau dài nhất. Hai nhà khoa học cầm 2 chuỗi DNA, đối từng cặp kí tự, khớp thì đánh dấu, không khớp thì thử bỏ qua từng bên.</p>
 </div>
 
 <div class="callout callout-example">
@@ -643,6 +692,26 @@ print(lcs(a, b))  # 5 (dãy 2, 4, 5, 6, 7)</code></pre>
 <div class="callout callout-theory">
   <div class="callout-title">💡 Ý tưởng</div>
   <p>0/1 Knapsack có <strong>cấu trúc con tối ưu</strong>: tại vật $k$, quyết định chọn/không chọn dựa trên lời giải tối ưu của $k-1$ vật đầu. <strong>Greedy không tối ưu</strong> (vì mỗi vật chỉ 1 cái, không thể bù bằng tỉ lệ $v/g$). Phải dùng DP: lập bảng $F[k, V]$ = GT lớn nhất khi xét $k$ vật đầu, TTL còn $V$.</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Bạn có 1 cái ba lô giới hạn $W$ kg. Có $n$ đồ vật, mỗi vật có trọng lượng $g[i]$ và giá trị $v[i]$. Mỗi vật <strong>CHỈ CÓ 1 CÁI</strong> — chọn hoặc không. Tìm cách chọn sao cho tổng giá trị <strong>MAX</strong> mà không vượt $W$.</p>
+  <p><strong>Khác Knapsack vô hạn (Greedy):</strong> vô hạn mỗi vật lấy bao nhiêu cũng được → Greedy (sắp đơn giá giảm dần) đúng. 0/1 mỗi vật chỉ 1 cái → Greedy có thể <strong>SAI</strong>.</p>
+  <p><strong>Ví dụ Greedy sai:</strong> $W=10$, 3 vật:</p>
+  <ul style="padding-left: 20px;">
+    <li>A: $g=6, v=12$ (đơn giá 2.0)</li>
+    <li>B: $g=5, v=9$ (đơn giá 1.8)</li>
+    <li>C: $g=5, v=9$ (đơn giá 1.8)</li>
+  </ul>
+  <p>Greedy: chọn A (đơn giá cao nhất) → còn 4 kg, không chọn được B hay C (cần 5 kg). Tổng = 12.<br>
+  DP: chọn B + C = 10 kg, giá trị 18. <strong>TỐI ƯU!</strong> Greedy sai vì "tham lam" A mà không thấy B+C lợi hơn.</p>
+  <p><strong>Cách DP:</strong> $F[k, V]$ = giá trị max khi xét $k$ vật đầu, trọng lượng còn $V$.</p>
+  <ul style="padding-left: 20px;">
+    <li>$F[k, V] = \max(F[k-1, V],\; F[k-1, V-g[k]] + v[k])$.</li>
+    <li>Không chọn vật $k$ → $F[k-1, V]$. Chọn vật $k$ (nếu $g[k] \le V$) → $F[k-1, V-g[k]] + v[k]$.</li>
+  </ul>
+  <p><strong>Cảm giác:</strong> giống bạn có 1 vali giới hạn cân, chọn đồ mang đi du lịch. Mỗi món chỉ có 1 cái — chọn hay không chọn? DP giúp xem xét <strong>TẤT CẢ</strong> tổ hợp mà không phải thử từng cái (vét cạn $2^n$ trường hợp).</p>
 </div>
 
 <div class="callout callout-warn">
@@ -728,6 +797,19 @@ print(knapsack_01(weights, values, W))  # 13</code></pre>
 <div class="callout callout-theory">
   <div class="callout-title">💡 Ý tưởng</div>
   <p>"Đếm số cách phân tích $n$" là bài toán <strong>đếm</strong> điển hình → dấu hiệu nhận biết DP. Có <strong>bài toán con chồng lặp</strong>: phân tích $v$ thành tổng các số $\le m$ phụ thuộc vào phân tích $v$ thành tổng $\le m-1$ và $\le m$ (với $v-m$). DP lập bảng $F[m, v]$.</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Cho số $n$, đếm có bao nhiêu cách viết $n$ thành tổng các số nguyên dương (thứ tự không quan trọng — vd $3+2$ và $2+3$ là cùng 1 cách).</p>
+  <p><strong>Ví dụ:</strong> 5 có thể viết: $5=5$; $5=4+1$; $5=3+2$; $5=3+1+1$; $5=2+2+1$; $5=2+1+1+1$; $5=1+1+1+1+1$. Tổng <strong>7 cách</strong>.</p>
+  <p><strong>Cách DP:</strong> $F[m, v]$ = số cách phân tích số $v$ thành tổng các số nguyên dương $\le m$.</p>
+  <ul style="padding-left: 20px;">
+    <li>$F[m-1, v]$: <strong>không dùng</strong> số $m$.</li>
+    <li>$F[m, v-m]$: <strong>dùng thêm 1 lần</strong> số $m$ (với $v - m \ge 0$).</li>
+    <li>$F[m, v] = F[m-1, v] + F[m, v-m]$ (nếu $m \le v$).</li>
+  </ul>
+  <p><strong>Cảm giác:</strong> giống đếm số cách trả tiền bằng các tờ mệnh giá khác nhau — nhưng ở đây "mệnh giá" là các số từ 1 đến $n$. Bạn có "tờ 1 đồng, 2 đồng, 3 đồng..."; trả 5 đồng thì có bao nhiêu cách kết hợp các tờ (không phân biệt thứ tự rút tờ nào trước)?</p>
 </div>
 
 <div class="callout callout-example">
@@ -1127,6 +1209,31 @@ new Quiz('quiz-dp', [
   <p>• <strong>LIS</strong> thường yêu cầu truy vết → phải dùng mảng <code>prev</code>.</p>
   <p>• <strong>Phân tích số</strong> dễ nhầm công thức — nhớ dấu hiệu "$F[m, v-m]$" (cùng $m$, giảm $v$).</p>
   <p>• Khi gặp bài lạ: <em>"Đếm số cách..."</em> hoặc <em>"Tìm max/min..."</em> với ràng buộc → nghĩ đến DP.</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Tổng kết DP bằng ngôn ngữ đời thường</div>
+  <p><strong>Khi nào dùng DP?</strong> Bài toán có 2 tính chất:</p>
+  <ol style="padding-left: 20px;">
+    <li><strong>Cấu trúc con tối ưu:</strong> lời giải bài lớn = tổng hợp lời giải bài con (giống xếp Lego — tháp lớn được xây từ các khối nhỏ).</li>
+    <li><strong>Bài toán con chồng lặp:</strong> cùng 1 bài con được dùng nhiều lần (giống ôn bài — gặp cùng dạng nhiều lần thì nhớ cách giải).</li>
+  </ol>
+  <p><strong>Cách nhận diện bài DP:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>"Đếm số cách..." → DP.</li>
+    <li>"Tìm max/min..." với ràng buộc → DP.</li>
+    <li>Bài có công thức truy hồi → DP.</li>
+  </ul>
+  <p><strong>5 bước giải (như nấu 1 món ăn):</strong></p>
+  <ol style="padding-left: 20px;">
+    <li><strong>Định nghĩa $F[i]$</strong> (hoặc $F[i,j]$) — giống quyết định "món này cần nguyên liệu gì".</li>
+    <li><strong>Tìm công thức truy hồi</strong> — "công thức nấu".</li>
+    <li><strong>Xác định giá trị biên</strong> — "lượng nguyên liệu tối thiểu".</li>
+    <li><strong>Tính từ dưới lên</strong> — "nấu từng bước, không bỏ bước".</li>
+    <li><strong>Truy vết nếu cần</strong> — "ghi lại công thức để lần sau nấu lại".</li>
+  </ol>
+  <p><strong>Ví dụ:</strong> C(n,k) = "chọn bạn vào đội", LIS = "xếp gạch tăng dần", LCS = "so sánh DNA", 0/1 Knapsack = "đóng vali du lịch", Phân tích số = "đếm cách trả tiền". Cả 5 đều cùng 1 tinh thần: <strong>chia nhỏ → ghi nhớ → tổng hợp</strong>.</p>
+  <p><strong>Cảm giác chung:</strong> DP = <em>"lười nhưng thông minh"</em> — đã tính rồi thì nhớ, đừng tính lại. Đó là tinh thần cốt lõi của 5 bài toán kinh điển này.</p>
 </div>
 
 <div class="nav-bottom">

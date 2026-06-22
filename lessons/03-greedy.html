@@ -36,6 +36,19 @@
   <p>Sau khi chọn <code>Xᵢ</code>, ta KHÔNG bao giờ quay lại thay đổi lựa chọn đó. Greedy cứ "tham" chọn cái tốt nhất trước mắt, hy vọng kết quả cuối cùng cũng tốt.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>"Tham lam" (Greedy) = ở mỗi bước, chọn cái <strong>TỐT NHẤT</strong> tại thời điểm đó, <strong>KHÔNG QUAY LẠI</strong> sửa đổi. Giống bạn đi ăn buffet — thấy món nào ngon nhất thì lấy trước, không nghĩ "có khi lát nữa còn món ngon hơn".</p>
+  <p>Đặc điểm: <strong>nhanh, đơn giản</strong>, NHƯNG <strong>không phải lúc nào cũng tối ưu</strong>.</p>
+  <p><strong>Ví dụ:</strong> Bạn có 1 giờ, có 3 bài tập (mỗi bài 30 phút, điểm 5/10) HOẶC 1 bài (60 phút, điểm 8/10).</p>
+  <ul style="padding-left: 20px;">
+    <li>Greedy: làm 3 bài (lấy nhiều bài trước) → 15 điểm.</li>
+    <li>Tối ưu: làm 1 bài → 8 điểm. Thua!</li>
+    <li>Nhưng nếu chỉ được 1 giờ (= 60 phút), Greedy sẽ làm 2 bài trước → 10 điểm. Tối ưu là 8. Greedy đúng!</li>
+  </ul>
+  <p>Cảm giác: Greedy giống "chọn lợi ích trước mắt". Đôi khi đúng, đôi khi sai.</p>
+</div>
+
 <div class="callout callout-warn">
   <div class="callout-title">⚠️ Lưu ý cực kỳ quan trọng</div>
   <p>Greedy cho <strong>giải thuật thời gian đa thức</strong> (nhanh), nhưng thường chỉ được phương án <strong>TỐT</strong> chứ chưa chắc <strong>TỐI ƯU</strong>.</p>
@@ -539,6 +552,18 @@ new StepReveal('step-tsp', [
   <p><strong>Vì sao?</strong> Mỗi tờ 100k thay thế được 2 tờ 50k → giảm số tờ. Mệnh giá lớn càng ưu tiên thì số tờ càng ít.</p>
 </div>
 
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Giống khi bạn rút tiền ở ATM, máy luôn ưu tiên trả tờ mệnh giá lớn trước — ít tờ hơn thì dễ đếm, nhẹ ví, tiện cho khách.</p>
+  <p><strong>Ví dụ:</strong> Rút 1.290.000đ. Có 2 cách:</p>
+  <ul style="padding-left: 20px;">
+    <li>Cách Greedy: 12 tờ 100k + 1 tờ 50k + 2 tờ 20k = 15 tờ. Gọn!</li>
+    <li>Cách "cười": 129 tờ 10k. Ví phình to, nhân viên ngân hàng khóc.</li>
+    <li>Máy ATM luôn dùng cách Greedy.</li>
+  </ul>
+  <p>Tại sao Greedy đúng cho ATM? Vì hệ mệnh giá tiền Việt Nam là "Canon" — mỗi tờ lớn hơn gấp đôi tờ nhỏ hơn liền kề, nên luôn tối ưu.</p>
+</div>
+
 <div class="callout callout-theory">
   <div class="callout-title">📋 Phát biểu bài toán</div>
   <p>Máy ATM có 4 mệnh giá: <strong>100.000đ, 50.000đ, 20.000đ, 10.000đ</strong>. Rút <code>n</code> đồng (n chia hết cho 10.000). Tìm số tờ ít nhất.</p>
@@ -602,6 +627,19 @@ print(atm(1290000, tigia))  # [12, 1, 2, 0]</code></pre>
     </li>
     <li><strong>Lặp lại</strong> cho đến khi xây dựng được 1 chu trình (đủ n cạnh).</li>
   </ol>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Bạn là shipper, có 5 điểm giao hàng. Bạn muốn đi đường ngắn nhất để tiết kiệm xăng. Cách tham lam: luôn đi đến điểm <strong>GẦN NHẤT</strong> chưa giao. Nhưng đôi khi đi gần trước lại xa tổng thể.</p>
+  <p><strong>Ví dụ:</strong> Bạn ở A, có 4 điểm B, C, D, E. Khoảng cách: A-B=1, A-C=10, A-D=10, A-E=10. B-C=10, B-D=1, B-E=10.</p>
+  <ul style="padding-left: 20px;">
+    <li>Greedy: A→B (1km, gần nhất). Từ B: B→D (1km, gần nhất). Từ D: còn C, E đều 10km. Đi tiếp...</li>
+    <li>Tổng Greedy có thể = 1+1+10+10+10 = 32km.</li>
+    <li>Tối ưu thực sự: A→C→E→D→B = 10+10+1+10+1 = 32km. Cũng 32! Greedy đúng lần này.</li>
+    <li>Nhưng đổi ma trận một chút → Greedy có thể sai.</li>
+  </ul>
+  <p>Cảm giác: TSP là bài toán "NP-hard" — chưa ai tìm được thuật toán tối ưu nhanh. Greedy cho "phương án tốt" nhưng chưa chắc "tốt nhất".</p>
 </div>
 
 <div class="callout callout-theory">
@@ -693,6 +731,20 @@ print(tsp_greedy(dist, 4))</code></pre>
     <li>Với mỗi đồ vật (theo thứ tự đã sắp), <strong>lấy số lượng tối đa</strong> mà trọng lượng còn lại cho phép: <code>⌊W_còn / gᵢ⌋</code>.</li>
   </ol>
   <p><strong>Vì sao?</strong> Đơn giá cao = "hời" nhất (nhiều giá trị / ít trọng lượng) → ưu tiên lấy hết.</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Bạn đi siêu thị, có 1 cái túi tối đa 5kg. Có các loại hàng:</p>
+  <ul style="padding-left: 20px;">
+    <li>Kẹo: 1kg, 10k VNĐ → đơn giá 10k/kg</li>
+    <li>Bánh: 2kg, 30k → 15k/kg (đắt nhất!)</li>
+    <li>Nước: 3kg, 30k → 10k/kg</li>
+  </ul>
+  <p>Greedy: ưu tiên hàng có đơn giá cao nhất/kg → lấy Bánh trước (15k/kg). Lấy 2 bánh = 4kg, 60k. Còn 1kg → lấy Kẹo 1kg, 10k. Tổng 70k.</p>
+  <p>Có cách tốt hơn không? Có 5kg → 5 kẹo = 50k (thua), 1 bánh + 1 nước = 5kg, 60k (thua). Greedy đúng!</p>
+  <p>Nhưng nếu chỉ được 6kg: Greedy = 3 bánh = 6kg, 90k. Tốt nhất? Có. Greedy đúng.</p>
+  <p><strong>Lưu ý:</strong> Greedy đúng cho Knapsack VÔ HẠN (mỗi loại lấy bao nhiêu cũng được). Nhưng cho Knapsack 0/1 (mỗi vật chỉ 1 cái) thì Greedy có thể SAI → phải dùng DP.</p>
 </div>
 
 <div class="callout callout-theory">
@@ -1085,6 +1137,21 @@ new Quiz('quiz-greedy', [
   <p>• Khi gặp đề "chu trình qua tất cả" → TSP Greedy (chỉ tốt, không tối ưu).</p>
   <p>• Khi gặp đề "ba lô + số lượng không hạn chế" → Knapsack vô hạn Greedy.</p>
   <p>• Khi gặp đề "ba lô + mỗi vật 1 cái" → DP, KHÔNG dùng Greedy!</p>
+</div>
+
+<div class="callout callout-life">
+  <div class="callout-title">🌍 Giải thích đời thường</div>
+  <p>Cảm giác về Greedy: giống bạn đi mua sắm, luôn chọn món "hời nhất" trước. Đa số trường hợp sẽ có kết quả tốt, nhưng đôi khi phải nhìn tổng thể mới tối ưu.</p>
+  <p><strong>Khi nào DÙNG Greedy:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Bài toán cho phép "lấy bao nhiêu cũng được" (ATM, Knapsack vô hạn).</li>
+    <li>Bài toán có tính chất "chọn cục bộ tối ưu = tổng thể tối ưu".</li>
+  </ul>
+  <p><strong>Khi nào KHÔNG DÙNG:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Bài toán 0/1 (chỉ chọn hoặc không).</li>
+    <li>Bài toán cần xem lại các lựa chọn trước.</li>
+  </ul>
 </div>
 
 <div class="nav-bottom">

@@ -399,6 +399,20 @@ pre code {
   color: var(--accent-dark);
 }
 
+.callout-life {
+  background: linear-gradient(135deg, rgba(255, 236, 210, 0.5) 0%, rgba(255, 218, 224, 0.5) 100%);
+  border-color: #f59e0b;
+  color: #d97706;
+}
+
+.callout-life .callout-title {
+  color: #b45309;
+}
+
+[data-theme="dark"] .callout-life {
+  background: rgba(245, 158, 11, 0.12);
+}
+
 /* ----- Step-by-step ----- */
 .steps {
   list-style: none;
