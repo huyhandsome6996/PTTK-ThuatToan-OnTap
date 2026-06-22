@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ôn tập Phân Tích Thiết Kế Thuật Toán - 4 chương tương tác chi tiết</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="index.html"><strong>📚 PTTK Thuật Toán</strong></a>
+  <span style="color: var(--text-muted);">Quyết tâm 10 điểm! 🎯</span>
+</div>
+
+<section class="hero">
+  <div class="hero-badge">
+    <span>Bám sát giáo trình Th.S. Nguyễn Văn Linh · Đại học Cần Thơ · 2003</span>
+  </div>
+  <h1>Ôn Tập Phân Tích Thiết Kế<br>Thuật Toán</h1>
+  <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 700px; margin: 20px auto;">
+    4 chương trọng tâm thi: <strong style="color: var(--primary-dark);">Sắp xếp</strong> · <strong style="color: var(--primary-dark);">Độ phức tạp BigO</strong> · <strong style="color: var(--primary-dark);">Tham lam (Greedy)</strong> · <strong style="color: var(--primary-dark);">Quy hoạch động (DP)</strong>.
+    Có giả mã, cài đặt Python, mô phỏng tương tác trực tiếp, quiz và cách trình bày bài thi.
+  </p>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-number">4</div>
+      <div class="hero-stat-label">Chương</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">7+</div>
+      <div class="hero-stat-label">Thuật toán sắp xếp</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">10+</div>
+      <div class="hero-stat-label">Bài toán mẫu</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number" data-progress-count>0</div>
+      <div class="hero-stat-label">Đã hoàn thành</div>
+    </div>
+  </div>
+
+  <div style="max-width: 600px; margin: 30px auto;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-muted);">
+      <span>Tiến độ học tập</span>
+      <span data-progress-text>0 / 4 bài đã hoàn thành (0%)</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-bar-fill" data-progress-fill style="width: 0%"></div>
+    </div>
+  </div>
+</section>
+
+<div class="search-container">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="search-input" class="search-input" placeholder="Tìm bài học... (vd: quicksort, bigO, knapsack, LCS, ATM)">
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Cách học hiệu quả để được 10 điểm</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Đọc lý thuyết + ý tưởng</strong> trước — phải hiểu <em>vì sao</em> thuật toán hoạt động, không chỉ học thuộc mã.</li>
+    <li><strong>Chạy mô phỏng từng bước</strong> — bấm "Bước tiếp" để xem thuật toán xử lý dữ liệu ra sao.</li>
+    <li><strong>Đọc giả mã + Python code</strong> song song — hiểu cả 2 ngôn ngữ vì đề thi có thể yêu cầu cái nào.</li>
+    <li><strong>Làm bài tập tự sinh</strong> — nhập dữ liệu của bạn, xem chương trình chạy ra sao.</li>
+    <li><strong>Làm quiz</strong> để kiểm tra đã hiểu.</li>
+    <li><strong>Đọc "Tư duy thuật toán"</strong> ở cuối mỗi bài — đây là chìa khóa để giải được bài lạ trong thi.</li>
+  </ol>
+</div>
+
+<h2>📋 Danh sách 4 chương trọng tâm</h2>
+
+<div class="lesson-grid" id="lesson-grid">
+
+  <a href="lessons/01-sort.html" class="lesson-card" data-lesson-id="01">
+    <span class="lesson-card-number">1</span>
+    <div class="lesson-card-title">Sắp xếp (Sorting)</div>
+    <div class="lesson-card-desc">7 thuật toán: Selection, Insertion, Bubble, QuickSort, HeapSort, BinSort, Bucket Sort. Giả mã + Python + mô phỏng từng bước.</div>
+    <span class="lesson-card-tag">Selection</span>
+    <span class="lesson-card-tag">Insertion</span>
+    <span class="lesson-card-tag">Quick</span>
+    <span class="lesson-card-tag">Heap</span>
+  </a>
+
+  <a href="lessons/02-bigo.html" class="lesson-card" data-lesson-id="02">
+    <span class="lesson-card-number">2</span>
+    <div class="lesson-card-title">Độ phức tạp BigO</div>
+    <div class="lesson-card-desc">Từ O(1) đến O(2^n). Tính BigO cho vòng lặp for, while, đệ quy. Quy tắc cộng/nhân. Phương trình đệ quy + Định lý Master.</div>
+    <span class="lesson-card-tag">O(n)</span>
+    <span class="lesson-card-tag">O(logn)</span>
+    <span class="lesson-card-tag">Đệ quy</span>
+    <span class="lesson-card-tag">Master</span>
+  </a>
+
+  <a href="lessons/03-greedy.html" class="lesson-card" data-lesson-id="03">
+    <span class="lesson-card-number">3</span>
+    <div class="lesson-card-title">Thuật toán Tham lam (Greedy)</div>
+    <div class="lesson-card-desc">Nguyên lý + ý tưởng. Bài toán ATM, người giao hàng TSP, cái ba lô (Knapsack) vô hạn. Tư duy chọn cục bộ tối ưu.</div>
+    <span class="lesson-card-tag">ATM</span>
+    <span class="lesson-card-tag">TSP</span>
+    <span class="lesson-card-tag">Knapsack</span>
+  </a>
+
+  <a href="lessons/04-dp.html" class="lesson-card" data-lesson-id="04">
+    <span class="lesson-card-number">4</span>
+    <div class="lesson-card-title">Quy hoạch động (DP)</div>
+    <div class="lesson-card-desc">C(n,k) tam giác Pascal, dãy con tăng dài nhất LIS, dãy con chung dài nhất LCS, ba lô 0/1, phân tích số. Bảng DP + truy vết.</div>
+    <span class="lesson-card-tag">C(n,k)</span>
+    <span class="lesson-card-tag">LIS</span>
+    <span class="lesson-card-tag">LCS</span>
+    <span class="lesson-card-tag">0/1 Knapsack</span>
+  </a>
+
+</div>
+
+<h2>🎯 Lộ trình ôn tập (theo độ khó tăng dần)</h2>
+
+<div class="tabs" data-tabs="schedule">
+  <button class="tab active">📚 Buổi 1: Nền tảng</button>
+  <button class="tab">⚡ Buổi 2: BigO + Sắp xếp</button>
+  <button class="tab">🏆 Buổi 3: Greedy + DP</button>
+</div>
+
+<div class="tab-content active">
+  <h3>Buổi 1 — Nền tảng (2 giờ)</h3>
+  <p>Đọc lý thuyết chung về thuật toán, độ phức tạp, các khái niệm cơ bản.</p>
+  <ul style="padding-left: 20px;">
+    <li>Bài 2: Đọc phần "Lý thuyết BigO" + "Quy tắc cộng/nhân" (30 phút)</li>
+    <li>Bài 1: Đọc phần "Tổng quan sắp xếp" + 3 thuật toán đơn giản (Selection, Insertion, Bubble) (60 phút)</li>
+    <li>Làm quiz các bài đã học (30 phút)</li>
+  </ul>
+  <p><strong>Mục tiêu</strong>: Hiểu BigO là gì, biết tính độ phức tạp vòng lặp đơn giản, nắm 3 thuật toán sắp xếp cơ bản.</p>
+</div>
+
+<div class="tab-content">
+  <h3>Buổi 2 — BigO nâng cao + Sắp xếp nhanh (2 giờ)</h3>
+  <ul style="padding-left: 20px;">
+    <li>Bài 2: "Phương trình đệ quy" + "Định lý Master" (30 phút)</li>
+    <li>Bài 1: QuickSort + HeapSort (60 phút — 2 thuật toán quan trọng nhất)</li>
+    <li>Bài 1: BinSort + Bucket Sort (30 phút)</li>
+  </ul>
+  <p><strong>Mục tiêu</strong>: Tự tính được BigO của hàm đệ quy, tự implement QuickSort và HeapSort trên giấy.</p>
+</div>
+
+<div class="tab-content">
+  <h3>Buổi 3 — Kỹ thuật thiết kế (3 giờ)</h3>
+  <ul style="padding-left: 20px;">
+    <li>Bài 3: Tham lam — ATM, TSP, Knapsack (90 phút)</li>
+    <li>Bài 4: Quy hoạch động — C(n,k), LIS, LCS, 0/1 Knapsack (90 phút)</li>
+  </ul>
+  <p><strong>Mục tiêu</strong>: Nắm vững tư duy "chọn cục bộ tối ưu" của Greedy và "ghi nhớ bài toán con" của DP — đây là 2 kỹ thuật hay ra trong thi.</p>
+</div>
+
+<h2>🏆 Bí kíp được 10 điểm môn Thuật Toán</h2>
+
+<div class="callout callout-exam">
+  <div class="callout-title">6 quy tắc vàng khi làm bài thi</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Luôn nêu Ý TƯỞNG trước khi viết mã</strong> — giám khảo chấm ý tưởng trước, mã sau. Nếu ý tưởng đúng mà mã sai vẫn được 60-70% điểm.</li>
+    <li><strong>Viết giả mã rõ ràng</strong> — dùng <code>PROCEDURE</code>, <code>FOR</code>, <code>WHILE</code>, <code>IF</code>, thụt lề đúng.</li>
+    <li><strong>Phân tích độ phức tạp cuối bài</strong> — luôn có dòng "Độ phức tạp: O(nlogn)" với giải thích.</li>
+    <li><strong>Cho ví dụ minh họa</strong> — chạy tay 1 ví dụ nhỏ (vd mảng [5,3,8,1]) để chứng tỏ hiểu.</li>
+    <li><strong>Nêu trường hợp xấu nhất / tốt nhất</strong> — vd QuickSort: tốt O(nlogn), xấu O(n²).</li>
+    <li><strong>So sánh với thuật toán khác</strong> — vd "QuickSort nhanh hơn HeapSort trên thực tế do cache-friendly" — được điểm cộng.</li>
+  </ol>
+</div>
+
+<h2>📖 Bám sát giáo trình nào?</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📚 Thông tin giáo trình</div>
+  <p>Trang web này bám sát nội dung giáo trình:</p>
+  <ul style="padding-left: 20px;">
+    <li><strong>Tên:</strong> GIẢI THUẬT (tổng hợp)</li>
+    <li><strong>Tác giả:</strong> Th.S. Nguyễn Văn Linh</li>
+    <li><strong>Đơn vị:</strong> Đại học Cần Thơ</li>
+    <li><strong>Năm:</strong> 12/2003</li>
+    <li><strong>Dự án:</strong> ASVIET002CNTT "Tăng cường hiệu quả đào tạo và năng lực tự đào tạo của sinh viên khoa CNTT"</li>
+  </ul>
+  <p>Các thuật toán, ký hiệu, cách phân tích đều <strong>theo đúng giáo trình</strong> để bạn làm bài thi không bị chênh lệch.</p>
+</div>
+
+<h2>⚙️ Tính năng đặc biệt</h2>
+
+<div class="lesson-grid" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));">
+  <div class="lesson-card" style="cursor: default;">
+    <div style="font-size: 2rem; margin-bottom: 10px;">🌙</div>
+    <div class="lesson-card-title">Dark Mode</div>
+    <div class="lesson-card-desc">Nút góc dưới phải để chuyển sáng/tối. Tự động nhớ lựa chọn.</div>
+  </div>
+  <div class="lesson-card" style="cursor: default;">
+    <div style="font-size: 2rem; margin-bottom: 10px;">🎮</div>
+    <div class="lesson-card-title">Mô phỏng từng bước</div>
+    <div class="lesson-card-desc">Bấm "Bước tiếp" xem thuật toán xử lý từng bước. Có animation.</div>
+  </div>
+  <div class="lesson-card" style="cursor: default;">
+    <div style="font-size: 2rem; margin-bottom: 10px;">🐍</div>
+    <div class="lesson-card-title">Python + Giả mã</div>
+    <div class="lesson-card-desc">Mỗi thuật toán có cả giả mã (Pascal/C) và cài đặt Python chạy được.</div>
+  </div>
+  <div class="lesson-card" style="cursor: default;">
+    <div style="font-size: 2rem; margin-bottom: 10px;">🧠</div>
+    <div class="lesson-card-title">Tư duy thuật toán</div>
+    <div class="lesson-card-desc">Phần "Tư duy" cuối mỗi bài giúp hiểu bản chất để giải bài lạ.</div>
+  </div>
+  <div class="lesson-card" style="cursor: default;">
+    <div style="font-size: 2rem; margin-bottom: 10px;">📊</div>
+    <div class="lesson-card-title">Bảng BigO trực quan</div>
+    <div class="lesson-card-desc">So sánh O(1), O(log n), O(n), O(n²), O(2^n) với biểu đồ tăng trưởng.</div>
+  </div>
+  <div class="lesson-card" style="cursor: default;">
+    <div style="font-size: 2rem; margin-bottom: 10px;">🖨️</div>
+    <div class="lesson-card-title">In mang đi thi</div>
+    <div class="lesson-card-desc">Ctrl+P để in. Mỗi bài có "Cách trình bày bài thi" chuẩn.</div>
+  </div>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Quan trọng về GitHub Token</div>
+  <p>Token GitHub đã được dùng để tạo repo này. <strong>Bạn PHẢI revoke (xóa) token ngay</strong>:</p>
+  <ol style="padding-left: 20px;">
+    <li>Vào <a href="https://github.com/settings/tokens" target="_blank">https://github.com/settings/tokens</a></li>
+    <li>Tìm token bắt đầu bằng <code>ghp_u9sK1...</code></li>
+    <li>Bấm <strong>Delete</strong>.</li>
+  </ol>
+</div>
+
+<div class="text-center" style="margin-top: 40px; padding: 24px; background: var(--bg-glass); border-radius: var(--radius-lg); backdrop-filter: blur(10px);">
+  <p style="font-size: 1.2rem; font-weight: 600; color: var(--primary-dark);">
+    Chúc bạn làm bài thật tốt! 🎓
+  </p>
+  <p style="color: var(--text-muted); margin-top: 8px;">
+    Quyết tâm 10 điểm! Hiểu tư duy thuật toán, không học thuộc.
+  </p>
+</div>
+
+<script src="assets/common.js"></script>
+</body>
+</html>

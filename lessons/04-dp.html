@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bài 4: Quy hoạch động (DP) - PTTK Thuật Toán</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="../assets/common.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="03-greedy.html">← Bài 3: Tham lam</a>
+  <strong>Bài 4: Quy hoạch động (DP)</strong>
+  <span>4/4</span>
+</div>
+
+<h1>Bài 4: Quy Hoạch Động (Dynamic Programming)</h1>
+
+<p class="text-center" style="color: var(--text-secondary); font-size: 1.05rem;">
+  Quy hoạch động (DP) là kỹ thuật mạnh nhất trong PTTK — giải bài toán tối ưu bằng cách <strong>GHI NHỚ</strong> lời giải các bài toán con. 5 bài toán kinh điển: C(n,k), LIS, LCS, 0/1 Knapsack, phân tích số.
+</p>
+
+<!-- ============================== LÝ THUYẾT DP ============================== -->
+<h2>📖 Lý thuyết Quy hoạch động</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">🔑 Nguyên lý</div>
+  <p>DP <strong>giống chia để trị</strong> — chia bài toán thành các bài toán con nhỏ hơn. KHÁC BIỆT cốt lõi: các bài toán con <strong>KHÔNG độc lập</strong> với nhau (cùng dùng chung bài toán con nhỏ hơn), nên nếu dùng chia để trị sẽ <strong>lặp lại việc giải</strong> → DP <strong>giải 1 lần rồi GHI NHỚ</strong>.</p>
+  <p>Ví dụ kinh điển: <strong>Fibonacci</strong>. $F(n) = F(n-1) + F(n-2)$. Cả $F(n-1)$ và $F(n-2)$ đều cần $F(n-2)$, $F(n-3)$... Nếu đệ quy thông thường, $F(2)$ được tính đi tính lại rất nhiều lần. DP lưu $F(2)$ vào bảng → chỉ tính 1 lần.</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Phân biệt DP với Chia để trị</div>
+  <table>
+    <tr><th>Tiêu chí</th><th>Chia để trị</th><th>Quy hoạch động</th></tr>
+    <tr><td>Bài toán con</td><td>ĐỘC LẬP (QuickSort: 2 nửa riêng biệt)</td><td>CHỒNG LẤP (cùng dùng bài toán con chung)</td></tr>
+    <tr><td>Cách giải</td><td>Đệ quy (top-down)</td><td>Ghi nhớ + đi từ dưới lên (bottom-up)</td></tr>
+    <tr><td>Ví dụ</td><td>QuickSort, MergeSort, Binary Search</td><td>Fibonacci, C(n,k), LIS, LCS, Knapsack</td></tr>
+  </table>
+</div>
+
+<h3>📋 Phương pháp chung 3 bước</h3>
+<ol class="steps">
+  <li><span class="step-title">Phân rã</span>Chia bài toán thành các bài toán con nhỏ hơn. Mỗi bài toán lớn được biểu diễn qua bài toán con.</li>
+  <li><span class="step-title">Ghi nhớ lời giải</span>Lưu lời giải các bài toán con vào bảng (1D, 2D, 3D... tùy bài). Khi cần lại, tra cứu bảng thay vì tính lại.</li>
+  <li><span class="step-title">Tổng hợp lời giải</span>Đi từ dưới lên (bottom-up): từ bài toán con nhỏ nhất → lớn dần → bài toán gốc.</li>
+</ol>
+
+<h3>📊 Ưu / Nhược điểm</h3>
+<table>
+  <tr><th>Ưu điểm</th><th>Nhược điểm</th></tr>
+  <tr>
+    <td>✅ Nhanh (do ghi nhớ, tránh lặp)<br>✅ Áp dụng cho bài toán tối ưu + bài có công thức truy hồi<br>✅ Đảm bảo tìm được lời giải TỐI ƯU</td>
+    <td>❌ Khó tìm công thức truy hồi (cần tư duy mạnh)<br>❌ Bộ nhớ lớn (cần lưu bảng DP)<br>❌ Không phải bài nào cũng có cấu trúc con tối ưu</td>
+  </tr>
+</table>
+
+<h3>🛠️ Các bước thực hiện DP</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 3 bước cài đặt</div>
+  <p><strong>Bước 1: Lập hệ thức</strong> — tìm công thức truy hồi $F[i] = ...$ dựa vào $F[j]$ với $j < i$.</p>
+  <p><strong>Bước 2: Tổ chức dữ liệu và chương trình</strong> — chọn bảng (1D/2D/3D), khởi tạo giá trị biên, tính bảng theo công thức từ dưới lên.</p>
+  <p><strong>Bước 3: Làm mịn (nếu cần)</strong> — tối ưu bộ nhớ (vd giảm 2D → 1D), tối ưu thời gian.</p>
+</div>
+
+<!-- ============================== TƯ DUY DP ============================== -->
+<h2>🧠 Tư duy DP — Khi nào dùng?</h2>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Dùng DP khi bài toán có 2 tính chất</div>
+  <p><strong>1. Cấu trúc con tối ưu (subproblem optimality):</strong> Lời giải tối ưu của bài toán lớn <em>chứa</em> lời giải tối ưu của các bài toán con. Ví dụ: LIS của cả dãy chứa LIS của tiền tố.</p>
+  <p><strong>2. Bài toán con chồng lặp (overlapping subproblems):</strong> Cùng 1 bài toán con được dùng nhiều lần trong quá trình giải. Đây là điều khiến chia để trị kém hiệu quả và DP tỏa sáng.</p>
+</div>
+
+<h3>🔍 Cách nhận diện bài toán DP</h3>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Dấu hiệu nhận biết</div>
+  <ul style="padding-left: 20px;">
+    <li>Câu hỏi dạng <strong>"Đếm số cách..."</strong> → thường DP. (vd: đếm số cách leo cầu thang, đếm số cách phân tích số).</li>
+    <li>Câu hỏi dạng <strong>"Tìm max/min..."</strong> với ràng buộc → thường DP. (vd: LIS, LCS, Knapsack).</li>
+    <li>Bài có <strong>công thức truy hồi</strong> rõ ràng → DP. (vd: Fibonacci, C(n,k)).</li>
+    <li>Bài mà đệ quy thông thường <strong>chậm do lặp</strong> → DP.</li>
+  </ul>
+</div>
+
+<h3>📝 5 bước giải bài DP (chuẩn trình bày thi)</h3>
+<ol class="steps">
+  <li><span class="step-title">Định nghĩa F[i] (hoặc F[i,j]) là gì</span>Ví dụ: $F[i]$ = độ dài LIS kết thúc tại $a[i]$. Đây là bước quan trọng nhất — định nghĩa sai thì cả bài sai.</li>
+  <li><span class="step-title">Tìm công thức truy hồi</span>Nhìn bài toán con nhỏ nhất: $F[i]$ được tính từ các $F[j]$ nào? Điều kiện gì?</li>
+  <li><span class="step-title">Xác định giá trị biên</span>$F[0]$, $F[1]$, $F[i,0]$... — giá trị khởi tạo để chạy công thức truy hồi.</li>
+  <li><span class="step-title">Tính từ dưới lên (bottom-up)</span>Viết vòng lặp for đi từ $i=0$ đến $i=n$, dùng công thức truy hồi.</li>
+  <li><span class="step-title">Truy vết nếu cần</span>Nếu đề yêu cầu chỉ ra các phần tử được chọn (không chỉ độ dài/giá trị), phải truy vết ngược từ $F[n]$ về.</li>
+</ol>
+
+<!-- ============================== BẢNG TỔNG QUAN ============================== -->
+<h2>📊 Bảng tổng quan 5 bài toán DP</h2>
+<table>
+  <tr><th>Bài toán</th><th>Ý nghĩa F</th><th>Công thức truy hồi</th><th>Độ phức tạp</th></tr>
+  <tr><td><strong>C(n, k)</strong></td><td>C[i,j] = số tổ hợp</td><td>C[i,j] = C[i-1,j-1] + C[i-1,j]</td><td>O(n²)</td></tr>
+  <tr><td><strong>LIS</strong></td><td>F[i] = độ dài LIS kết thúc tại a[i]</td><td>F[i] = max(F[j]) + 1, j&lt;i, a[j]&lt;a[i]</td><td>O(n²) / O(n log n)</td></tr>
+  <tr><td><strong>LCS</strong></td><td>F[i,j] = độ dài LCS(A[1..i], B[1..j])</td><td>F[i,j] = F[i-1,j-1]+1 nếu A[i]=B[j], ngược lại max(F[i-1,j], F[i,j-1])</td><td>O(n·m)</td></tr>
+  <tr><td><strong>0/1 Knapsack</strong></td><td>F[k,V] = GT lớn nhất k vật, TTL V</td><td>F[k,V] = max(F[k-1,V], F[k-1,V-gₖ]+vₖ)</td><td>O(n·W)</td></tr>
+  <tr><td><strong>Phân tích số</strong></td><td>F[m,v] = số cách PT v thành tổng ≤ m</td><td>F[m,v] = F[m-1,v] + F[m,v-m] nếu m ≤ v</td><td>O(n²)</td></tr>
+</table>
+
+<!-- ============================== MÔ PHỎNG TƯƠNG TÁC ============================== -->
+<h2>🎮 Mô phỏng tương tác — 4 bài toán DP</h2>
+
+<div class="tabs" data-tabs="dp-vis">
+  <button class="tab active">🔺 C(n,k) — Tam giác Pascal</button>
+  <button class="tab">📈 LIS — Dãy con tăng</button>
+  <button class="tab">🔗 LCS — Dãy con chung</button>
+  <button class="tab">🎒 0/1 Knapsack</button>
+</div>
+
+<!-- ===== TAB 1: PASCAL ===== -->
+<div class="tab-content active">
+  <div class="visualizer">
+    <div class="visualizer-title">⚡ Tam giác Pascal — Tính C(n, k) bằng DP</div>
+    <p class="text-center" style="color: var(--text-secondary); margin-bottom: 16px;">
+      Nhập n, k → bấm tính. Bảng (n+1)×(n+1) sẽ hiện ra. <strong>Click vào ô bất kỳ</strong> để xem công thức tính ô đó.
+    </p>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px;">
+      <label>n = <input type="number" id="pascal-n" value="5" min="0" max="10" style="width: 80px;"></label>
+      <label>k = <input type="number" id="pascal-k" value="2" min="0" max="10" style="width: 80px;"></label>
+      <button class="btn" onclick="pascalRun()">▶ Tính C(n, k)</button>
+    </div>
+    <div id="pascal-result" style="overflow-x: auto;"></div>
+    <div id="pascal-info" style="margin-top: 16px;"></div>
+  </div>
+</div>
+
+<!-- ===== TAB 2: LIS ===== -->
+<div class="tab-content">
+  <div class="visualizer">
+    <div class="visualizer-title">⚡ LIS — Tìm dãy con tăng dài nhất</div>
+    <p class="text-center" style="color: var(--text-secondary); margin-bottom: 16px;">
+      Nhập dãy số (cách nhau bởi dấu phẩy) → bấm tính. Xem bảng F[i] và dãy LIS được chọn (highlight xanh).
+    </p>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px;">
+      <input type="text" id="lis-input" value="1,2,3,4,9,10,5,6,7,8" style="max-width: 320px;">
+      <button class="btn" onclick="lisRun()">▶ Tìm LIS</button>
+    </div>
+    <div id="lis-result"></div>
+    <div id="lis-info" style="margin-top: 16px;"></div>
+  </div>
+</div>
+
+<!-- ===== TAB 3: LCS ===== -->
+<div class="tab-content">
+  <div class="visualizer">
+    <div class="visualizer-title">⚡ LCS — Tìm dãy con chung dài nhất</div>
+    <p class="text-center" style="color: var(--text-secondary); margin-bottom: 16px;">
+      Nhập 2 dãy A, B (cách nhau bởi dấu phẩy) → bấm tính. Xem bảng F[i,j] và đường truy vết LCS.
+    </p>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px;">
+      <label>A = <input type="text" id="lcs-a" value="1,2,3,4,5,6,7" style="max-width: 240px;"></label>
+      <label>B = <input type="text" id="lcs-b" value="2,4,3,5,6,8,7,1,10" style="max-width: 280px;"></label>
+      <button class="btn" onclick="lcsRun()">▶ Tìm LCS</button>
+    </div>
+    <div id="lcs-result" style="overflow-x: auto;"></div>
+    <div id="lcs-info" style="margin-top: 16px;"></div>
+  </div>
+</div>
+
+<!-- ===== TAB 4: KNAPSACK ===== -->
+<div class="tab-content">
+  <div class="visualizer">
+    <div class="visualizer-title">⚡ 0/1 Knapsack — Cái ba lô 0/1</div>
+    <p class="text-center" style="color: var(--text-secondary); margin-bottom: 16px;">
+      Nhập sức chứa W + danh sách vật (mỗi vật: <code>trọng_lượng,giá_trị</code>, các vật cách nhau bởi <code>;</code>).<br>
+      Vd: <code>3,4;4,5;5,6;2,3;1,1</code> → 5 vật: (g=3,v=4), (g=4,v=5), (g=5,v=6), (g=2,v=3), (g=1,v=1).
+    </p>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px;">
+      <label>W = <input type="number" id="knap-w" value="10" min="1" max="30" style="width: 80px;"></label>
+      <input type="text" id="knap-items" value="3,4;4,5;5,6;2,3;1,1" style="max-width: 320px;">
+      <button class="btn" onclick="knapRun()">▶ Giải bài toán</button>
+    </div>
+    <div id="knap-result" style="overflow-x: auto;"></div>
+    <div id="knap-info" style="margin-top: 16px;"></div>
+  </div>
+</div>
+
+<script>
+// ==================== TAB 1: PASCAL TRIANGLE ====================
+function pascalRun() {
+  const n = parseInt(document.getElementById('pascal-n').value);
+  const k = parseInt(document.getElementById('pascal-k').value);
+  if (isNaN(n) || isNaN(k) || n < 0 || k < 0 || k > n || n > 10) {
+    document.getElementById('pascal-info').innerHTML = '<div class="result-box error"><span class="result-label">Lỗi</span>Nhập lại n, k hợp lệ (0 ≤ k ≤ n, n ≤ 10).</div>';
+    return;
+  }
+  // Compute C[i][j]
+  const C = [];
+  for (let i = 0; i <= n; i++) {
+    C[i] = [];
+    for (let j = 0; j <= n; j++) {
+      if (j > i) C[i][j] = null;
+      else if (j === 0 || j === i) C[i][j] = 1;
+      else C[i][j] = C[i-1][j-1] + C[i-1][j];
+    }
+  }
+  // Render table
+  let html = '<table style="font-family: var(--font-mono); text-align: center; min-width: 400px;">';
+  html += '<tr><th>i \\ j</th>';
+  for (let j = 0; j <= n; j++) html += '<th>' + j + '</th>';
+  html += '</tr>';
+  for (let i = 0; i <= n; i++) {
+    html += '<tr><th>' + i + '</th>';
+    for (let j = 0; j <= n; j++) {
+      if (j > i) html += '<td style="background: var(--bg-subtle); color: var(--text-muted);">·</td>';
+      else {
+        const isAns = (i === n && j === k);
+        const style = isAns
+          ? 'background: var(--gradient-success); color: white; font-weight: 700; cursor: pointer; box-shadow: var(--shadow-md);'
+          : 'cursor: pointer;';
+        html += '<td onclick="pascalShow(' + i + ',' + j + ')" style="' + style + '" title="C(' + i + ',' + j + ')">' + C[i][j] + '</td>';
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  document.getElementById('pascal-result').innerHTML = html;
+  document.getElementById('pascal-info').innerHTML =
+    '<div class="result-box"><span class="result-label">Kết quả</span>C(' + n + ', ' + k + ') = <strong style="font-size:1.3rem; color: var(--success);">' + C[n][k] + '</strong>' +
+    '<br><small style="color: var(--text-secondary);">Ô màu xanh là đáp án. Click vào ô bất kỳ để xem công thức.</small></div>';
+  renderMath();
+}
+
+function pascalShow(i, j) {
+  let msg;
+  if (j === 0 || j === i) {
+    msg = 'C(' + i + ', ' + j + ') = <strong>1</strong> — đây là <strong>giá trị biên</strong> (j = 0 hoặc j = i). Công thức: $C(n, 0) = C(n, n) = 1$.';
+  } else if (j > i) {
+    msg = 'C(' + i + ', ' + j + ') = 0 (không tồn tại vì j &gt; i).';
+  } else {
+    msg = 'C(' + i + ', ' + j + ') = C(' + (i-1) + ', ' + (j-1) + ') + C(' + (i-1) + ', ' + j + ') = ' +
+      '<strong>ứng dụng công thức truy hồi</strong>: $C(n, k) = C(n-1, k-1) + C(n-1, k)$.';
+  }
+  document.getElementById('pascal-info').innerHTML =
+    '<div class="callout callout-theory"><div class="callout-title">🔍 Ô C(' + i + ', ' + j + ')</div><p>' + msg + '</p></div>';
+  renderMath();
+}
+
+// ==================== TAB 2: LIS ====================
+function lisRun() {
+  const txt = document.getElementById('lis-input').value.trim();
+  const a = txt.split(/[,\s]+/).map(Number).filter(n => !isNaN(n));
+  if (a.length < 1) {
+    document.getElementById('lis-info').innerHTML = '<div class="result-box error">Nhập dãy hợp lệ.</div>';
+    return;
+  }
+  const n = a.length;
+  const F = new Array(n).fill(1);
+  const prev = new Array(n).fill(-1);
+  for (let i = 1; i < n; i++) {
+    for (let j = 0; j < i; j++) {
+      if (a[j] < a[i] && F[j] + 1 > F[i]) {
+        F[i] = F[j] + 1;
+        prev[i] = j;
+      }
+    }
+  }
+  // Find max
+  let maxLen = 0, maxIdx = 0;
+  for (let i = 0; i < n; i++) {
+    if (F[i] > maxLen) { maxLen = F[i]; maxIdx = i; }
+  }
+  // Trace back
+  const chosen = [];
+  let cur = maxIdx;
+  while (cur !== -1) { chosen.unshift(cur); cur = prev[cur]; }
+
+  // Render array + F + trace
+  let html = '<div style="overflow-x:auto;"><table style="font-family: var(--font-mono); text-align:center; min-width: 500px;">';
+  html += '<tr><th>i</th>';
+  for (let i = 0; i < n; i++) html += '<th>' + i + '</th>';
+  html += '</tr><tr><th>a[i]</th>';
+  for (let i = 0; i < n; i++) {
+    const isChosen = chosen.includes(i);
+    html += '<td style="' + (isChosen ? 'background: var(--gradient-success); color: white; font-weight:700;' : '') + '">' + a[i] + '</td>';
+  }
+  html += '</tr><tr><th>F[i]</th>';
+  for (let i = 0; i < n; i++) {
+    const isChosen = chosen.includes(i);
+    html += '<td style="' + (isChosen ? 'background: var(--success-bg); color: var(--success); font-weight:700;' : '') + '">' + F[i] + '</td>';
+  }
+  html += '</tr></table></div>';
+  document.getElementById('lis-result').innerHTML = html;
+
+  const lisArr = chosen.map(i => a[i]).join(', ');
+  document.getElementById('lis-info').innerHTML =
+    '<div class="result-box"><span class="result-label">Kết quả</span>' +
+    'Độ dài LIS = <strong style="font-size:1.3rem; color: var(--success);">' + maxLen + '</strong><br>' +
+    'Dãy LIS: [' + lisArr + '] (highlight xanh)<br>' +
+    '<small style="color: var(--text-secondary);">F[i] = max(F[j]) + 1 với j &lt; i và a[j] &lt; a[i]. Truy vết từ vị trí có F max.</small></div>';
+}
+
+// ==================== TAB 3: LCS ====================
+function lcsRun() {
+  const A = document.getElementById('lcs-a').value.trim().split(/[,\s]+/).map(Number).filter(n => !isNaN(n));
+  const B = document.getElementById('lcs-b').value.trim().split(/[,\s]+/).map(Number).filter(n => !isNaN(n));
+  if (A.length < 1 || B.length < 1) {
+    document.getElementById('lcs-info').innerHTML = '<div class="result-box error">Nhập 2 dãy hợp lệ.</div>';
+    return;
+  }
+  const n = A.length, m = B.length;
+  // F[i][j], i=0..n, j=0..m
+  const F = [];
+  for (let i = 0; i <= n; i++) { F[i] = new Array(m+1).fill(0); }
+  for (let i = 1; i <= n; i++) {
+    for (let j = 1; j <= m; j++) {
+      if (A[i-1] === B[j-1]) F[i][j] = F[i-1][j-1] + 1;
+      else F[i][j] = Math.max(F[i-1][j], F[i][j-1]);
+    }
+  }
+  // Trace back
+  const path = new Set();
+  let i = n, j = m;
+  while (i > 0 && j > 0) {
+    if (A[i-1] === B[j-1]) { path.add(i + ',' + j); i--; j--; }
+    else if (F[i-1][j] >= F[i][j-1]) i--;
+    else j--;
+  }
+  // Render table: rows = i (0..n), cols = j (0..m)
+  let html = '<table style="font-family: var(--font-mono); text-align:center; font-size:0.85rem;">';
+  html += '<tr><th>F[i,j]</th><th>j=0</th>';
+  for (let j = 1; j <= m; j++) html += '<th>B[' + j + ']=' + B[j-1] + '</th>';
+  html += '</tr>';
+  for (let i = 0; i <= n; i++) {
+    html += '<tr><th>' + (i === 0 ? 'i=0' : 'A[' + i + ']=' + A[i-1]) + '</th>';
+    for (let j = 0; j <= m; j++) {
+      const inPath = path.has(i + ',' + j);
+      const isAns = (i === n && j === m);
+      let style = '';
+      if (isAns) style = 'background: var(--gradient-success); color: white; font-weight:700;';
+      else if (inPath) style = 'background: var(--success-bg); color: var(--success); font-weight:700;';
+      html += '<td style="' + style + '">' + F[i][j] + '</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  document.getElementById('lcs-result').innerHTML = html;
+
+  // Get LCS string
+  const lcs = [];
+  i = n; j = m;
+  while (i > 0 && j > 0) {
+    if (A[i-1] === B[j-1]) { lcs.unshift(A[i-1]); i--; j--; }
+    else if (F[i-1][j] >= F[i][j-1]) i--;
+    else j--;
+  }
+  document.getElementById('lcs-info').innerHTML =
+    '<div class="result-box"><span class="result-label">Kết quả</span>' +
+    'Độ dài LCS = <strong style="font-size:1.3rem; color: var(--success);">' + F[n][m] + '</strong><br>' +
+    'LCS: [' + lcs.join(', ') + ']<br>' +
+    '<small style="color: var(--text-secondary);">Đường truy vết (highlight xanh) đi từ F[n][m] ngược về F[0][0]. ' +
+    'Nếu A[i]=B[j] → đi chéo; ngược lại → đi lên hoặc trái tùy giá trị lớn hơn.</small></div>';
+}
+
+// ==================== TAB 4: 0/1 KNAPSACK ====================
+function knapRun() {
+  const W = parseInt(document.getElementById('knap-w').value);
+  const itemsStr = document.getElementById('knap-items').value.trim();
+  const pairs = itemsStr.split(';').map(s => s.trim().split(/[,\s]+/).map(Number)).filter(p => p.length === 2 && !isNaN(p[0]) && !isNaN(p[1]));
+  if (isNaN(W) || W < 1 || pairs.length < 1) {
+    document.getElementById('knap-info').innerHTML = '<div class="result-box error">Nhập W và danh sách vật hợp lệ.</div>';
+    return;
+  }
+  const n = pairs.length;
+  const g = pairs.map(p => p[0]);
+  const v = pairs.map(p => p[1]);
+  // F[k][V], k=0..n, V=0..W
+  const F = [];
+  for (let k = 0; k <= n; k++) { F[k] = new Array(W+1).fill(0); }
+  for (let k = 1; k <= n; k++) {
+    for (let V = 0; V <= W; V++) {
+      F[k][V] = F[k-1][V];
+      if (g[k-1] <= V && F[k-1][V - g[k-1]] + v[k-1] > F[k][V]) {
+        F[k][V] = F[k-1][V - g[k-1]] + v[k-1];
+      }
+    }
+  }
+  // Trace back: which items chosen
+  const chosen = new Set();
+  let V = W;
+  for (let k = n; k >= 1; k--) {
+    if (F[k][V] !== F[k-1][V]) {
+      // item k was chosen
+      chosen.add(k);
+      V -= g[k-1];
+    }
+  }
+  // Render table
+  let html = '<table style="font-family: var(--font-mono); text-align:center; font-size:0.82rem;">';
+  html += '<tr><th>F[k][V]</th><th>V=0</th>';
+  for (let Vv = 1; Vv <= W; Vv++) html += '<th>' + Vv + '</th>';
+  html += '</tr>';
+  for (let k = 0; k <= n; k++) {
+    html += '<tr><th>' + (k === 0 ? 'k=0' : 'k=' + k + ' (g=' + g[k-1] + ',v=' + v[k-1] + ')') + '</th>';
+    for (let Vv = 0; Vv <= W; Vv++) {
+      const isAns = (k === n && Vv === W);
+      let style = '';
+      if (isAns) style = 'background: var(--gradient-success); color: white; font-weight:700;';
+      html += '<td style="' + style + '">' + F[k][Vv] + '</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  document.getElementById('knap-result').innerHTML = html;
+
+  // Chosen items
+  let chosenList = '';
+  let totalG = 0, totalV = 0;
+  for (let k = 1; k <= n; k++) {
+    if (chosen.has(k)) {
+      chosenList += 'Vật ' + k + ' (g=' + g[k-1] + ', v=' + v[k-1] + '); ';
+      totalG += g[k-1];
+      totalV += v[k-1];
+    }
+  }
+  document.getElementById('knap-info').innerHTML =
+    '<div class="result-box"><span class="result-label">Kết quả</span>' +
+    'Giá trị max = <strong style="font-size:1.3rem; color: var(--success);">' + F[n][W] + '</strong><br>' +
+    'Vật được chọn: ' + (chosenList || 'không chọn vật nào') + '<br>' +
+    'Tổng trọng lượng = ' + totalG + ' / ' + W + '; Tổng giá trị = ' + totalV + '<br>' +
+    '<small style="color: var(--text-secondary);">Truy vết từ F[n][W] ngược lên: nếu F[k][W] ≠ F[k-1][W] → vật k được chọn, trừ đi g[k].</small></div>';
+}
+
+// Init on load
+window.addEventListener('DOMContentLoaded', () => {
+  pascalRun();
+  lisRun();
+  lcsRun();
+  knapRun();
+});
+</script>
+
+<!-- ============================== BÀI TOÁN 1: C(n,k) ============================== -->
+<h2>1️⃣ Bài toán 1: Tính số tổ hợp C(n, k)</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Bài toán</div>
+  <p>Tính số tổ hợp chập $k$ của $n$: $C(n, k) = \frac{n!}{k!(n-k)!}$. Dùng công thức giai thừa trực tiếp sẽ tràn số và chậm. DP giúp tính nhanh mà không cần giai thừa.</p>
+</div>
+
+<h3>📐 Công thức truy hồi</h3>
+<div class="callout callout-theory">
+  <p>$$C(n, 0) = C(n, n) = 1 \quad \text{(biên)}$$</p>
+  <p>$$C(n, k) = C(n-1, k-1) + C(n-1, k) \quad \text{với } 0 < k < n$$</p>
+  <p><strong>Giải thích:</strong> Xét 1 phần tử bất kỳ trong $n$ phần tử. Có 2 trường hợp chọn $k$ phần tử:</p>
+  <ul style="padding-left: 20px;">
+    <li><strong>Không chứa phần tử đó</strong> → chọn $k$ phần tử từ $n-1$ phần tử còn lại: $C(n-1, k)$ cách.</li>
+    <li><strong>Có chứa phần tử đó</strong> → chọn thêm $k-1$ phần tử từ $n-1$ phần tử còn lại: $C(n-1, k-1)$ cách.</li>
+  </ul>
+  <p>Cộng lại: $C(n, k) = C(n-1, k-1) + C(n-1, k)$. ✓</p>
+</div>
+
+<h3>🐢 Đệ quy thông thường — O(2ⁿ)</h3>
+<pre><code>int C(int n, int k) {
+    if (k == 0 || k == n) return 1;
+    return C(n-1, k-1) + C(n-1, k);
+}</code></pre>
+<p><strong>Nhận xét:</strong> Đệ quy tính đi tính lại nhiều $C(i, j)$ — đặc biệt $C(0, 0)$ được tính $2^n$ lần. Độ phức tạp $O(2^n)$ — rất chậm. Đây là lúc DP phát huy tác dụng.</p>
+
+<h3>🚀 DP — Lập bảng 2D</h3>
+<p>Lập bảng $C[n+1][n+1]$ với $C[i][j] = C(i, j)$. Điền từ trên xuống dưới, trái qua phải.</p>
+
+<h4>Bảng kết quả — Tam giác Pascal (n = 4)</h4>
+<table>
+  <tr><th>j \ i</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr>
+  <tr><th>0</th><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+  <tr><th>1</th><td>·</td><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+  <tr><th>2</th><td>·</td><td>·</td><td>1</td><td>3</td><td>6</td></tr>
+  <tr><th>3</th><td>·</td><td>·</td><td>·</td><td>1</td><td>4</td></tr>
+  <tr><th>4</th><td>·</td><td>·</td><td>·</td><td>·</td><td>1</td></tr>
+</table>
+
+<h4>Giả mã DP (C)</h4>
+<pre><code>int Comb(int n, int k) {
+    int C[n+1][n+1], i, j;
+    C[0][0] = 1;
+    for (i = 1; i &lt;= n; i++) {
+        C[i][0] = 1;          // biên trái
+        C[i][i] = 1;          // biên chéo
+        for (j = 1; j &lt; i; j++)
+            C[i][j] = C[i-1][j-1] + C[i-1][j];   // công thức truy hồi
+    }
+    return C[n][k];
+}</code></pre>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <p><strong>Số phép tính:</strong> $\sum_{i=1}^{n}(i-1) = 0 + 1 + 2 + ... + (n-1) = \frac{n(n-1)}{2}$.</p>
+  <p><strong>Độ phức tạp thời gian:</strong> $T(n) = \frac{n(n-1)}{2} = $ <strong>O(n²)</strong>.</p>
+  <p><strong>Độ phức tạp bộ nhớ:</strong> O(n²) cho bảng 2D.</p>
+</div>
+
+<h3>⚡ Cải tiến — Dùng bảng 1D</h3>
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Ý tưởng cải tiến</div>
+  <p>Để tính dòng $i$, ta chỉ cần dòng $i-1$. Vậy ta không cần lưu cả bảng 2D — chỉ cần 1 mảng 1D $V[0..n]$ và cập nhật từ phải qua trái (để không ghi đè giá trị cũ trước khi dùng).</p>
+</div>
+<pre><code>int Comb(int n, int k) {
+    int V[n+1];
+    V[0] = 1; V[1] = 1;        // dòng 0 và 1 của tam giác Pascal
+    for (int i = 2; i &lt;= n; i++) {
+        int p1 = V[0];          // lưu V[j-1] cũ
+        for (int j = 1; j &lt; i; j++) {
+            int p2 = V[j];      // lưu V[j] cũ trước khi ghi đè
+            V[j] = p1 + p2;     // V[j] mới = V[j-1]_cũ + V[j]_cũ
+            p1 = p2;            // dịch p1
+        }
+        V[i] = 1;               // biên phải
+    }
+    return V[k];
+}</code></pre>
+<p><strong>Bộ nhớ giảm:</strong> O(n²) → <strong>O(n)</strong>. Thời gian vẫn O(n²).</p>
+
+<!-- ============================== BÀI TOÁN 2: LIS ============================== -->
+<h2>2️⃣ Bài toán 2: Dãy con tăng dài nhất (LIS)</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Bài toán</div>
+  <p>Cho dãy $a_1, a_2, ..., a_n$. Tìm <strong>độ dài dãy con tăng dài nhất</strong> (Longest Increasing Subsequence — LIS). Dãy con phải giữ nguyên thứ tự các phần tử (không cần liền nhau).</p>
+  <p><strong>Ví dụ:</strong> $a = \{1, 2, 3, 4, 9, 10, 5, 6, 7, 8\}$ → LIS = <strong>8</strong> (dãy $\{1, 2, 3, 4, 5, 6, 7, 8\}$).</p>
+</div>
+
+<h3>📐 Công thức truy hồi</h3>
+<div class="callout callout-theory">
+  <p>Định nghĩa: <strong>$F[i]$ = độ dài LIS kết thúc tại $a[i]$</strong>.</p>
+  <p>$$F[i] = \max(F[j]) + 1 \quad \text{với } j < i \text{ và } a[j] < a[i]$$</p>
+  <p>$$F[1] = 1 \quad \text{(chỉ gồm 1 phần tử)}$$</p>
+  <p><strong>Kết quả:</strong> $\max(F[i])$ với $i = 1..n$.</p>
+  <p><strong>Giải thích:</strong> Tại $a[i]$, ta nối $a[i]$ vào sau LIS dài nhất kết thúc tại $a[j]$ nào đó (với $a[j] < a[i]$). Lấy $F[j]$ lớn nhất rồi cộng 1.</p>
+</div>
+
+<h4>🐍 Cài đặt Python</h4>
+<pre><code>def lis(a):
+    n = len(a)
+    F = [1] * n          # F[i] = độ dài LIS kết thúc tại a[i]
+    prev = [-1] * n      # để truy vết
+    for i in range(1, n):
+        for j in range(i):
+            if a[j] &lt; a[i] and F[j] + 1 &gt; F[i]:
+                F[i] = F[j] + 1
+                prev[i] = j
+    # Tìm vị trí có F lớn nhất
+    max_idx = F.index(max(F))
+    # Truy vết
+    seq = []
+    cur = max_idx
+    while cur != -1:
+        seq.append(a[cur])
+        cur = prev[cur]
+    seq.reverse()
+    return max(F), seq
+
+a = [1, 2, 3, 4, 9, 10, 5, 6, 7, 8]
+print(lis(a))  # (8, [1, 2, 3, 4, 5, 6, 7, 8])</code></pre>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <p><strong>Thời gian:</strong> 2 vòng lặp for lồng nhau → <strong>O(n²)</strong>.</p>
+  <p><strong>Bộ nhớ:</strong> O(n) cho $F$ và $prev$.</p>
+  <p><strong>Cải tiến:</strong> Dùng Binary Search để tìm $j$ nhanh → <strong>O(n log n)</strong>. (Nâng cao, ít gặp trong đề thi cơ bản.)</p>
+</div>
+
+<!-- ============================== BÀI TOÁN 3: LCS ============================== -->
+<h2>3️⃣ Bài toán 3: Dãy con chung dài nhất (LCS)</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Bài toán</div>
+  <p>Cho 2 dãy $A$ và $B$. Tìm dãy con $C$ chung dài nhất của $A$ và $B$.</p>
+  <p><strong>Ví dụ:</strong> $A = \{1, 2, 3, 4, 5, 6, 7\}$, $B = \{2, 4, 3, 5, 6, 8, 7, 1, 10\}$ → $C = \{2, 4, 5, 6, 7\}$, độ dài <strong>5</strong>.</p>
+</div>
+
+<h3>📐 Công thức truy hồi</h3>
+<div class="callout callout-theory">
+  <p>Định nghĩa: <strong>$F[i, j]$ = độ dài LCS của $A[1..i]$ và $B[1..j]$</strong>.</p>
+  <p>$$F[i, j] = F[i-1, j-1] + 1 \quad \text{nếu } A[i] = B[j]$$</p>
+  <p>$$F[i, j] = \max(F[i-1, j], F[i, j-1]) \quad \text{nếu } A[i] \ne B[j]$$</p>
+  <p>$$F[0, j] = F[i, 0] = 0 \quad \text{(biên: 1 dãy rỗng → LCS = 0)}$$</p>
+  <p><strong>Giải thích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Nếu $A[i] = B[j]$: 2 phần tử này khớp → đưa vào LCS → $F[i,j] = F[i-1,j-1] + 1$.</li>
+    <li>Nếu $A[i] \ne B[j]$: phải bỏ 1 trong 2 → lấy max của $F[i-1,j]$ (bỏ $A[i]$) hoặc $F[i,j-1]$ (bỏ $B[j]$).</li>
+  </ul>
+</div>
+
+<h4>🐍 Cài đặt Python</h4>
+<pre><code>def lcs(A, B):
+    n, m = len(A), len(B)
+    F = [[0]*(m+1) for _ in range(n+1)]
+    for i in range(1, n+1):
+        for j in range(1, m+1):
+            if A[i-1] == B[j-1]:
+                F[i][j] = F[i-1][j-1] + 1
+            else:
+                F[i][j] = max(F[i-1][j], F[i][j-1])
+    # Truy vết
+    seq = []
+    i, j = n, m
+    while i &gt; 0 and j &gt; 0:
+        if A[i-1] == B[j-1]:
+            seq.append(A[i-1])
+            i -= 1; j -= 1
+        elif F[i-1][j] &gt;= F[i][j-1]:
+            i -= 1
+        else:
+            j -= 1
+    seq.reverse()
+    return F[n][m], seq
+
+A = [1, 2, 3, 4, 5, 6, 7]
+B = [2, 4, 3, 5, 6, 8, 7, 1, 10]
+print(lcs(A, B))  # (5, [2, 4, 5, 6, 7])</code></pre>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <p><strong>Thời gian:</strong> 2 vòng lặp lồng nhau kích thước $n$ và $m$ → <strong>O(n·m)</strong>.</p>
+  <p><strong>Bộ nhớ:</strong> O(n·m) cho bảng $F$.</p>
+  <p><strong>Truy vết:</strong> đi từ $F[n][m]$ ngược về $F[0][0]$, mất O(n+m) bước.</p>
+</div>
+
+<!-- ============================== BÀI TOÁN 4: 0/1 KNAPSACK ============================== -->
+<h2>4️⃣ Bài toán 4: Cái ba lô 0/1 (0/1 Knapsack)</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Bài toán</div>
+  <p>Ba lô trọng lượng $W$. Có $n$ đồ vật, mỗi vật $i$ có trọng lượng $g_i$ và giá trị $v_i$. <strong>Mỗi vật CHỈ CÓ 1 CÁI</strong> (chọn hoặc không chọn — đây là điểm khác biệt với Knapsack vô hạn ở bài Tham lam).</p>
+  <p><strong>Mục tiêu:</strong> Chọn các vật sao cho tổng trọng lượng $\le W$ và tổng giá trị lớn nhất.</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Khác biệt với Knapsack vô hạn (Greedy)</div>
+  <p>• <strong>Knapsack vô hạn</strong> (Bài 3 — Greedy): mỗi vật có số lượng không giới hạn. Tham lam (chọn theo tỉ lệ $v_i/g_i$ giảm dần) cho kết quả <em>gần</em> tối ưu.</p>
+  <p>• <strong>0/1 Knapsack</strong> (Bài này — DP): mỗi vật chỉ có 1 cái. Tham lam KHÔNG tối ưu → phải dùng DP.</p>
+</div>
+
+<h3>📐 Công thức truy hồi</h3>
+<div class="callout callout-theory">
+  <p>Định nghĩa: <strong>$F[k, V]$ = tổng giá trị lớn nhất khi xét $k$ đồ vật đầu, trọng lượng còn lại $V$</strong>.</p>
+  <p>$$F[k, V] = \max(F[k-1, V], \; F[k-1, V - g_k] + v_k)$$</p>
+  <p>$$F[0, V] = 0 \quad \text{(không có vật nào → GT = 0)}$$</p>
+  <p>$$F[k, 0] = 0 \quad \text{(TTL còn 0 → không chọn thêm)}$$</p>
+  <p><strong>Giải thích:</strong> Tại vật $k$, có 2 lựa chọn:</p>
+  <ul style="padding-left: 20px;">
+    <li><strong>Không chọn vật $k$</strong>: $F[k, V] = F[k-1, V]$ (giữ nguyên TTL, không thêm GT).</li>
+    <li><strong>Chọn vật $k$</strong> (nếu $g_k \le V$): $F[k, V] = F[k-1, V - g_k] + v_k$ (giảm TTL đi $g_k$, tăng GT thêm $v_k$).</li>
+  </ul>
+  <p>Lấy max của 2 lựa chọn.</p>
+</div>
+
+<h4>Giả mã (C) — theo giáo trình</h4>
+<pre><code>int v[] = {0, 4, 5, 6, 3, 1};    // giá trị (v[0] bỏ qua)
+int g[] = {0, 3, 4, 5, 2, 1};    // trọng lượng
+int w = 10, n = 5;                // W = 10, 5 vật
+int f[6][11];                     // f[k][V], k=0..5, V=0..10
+
+// Khởi tạo dòng k=0
+for (int i = 0; i &lt;= w; i++) f[0][i] = 0;
+
+// Tính bảng
+for (int i = 1; i &lt;= n; i++) {
+    for (int j = 0; j &lt;= w; j++) {
+        f[i][j] = f[i-1][j];    // mặc định: không chọn vật i
+        if (g[i] &lt;= j && f[i-1][j] &lt; f[i-1][j-g[i]] + v[i])
+            f[i][j] = f[i-1][j-g[i]] + v[i];   // chọn vật i tốt hơn
+    }
+}
+// Kết quả: f[n][w] = f[5][10]</code></pre>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <p><strong>Thời gian:</strong> 2 vòng lặp lồng nhau $n$ và $W$ → <strong>O(n·W)</strong>.</p>
+  <p><strong>Bộ nhớ:</strong> O(n·W) cho bảng 2D. Có thể tối ưu về O(W) bằng bảng 1D.</p>
+  <p><strong>Lưu ý:</strong> Đây là độ phức tạp <em>giả đa thức</em> (pseudo-polynomial) — phụ thuộc vào $W$ (số nguyên). Nếu $W$ rất lớn thì không khả thi.</p>
+</div>
+
+<h3>🔍 Truy vết</h3>
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Cách truy vết</div>
+  <p>Đi từ $F[n][W]$ ngược về $F[0][0]$:</p>
+  <ul style="padding-left: 20px;">
+    <li>Nếu $F[k][V] \ne F[k-1][V]$ → <strong>vật $k$ đã được chọn</strong>. Giảm $V$ đi $g_k$, giảm $k$ đi 1.</li>
+    <li>Nếu $F[k][V] = F[k-1][V]$ → <strong>vật $k$ không được chọn</strong>. Chỉ giảm $k$ đi 1.</li>
+  </ul>
+</div>
+
+<!-- ============================== BÀI TOÁN 5: PHÂN TÍCH SỐ ============================== -->
+<h2>5️⃣ Bài toán 5: Phân tích số</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Bài toán</div>
+  <p>Cho số $n < 100$. Đếm số cách phân tích $n$ thành tổng các số nguyên dương (thứ tự không quan trọng).</p>
+  <p><strong>Ví dụ:</strong> $n = 5$ có <strong>7 cách</strong>:</p>
+  <div class="code-block">1. 5 = 1+1+1+1+1
+2. 5 = 1+1+1+2
+3. 5 = 1+1+3
+4. 5 = 1+2+2
+5. 5 = 1+4
+6. 5 = 2+3
+7. 5 = 5</div>
+</div>
+
+<h3>📐 Công thức truy hồi</h3>
+<div class="callout callout-theory">
+  <p>Định nghĩa: <strong>$F[m, v]$ = số cách phân tích số $v$ thành tổng các số nguyên dương $\le m$</strong>.</p>
+  <p>$$F[m, v] = F[m-1, v] \quad \text{nếu } m > v$$</p>
+  <p>$$F[m, v] = F[m-1, v] + F[m, v-m] \quad \text{nếu } m \le v$$</p>
+  <p><strong>Giải thích:</strong></p>
+  <ul style="padding-left: 20px;">
+    <li>Nếu $m > v$: không thể dùng số $m$ (vì $m$ đã lớn hơn $v$) → chỉ xét các số $\le m-1$: $F[m, v] = F[m-1, v]$.</li>
+    <li>Nếu $m \le v$: có 2 trường hợp — không dùng $m$ ($F[m-1, v]$) hoặc dùng ít nhất 1 lần số $m$ ($F[m, v-m]$). Cộng lại.</li>
+  </ul>
+  <p><strong>Biên:</strong> $F[1, v] = 1$ với mọi $v$ (chỉ có 1 cách: toàn số 1). $F[m, 0] = 1$ (1 cách: không dùng số nào).</p>
+</div>
+
+<h4>🐍 Cài đặt Python</h4>
+<pre><code>def count_partitions(n):
+    # F[m][v], m=1..n, v=0..n
+    F = [[0]*(n+1) for _ in range(n+1)]
+    for m in range(1, n+1):
+        F[m][0] = 1        # 1 cách: không dùng số nào
+        for v in range(1, n+1):
+            F[m][v] = F[m-1][v]
+            if m &lt;= v:
+                F[m][v] += F[m][v-m]
+    return F[n][n]
+
+for n in [1, 2, 3, 4, 5]:
+    print(f"n={n}: {count_partitions(n)} cách")
+# n=1: 1, n=2: 2, n=3: 3, n=4: 5, n=5: 7</code></pre>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <p><strong>Thời gian:</strong> 2 vòng lặp kích thước $n$ → <strong>O(n²)</strong>.</p>
+  <p><strong>Bộ nhớ:</strong> O(n²) cho bảng 2D.</p>
+</div>
+
+<!-- ============================== 5 VÍ DỤ MẪU STEP REVEAL ============================== -->
+<h2>🎯 5 ví dụ mẫu — Chạy tay từng bước</h2>
+
+<h3>Ví dụ 1: Tính C(5, 2) bằng DP</h3>
+<div id="ex1"></div>
+<script>
+new StepReveal('ex1', [
+  { title: 'Bước 0: Khởi tạo', content: '<p>Lập bảng $C[6][6]$. Khởi tạo <code>C[0][0] = 1</code>.</p>' },
+  { title: 'Bước 1: Tính dòng i=1', content: '<p>$C[1][0] = 1$ (biên trái). $C[1][1] = 1$ (biên chéo). Vòng for trong không chạy (j từ 1 đến 0).</p>' },
+  { title: 'Bước 2: Tính dòng i=2', content: '<p>$C[2][0] = 1$, $C[2][2] = 1$ (biên). $C[2][1] = C[1][0] + C[1][1] = 1 + 1 = 2$.</p>' },
+  { title: 'Bước 3: Tính dòng i=3', content: '<p>$C[3][0] = 1$, $C[3][3] = 1$. $C[3][1] = C[2][0] + C[2][1] = 1 + 2 = 3$. $C[3][2] = C[2][1] + C[2][2] = 2 + 1 = 3$.</p>' },
+  { title: 'Bước 4: Tính dòng i=4', content: '<p>$C[4][0] = 1$, $C[4][4] = 1$. $C[4][1] = 1+3 = 4$. $C[4][2] = 3+3 = 6$. $C[4][3] = 3+1 = 4$.</p>' },
+  { title: 'Bước 5: Tính dòng i=5 (dòng cần kết quả)', content: '<p>$C[5][0] = 1$, $C[5][5] = 1$. $C[5][1] = 1+4 = 5$. <strong style="color: var(--success);">$C[5][2] = C[4][1] + C[4][2] = 4 + 6 = 10$.</strong> $C[5][3] = 6+4 = 10$. $C[5][4] = 4+1 = 5$.</p>' },
+  { title: '✓ Kết quả', content: '<p><strong>C(5, 2) = 10</strong>. Độ phức tạp: $\\frac{5 \\cdot 4}{2} = 10$ phép cộng = O(n²).</p>' }
+]);
+</script>
+
+<h3>Ví dụ 2: Tính LIS của {1, 2, 3, 4, 9, 10, 5, 6, 7, 8}</h3>
+<div id="ex2"></div>
+<script>
+new StepReveal('ex2', [
+  { title: 'Khởi tạo', content: '<p>$F[i] = 1$ với mọi $i$ (mỗi phần tử là LIS độ dài 1 của chính nó).</p>' },
+  { title: 'i=0: a[0]=1', content: '<p>$F[0] = 1$. (Không có j &lt; 0.)</p>' },
+  { title: 'i=1: a[1]=2', content: '<p>j=0: $a[0]=1 < 2$ → $F[1] = F[0]+1 = 2$.</p>' },
+  { title: 'i=2: a[2]=3', content: '<p>j=0,1: max $F[j]$ với $a[j]<3$ là $F[1]=2$. $F[2] = 2+1 = 3$.</p>' },
+  { title: 'i=3: a[3]=4', content: '<p>max $F[j]$ với $a[j]<4$ là $F[2]=3$. $F[3] = 3+1 = 4$.</p>' },
+  { title: 'i=4: a[4]=9', content: '<p>max $F[j]$ với $a[j]<9$ là $F[3]=4$. $F[4] = 4+1 = 5$.</p>' },
+  { title: 'i=5: a[5]=10', content: '<p>$F[5] = F[4]+1 = 6$.</p>' },
+  { title: 'i=6: a[6]=5', content: '<p>j có $a[j]<5$: chỉ j=0,1,2,3 ($a[j]=1,2,3,4$). max $F[j] = F[3]=4$. $F[6] = 4+1 = 5$.</p>' },
+  { title: 'i=7: a[7]=6', content: '<p>max $F[j]$ với $a[j]<6$: $F[6]=5$ ($a[6]=5<6$). $F[7] = 5+1 = 6$.</p>' },
+  { title: 'i=8: a[8]=7', content: '<p>$F[8] = F[7]+1 = 7$.</p>' },
+  { title: 'i=9: a[9]=8', content: '<p>$F[9] = F[8]+1 = 8$.</p>' },
+  { title: '✓ Kết quả', content: '<p>max $F[i] = F[9] = 8$. Truy vết: $8 \\leftarrow 7 \\leftarrow 6 \\leftarrow 5 \\leftarrow 4 \\leftarrow 3 \\leftarrow 2 \\leftarrow 1$.</p><p><strong>LIS = 8</strong>: dãy $\{1, 2, 3, 4, 5, 6, 7, 8\}$. ✓</p>' }
+]);
+</script>
+
+<h3>Ví dụ 3: Tính LCS của A={1,2,3,4,5,6,7}, B={2,4,3,5,6,8,7,1,10}</h3>
+<div id="ex3"></div>
+<script>
+new StepReveal('ex3', [
+  { title: 'Khởi tạo', content: '<p>$F[0, j] = F[i, 0] = 0$ với mọi $i, j$.</p>' },
+  { title: 'Quét bảng theo hàng', content: '<p>For $i=1..7$ (A[i]), for $j=1..9$ (B[j]): nếu $A[i]=B[j]$ → $F[i,j] = F[i-1,j-1]+1$; ngược lại → $F[i,j] = \\max(F[i-1,j], F[i,j-1])$.</p>' },
+  { title: 'i=1 (A[1]=1)', content: '<p>B có 1 ở vị trí $j=8$. Tại $j=8$: $F[1,8] = F[0,7]+1 = 0+1 = 1$. Các $j$ khác: $F[1,j]$ lan truyền giá trị 0 hoặc 1.</p>' },
+  { title: 'i=2 (A[2]=2)', content: '<p>B có 2 ở $j=1$. $F[2,1] = F[1,0]+1 = 1$. Các ô sau lan truyền max.</p>' },
+  { title: 'i=3 (A[3]=3), i=4 (A[4]=4)', content: '<p>Lần lượt có thêm các giá trị 3 ($j=3$) và 4 ($j=2$) trong B. Mỗi lần khớp, $F$ tăng 1. Sau $i=4$: max $F$ = 2.</p>' },
+  { title: 'i=5 (A[5]=5), i=6 (A[6]=6)', content: '<p>B có 5 ở $j=4$, 6 ở $j=5$. $F[5,4] = F[4,3]+1 = 3$. $F[6,5] = F[5,4]+1 = 4$.</p>' },
+  { title: 'i=7 (A[7]=7)', content: '<p>B có 7 ở $j=7$. $F[7,7] = F[6,6]+1 = 5$. <strong>$F[7][9] = 5$</strong> (lan truyền).</p>' },
+  { title: '✓ Kết quả + Truy vết', content: '<p><strong>Độ dài LCS = 5</strong>. Truy vết từ $F[7][7]$ đi chéo lên: $7 \\to 6 \\to 5 \\to 4 \\to 2$.</p><p><strong>LCS = {2, 4, 5, 6, 7}</strong>. ✓</p>' }
+]);
+</script>
+
+<h3>Ví dụ 4: 0/1 Knapsack W=10, 5 vật (g,v) = {(3,4), (4,5), (5,6), (2,3), (1,1)}</h3>
+<div id="ex4"></div>
+<script>
+new StepReveal('ex4', [
+  { title: 'Khởi tạo', content: '<p>$F[0][V] = 0$ với mọi $V = 0..10$ (không có vật nào → GT = 0).</p>' },
+  { title: 'k=1: vật 1 (g=3, v=4)', content: '<p>Với $V \\ge 3$: chọn vật 1 được $F[1][V] = 0+4 = 4$. Với $V < 3$: không chọn được, $F[1][V] = 0$. → $F[1][3..10] = 4$.</p>' },
+  { title: 'k=2: vật 2 (g=4, v=5)', content: '<p>Với $V \\ge 4$: $F[2][V] = \\max(F[1][V], F[1][V-4]+5)$. Vd $F[2][7] = \\max(4, F[1][3]+5) = \\max(4, 4+5) = 9$ (chọn cả vật 1 và 2). $F[2][10] = \\max(4, F[1][6]+5) = \\max(4, 4+5) = 9$.</p>' },
+  { title: 'k=3: vật 3 (g=5, v=6)', content: '<p>$F[3][8] = \\max(F[2][8]=9, F[2][3]+6=4+6) = 10$ (chọn vật 1+3: TTL=8, GT=10). $F[3][9] = \\max(F[2][9]=9, F[2][4]+6=5+6) = 11$ (vật 2+3). $F[3][10] = \\max(F[2][10]=9, F[2][5]+6=5+6) = 11$.</p>' },
+  { title: 'k=4: vật 4 (g=2, v=3)', content: '<p>$F[4][9] = \\max(F[3][9]=11, F[3][7]+3=9+3) = 12$ (vật 1+2+4). <strong style="color: var(--success);">$F[4][10] = \\max(F[3][10]=11, F[3][8]+3=10+3) = 13$</strong> (chọn vật 1+3+4: TTL=3+5+2=10, GT=4+6+3=13).</p>' },
+  { title: 'k=5: vật 5 (g=1, v=1)', content: '<p>$F[5][10] = \\max(F[4][10]=13, F[4][9]+1=12+1) = \\max(13, 13) = 13$ (tie — có thể chọn hoặc không chọn vật 5, GT vẫn 13).</p>' },
+  { title: '✓ Kết quả + Truy vết', content: '<p><strong>Giá trị max = 13</strong> tại $F[5][10]$.</p><p>Truy vết: $F[5][10]=13 = F[4][10]=13$ → <strong>không chọn vật 5</strong>, $V$ vẫn = 10.<br>$F[4][10]=13 \\ne F[3][10]=11$ → <strong>chọn vật 4</strong>. $V = 10-2 = 8$.<br>$F[3][8]=10 \\ne F[2][8]=9$ → <strong>chọn vật 3</strong>. $V = 8-5 = 3$.<br>$F[2][3]=4 = F[1][3]=4$ → <strong>không chọn vật 2</strong>.<br>$F[1][3]=4 \\ne F[0][3]=0$ → <strong>chọn vật 1</strong>. $V = 3-3 = 0$. ✓ Dừng.</p><p><strong>Chọn vật 1, 3, 4</strong>: GT = 4+6+3 = 13, TTL = 3+5+2 = 10 = $W$. ✓</p>' }
+]);
+</script>
+
+<h3>Ví dụ 5: Phân tích số n=5</h3>
+<div id="ex5"></div>
+<script>
+new StepReveal('ex5', [
+  { title: 'Bước 0: Khởi tạo bảng', content: '<p>Lập bảng $F[m][v]$ với $m, v = 0..5$. Biên: $F[m][0] = 1$ (1 cách: không dùng số nào), $F[1][v] = 1$ (chỉ 1 cách: toàn số 1).</p>' },
+  { title: 'Bước 1: m=2', content: '<p>$F[2][v] = F[1][v] + F[2][v-2]$ nếu $v \\ge 2$.<br>$F[2][1] = F[1][1] = 1$. $F[2][2] = F[1][2]+F[2][0] = 1+1 = 2$. $F[2][3] = 1+1 = 2$. $F[2][4] = 1+2 = 3$. $F[2][5] = 1+2 = 3$.</p>' },
+  { title: 'Bước 2: m=3', content: '<p>$F[3][v] = F[2][v] + F[3][v-3]$ nếu $v \\ge 3$.<br>$F[3][3] = 2+1 = 3$. $F[3][4] = 3+1 = 4$. $F[3][5] = 3+2 = 5$.</p>' },
+  { title: 'Bước 3: m=4', content: '<p>$F[4][v] = F[3][v] + F[4][v-4]$ nếu $v \\ge 4$.<br>$F[4][4] = 4+1 = 5$. $F[4][5] = 5+1 = 6$.</p>' },
+  { title: 'Bước 4: m=5', content: '<p>$F[5][5] = F[4][5] + F[5][0] = 6 + 1 = 7$.</p>' },
+  { title: '✓ Kết quả', content: '<p><strong>Số cách phân tích 5 = 7</strong>. Đúng với 7 cách đã liệt kê ở trên. Độ phức tạp O(n²) = O(25) cho n=5.</p>' }
+]);
+</script>
+
+<!-- ============================== BÀI TẬP TỰ GIẢI ============================== -->
+<h2>✍️ Bài tập tự giải (có đáp án chi tiết)</h2>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 1</div>
+  <p>Tính $C(6, 3)$ bằng DP. Vẽ tam giác Pascal đến dòng 6.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-4-1').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-4-1" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức:</strong> $C(n, k) = C(n-1, k-1) + C(n-1, k)$, với $C(n, 0) = C(n, n) = 1$.</p>
+    <p><strong>💡 Cách áp dụng:</strong> Lập bảng $C[7][7]$, điền từ dòng 0 đến dòng 6. Mỗi ô tính bằng tổng 2 ô trên (trái-trái và trái).</p>
+    <p><strong>🧮 Tính toán:</strong></p>
+    <div class="code-block">Dòng 0: 1
+Dòng 1: 1  1
+Dòng 2: 1  2  1
+Dòng 3: 1  3  3  1
+Dòng 4: 1  4  6  4  1
+Dòng 5: 1  5 10 10  5  1
+Dòng 6: 1  6 15 20 15  6  1   ← C(6,3) = 20</div>
+    <p><strong>✓ Kết quả:</strong> $C(6, 3) = 20$.</p>
+    <p><strong>🔍 Kiểm tra:</strong> $\\frac{6!}{3! \\cdot 3!} = \\frac{720}{6 \\cdot 6} = 20$. ✓ Khớp công thức giai thừa.</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 2</div>
+  <p>Tìm LIS của dãy $a = \{3, 1, 4, 1, 5, 9, 2, 6, 5\}$. Truy vết dãy LIS.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-4-2').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-4-2" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức:</strong> $F[i] = \\max(F[j]) + 1$ với $j < i$ và $a[j] < a[i]$. $F[0] = 1$.</p>
+    <p><strong>💡 Cách áp dụng:</strong> Với mỗi $i$, quét tất cả $j < i$ thỏa $a[j] < a[i]$, lấy $F[j]$ lớn nhất + 1.</p>
+    <p><strong>🧮 Tính toán F[i]:</strong></p>
+    <div class="code-block">i=0, a=3: F[0] = 1
+i=1, a=1: không có j (a[j]<1) → F[1] = 1
+i=2, a=4: j=0 (3<4) F=1, j=1 (1<4) F=1 → max=1 → F[2] = 2
+i=3, a=1: không có j (a[j]<1) → F[3] = 1
+i=4, a=5: j=0(3<5)F=1, j=1(1<5)F=1, j=2(4<5)F=2, j=3(1<5)F=1 → max=2 → F[4] = 3
+i=5, a=9: tất cả a[j]<9, max F[j]=F[4]=3 → F[5] = 4
+i=6, a=2: j=1(1<2)F=1, j=3(1<2)F=1 → max=1 → F[6] = 2
+i=7, a=6: j có a[j]<6: 0,1,2,3,4,6 → max F = F[4]=3 → F[7] = 4
+i=8, a=5: j có a[j]<5: 0,1,2,3,6 (a=3,1,4,1,2) → max F = F[2]=F[6]=2 → F[8] = 3
+
+Bảng F: [1, 1, 2, 1, 3, 4, 2, 4, 3]
+max F = 4 tại i=5 hoặc i=7</div>
+    <p><strong>✓ Kết quả:</strong> Độ dài LIS = <strong>4</strong>. Truy vết từ i=5: 9 ← 5 ← 4 ← 1 → LIS = $\{1, 4, 5, 9\}$.<br>Hoặc từ i=7: 6 ← 5 ← 4 ← 1 → LIS = $\{1, 4, 5, 6\}$. Cả 2 đều độ dài 4.<br><em>(Lưu ý: Đề gợi ý "LIS = 5" dường như chưa chính xác — LIS thực sự là 4. Có thể đề gốc dùng dãy khác.)</em></p>
+    <p><strong>🔍 Kiểm tra:</strong> $\{1, 4, 5, 9\}$ — tăng dần ✓, các phần tử giữ thứ tự trong dãy gốc ✓ (1 ở vị trí 1, 4 ở vị trí 2, 5 ở vị trí 4, 9 ở vị trí 5).</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 3</div>
+  <p>Tìm LCS của $A = \{1, 3, 5, 7, 9\}$ và $B = \{3, 4, 5, 6, 7, 8\}$. Truy vết LCS.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-4-3').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-4-3" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức:</strong> $F[i,j] = F[i-1,j-1]+1$ nếu $A[i]=B[j]$; ngược lại $F[i,j] = \\max(F[i-1,j], F[i,j-1])$.</p>
+    <p><strong>💡 Cách áp dụng:</strong> Lập bảng $F[6][7]$. Điền từng ô từ trái qua phải, trên xuống dưới.</p>
+    <p><strong>🧮 Tính toán các ô quan trọng:</strong></p>
+    <div class="code-block">A = [1, 3, 5, 7, 9], B = [3, 4, 5, 6, 7, 8]
+
+Các ô khớp (A[i]=B[j]):
+- A[2]=3 = B[1]=3 → F[2,1] = F[1,0]+1 = 0+1 = 1
+- A[3]=5 = B[3]=5 → F[3,3] = F[2,2]+1
+- A[4]=7 = B[5]=7 → F[4,5] = F[3,4]+1
+
+Bảng F (tóm tắt dòng cuối):
+F[5][6] = 3  (kết quả)
+
+Truy vết từ F[5][6] = 3:
+- F[5][6] = F[4][6] = 3 (A[5]=9 ≠ B[6]=8, F[i-1,j] = F[i,j-1] = 3) → đi trái hoặc lên
+- ... kết thúc tại F[4][5] = 3 (A[4]=7=B[5]=7) → đưa 7 vào LCS, đi chéo
+- Tương tự đưa 5 (tại F[3,3]), 3 (tại F[2,1]) vào LCS</div>
+    <p><strong>✓ Kết quả:</strong> Độ dài LCS = <strong>3</strong>. LCS = $\{3, 5, 7\}$.</p>
+    <p><strong>🔍 Kiểm tra:</strong> $\{3, 5, 7\\}$ là dãy con của A (vị trí 2,3,4) ✓ và của B (vị trí 1,3,5) ✓. Thứ tự tăng dần ✓.</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 4</div>
+  <p>0/1 Knapsack: $W = 8$, 3 vật: A(g=3, v=4), B(g=4, v=5), C(g=5, v=6). Tìm tổ hợp tối ưu.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-4-4').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-4-4" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức:</strong> $F[k, V] = \\max(F[k-1, V], \\; F[k-1, V-g_k] + v_k)$.</p>
+    <p><strong>💡 Cách áp dụng:</strong> Liệt kê tất cả tổ hợp con của 3 vật (2³ = 8 trường hợp), tính tổng TTL và GT, chọn tổ hợp có GT max mà TTL ≤ W. Hoặc lập bảng DP $F[4][9]$.</p>
+    <p><strong>🧮 Tính toán (liệt kê tổ hợp):</strong></p>
+    <div class="code-block">Tổ hợp        TTL    GT    Có chọn? (TTL ≤ 8)
+{}              0     0    ✓
+{A}            3     4    ✓
+{B}            4     5    ✓
+{C}            5     6    ✓
+{A,B}          7     9    ✓
+{A,C}          8    10    ✓  ← MAX!
+{B,C}          9    11    ✗ (TTL > W)
+{A,B,C}       12    15    ✗ (TTL > W)
+
+Qua DP bảng F[4][9]:
+F[1][V] = 4 với V≥3 (chỉ chọn A, g=3)
+F[2][V]: thêm B (g=4,v=5).
+  F[2][7] = max(F[1][7]=4, F[1][3]+5=4+5=9) = 9 (chọn A+B: TTL=7, GT=9)
+  F[2][8] = max(F[1][8]=4, F[1][4]+5=4+5=9) = 9
+F[3][V]: thêm C (g=5,v=6).
+  F[3][8] = max(F[2][8]=9, F[2][3]+6=4+6=10) = 10 (chọn A+C: TTL=8, GT=10)</div>
+    <p><strong>✓ Kết quả:</strong> Tổ hợp tối ưu là <strong>chọn A + C</strong>: TTL = 3+5 = 8 (= W), GT = 4+6 = <strong>10</strong>.<br><em>(Lưu ý: Chọn A+B chỉ được GT=9 — kém hơn A+C. Đề gợi ý "A+B GT=9" có vẻ chưa tối ưu.)</em></p>
+    <p><strong>🔍 Kiểm tra:</strong> Truy vết từ $F[3][8] = 10 \\ne F[2][8] = 9$ → chọn vật C. $V = 8-5 = 3$. $F[2][3] = 4 \\ne F[1][3] = 4$? Bằng → không chọn B. $F[1][3] = 4 \\ne F[0][3] = 0$ → chọn vật A. → Chọn A + C. TTL = 3+5 = 8 = W ✓. GT = 4+6 = 10. ✓</p>
+  </div>
+</div>
+
+<!-- ============================== QUIZ ============================== -->
+<h2>❓ Kiểm tra hiểu bài</h2>
+<div id="quiz-dp"></div>
+
+<script>
+new Quiz('quiz-dp', [
+  {
+    question: "DP khác chia để trị ở điểm cốt lõi nào?",
+    options: ["DP dùng vòng lặp, chia để trị dùng đệ quy", "Bài toán con của DP chồng lặp (dùng chung), chia để trị thì độc lập", "DP luôn nhanh hơn chia để trị", "DP chỉ dùng cho sắp xếp"],
+    correct: 1,
+    explanation: "Chia để trị chia bài toán thành các phần ĐỘC LẬP. DP dùng khi các bài toán con CHỒNG LẤP (cùng dùng bài toán con chung) → DP ghi nhớ để tránh lặp."
+  },
+  {
+    question: "Độ phức tạp của thuật toán DP tính C(n, k) là bao nhiêu?",
+    options: ["O(n)", "O(n²)", "O(n log n)", "O(2ⁿ)"],
+    correct: 1,
+    explanation: "Bảng (n+1)×(n+1) cần n(n-1)/2 phép cộng = O(n²). Cải tiến 1D vẫn O(n²) thời gian nhưng O(n) bộ nhớ."
+  },
+  {
+    question: "0/1 Knapsack khác Knapsack vô hạn ở đâu?",
+    options: ["0/1 Knapsack không có giới hạn W", "Mỗi vật chỉ có 1 cái (0/1) vs không giới hạn số lượng", "0/1 Knapsack không dùng DP", "Knapsack vô hạn luôn cho GT cao hơn"],
+    correct: 1,
+    explanation: "0/1 Knapsack: mỗi vật CHỈ CÓ 1 CÁI (chọn hoặc không). Knapsack vô hạn (Greedy): mỗi vật có số lượng không giới hạn."
+  },
+  {
+    question: "Công thức truy hồi của LCS khi A[i] = B[j] là gì?",
+    options: ["F[i,j] = F[i-1,j] + 1", "F[i,j] = F[i,j-1] + 1", "F[i,j] = F[i-1,j-1] + 1", "F[i,j] = max(F[i-1,j], F[i,j-1])"],
+    correct: 2,
+    explanation: "Khi A[i] = B[j], 2 phần tử khớp → đưa vào LCS. Loại bỏ cả 2 phần tử → xét F[i-1,j-1] rồi cộng 1."
+  },
+  {
+    question: "DP tổng hợp lời giải theo hướng nào?",
+    options: ["Top-down (từ lớn đến nhỏ)", "Bottom-up (từ bài toán con nhỏ đến lớn)", "Ngẫu nhiên", "Chỉ dùng đệ quy"],
+    correct: 1,
+    explanation: "DP đi từ dưới lên (bottom-up): tính bài toán con nhỏ nhất trước, rồi lớn dần đến bài toán gốc. Tránh lặp do đã ghi nhớ."
+  },
+  {
+    question: "Độ phức tạp của LIS (DP cơ bản) là bao nhiêu?",
+    options: ["O(n)", "O(n log n)", "O(n²)", "O(2ⁿ)"],
+    correct: 2,
+    explanation: "2 vòng lặp lồng nhau kích thước n → O(n²). Có thể cải tiến O(n log n) bằng Binary Search (nâng cao)."
+  },
+  {
+    question: "Trong 0/1 Knapsack, F[k, V] biểu diễn gì?",
+    options: ["Giá trị lớn nhất với k vật và TTL còn V", "Số cách chọn k vật", "Tổng trọng lượng k vật", "Số vật được chọn"],
+    correct: 0,
+    explanation: "F[k, V] = tổng giá trị LỚN NHẤT khi xét k đồ vật đầu, trọng lượng còn lại V. Công thức: max(F[k-1,V], F[k-1,V-gₖ]+vₖ)."
+  },
+  {
+    question: "Khi nào dùng DP thay vì Greedy?",
+    options: ["Khi chỉ cần kết quả gần đúng", "Khi bài toán có cấu trúc con tối ưu + bài toán con chồng lặp", "Khi dữ liệu nhỏ", "Khi cần thuật toán nhanh nhất"],
+    correct: 1,
+    explanation: "DP dùng khi có 2 tính chất: (1) Cấu trúc con tối ưu, (2) Bài toán con chồng lặp. Greedy không đảm bảo tối ưu toàn cục trong nhiều bài (vd 0/1 Knapsack)."
+  }
+]);
+</script>
+
+<!-- ============================== CÁCH TRÌNH BÀY BÀI THI ============================== -->
+<h2>🏆 Cách trình bày bài thi DP</h2>
+
+<div class="callout callout-exam">
+  <div class="callout-title">📋 Mẫu trình bày chuẩn cho bài DP</div>
+  <p>Đề bài mẫu: <em>"Trình bày thuật toán DP giải bài toán cái ba lô 0/1. Chạy tay ví dụ."</em></p>
+
+  <h4>Trình bày chuẩn:</h4>
+  <pre><code>1. NGUYÊN LÝ DP:
+   DP giống chia để trị nhưng các bài toán con CHỒNG LẤP.
+   → Ghi nhớ lời giải vào bảng, tính từ dưới lên (bottom-up).
+
+2. ĐỊNH NGHĨA F:
+   F[k, V] = tổng giá trị lớn nhất khi xét k đồ vật đầu,
+             trọng lượng còn lại V.
+
+3. CÔNG THỨC TRUY HỒI:
+   F[k, V] = max(F[k-1, V],  F[k-1, V - gₖ] + vₖ)
+   F[0, V] = 0   (không có vật → GT = 0)
+
+4. GIẢ MÃ (C):
+   for (i = 0; i &lt;= w; i++) f[0][i] = 0;
+   for (i = 1; i &lt;= n; i++)
+     for (j = 0; j &lt;= w; j++) {
+       f[i][j] = f[i-1][j];
+       if (g[i] &lt;= j && f[i-1][j] &lt; f[i-1][j-g[i]] + v[i])
+         f[i][j] = f[i-1][j-g[i]] + v[i];
+     }
+
+5. CHẠY TAY VÍ DỤ:
+   W = 10, 5 vật: (g,v) = (3,4),(4,5),(5,6),(2,3),(1,1).
+   Lập bảng f[6][11], điền từng ô...
+   → f[5][10] = 12.
+
+6. PHÂN TÍCH ĐỘ PHỨC TẠP:
+   - Thời gian: 2 vòng lặp n × W → O(n·W).
+   - Bộ nhớ: O(n·W) cho bảng 2D (có thể tối ưu O(W) bằng 1D).
+
+7. TRUY VẾT:
+   Từ f[n][W] ngược về f[0][0].
+   Nếu f[k][W] ≠ f[k-1][W] → vật k được chọn, W -= gₖ.
+   Với ví dụ: chọn vật 2, 3, 5 (TTL = 4+5+1 = 10, GT = 5+6+1 = 12).</code></pre>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 5 bí kíp để được điểm tối đa</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Luôn nêu nguyên lý DP trước</strong> — giám khảo cần biết bạn hiểu "tại sao dùng DP" (bài toán con chồng lặp → ghi nhớ).</li>
+    <li><strong>Định nghĩa F[i] (hoặc F[i,j]) RÕ RÀNG</strong> — đây là chìa khóa. Sai định nghĩa → sai cả bài.</li>
+    <li><strong>Liệt kê công thức truy hồi + giá trị biên</strong> — không chỉ công thức, phải có $F[0] = ?$, $F[1] = ?$.</li>
+    <li><strong>Chạy tay bảng trên 1 ví dụ nhỏ</strong> — chứng tỏ hiểu thuật toán. Điền từng ô, giải thích vì sao.</li>
+    <li><strong>Phân tích độ phức tạp + truy vết</strong> — đề thường yêu cầu "chỉ ra các vật được chọn" → phải biết truy vết.</li>
+  </ol>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Lỗi mất điểm thường gặp</div>
+  <ul style="padding-left: 20px;">
+    <li>❌ <strong>Định nghĩa F sai</strong> — vd LCS: $F[i,j]$ phải là độ dài LCS của $A[1..i]$ và $B[1..j]$, KHÔNG phải độ dài LCS của $A[0..i]$ và $B[0..j]$.</li>
+    <li>❌ <strong>Quên giá trị biên</strong> — $F[0]$, $F[1]$, $F[0][j]$, $F[i][0]$... Phải khởi tạo trước khi chạy công thức truy hồi.</li>
+    <li>❌ <strong>Nhầm 0/1 Knapsack với Knapsack vô hạn</strong> — 0/1: mỗi vật 1 cái (DP). Vô hạn: số lượng không giới hạn (Greedy).</li>
+    <li>❌ <strong>Không truy vết</strong> — nếu đề yêu cầu "chỉ ra dãy LIS / LCS / các vật được chọn" mà không truy vết → mất 30-40% điểm.</li>
+    <li>❌ <strong>Nhầm hướng đi trong bảng LCS</strong> — khi $A[i] = B[j]$ đi CHÉO (i-1, j-1); khi khác đi LÊN hoặc TRÁI tùy giá trị lớn hơn.</li>
+    <li>❌ <strong>Sai công thức phân tích số</strong> — phải là $F[m, v] = F[m-1, v] + F[m, v-m]$ (dùng $F[m, v-m]$, không phải $F[m-1, v-m]$).</li>
+    <li>❌ <strong>Quên cải tiến 1D</strong> — nếu đề yêu cầu tối ưu bộ nhớ, phải biết giảm 2D → 1D (cập nhật từ phải qua trái).</li>
+  </ul>
+</div>
+
+<!-- ============================== TÓM TẮT ============================== -->
+<h2>📌 Tóm tắt cuối bài</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">✅ Điểm cần nhớ</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>DP vs Chia để trị:</strong> DP dùng khi bài toán con CHỒNG LẤP. Ghi nhớ lời giải vào bảng.</li>
+    <li><strong>3 bước DP:</strong> Phân rã → Ghi nhớ → Tổng hợp (bottom-up).</li>
+    <li><strong>5 bước giải 1 bài DP:</strong> Định nghĩa F → Công thức → Biên → Tính bảng → Truy vết.</li>
+    <li><strong>C(n, k):</strong> $C[n][k] = C[n-1][k-1] + C[n-1][k]$, O(n²). Có thể tối ưu 1D O(n) bộ nhớ.</li>
+    <li><strong>LIS:</strong> $F[i] = \\max(F[j])+1$ ($j<i$, $a[j]<a[i]$), O(n²). Truy vết bằng mảng prev.</li>
+    <li><strong>LCS:</strong> $F[i,j] = F[i-1,j-1]+1$ nếu khớp, ngược lại max. O(n·m). Truy vết đi chéo khi khớp.</li>
+    <li><strong>0/1 Knapsack:</strong> $F[k,V] = \\max(F[k-1,V], F[k-1,V-gₖ]+vₖ)$, O(n·W). Mỗi vật chỉ 1 cái.</li>
+    <li><strong>Phân tích số:</strong> $F[m,v] = F[m-1,v] + F[m,v-m]$, O(n²). Đếm số cách phân tích.</li>
+  </ol>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">🎯 Mẹo thi nhanh</div>
+  <p>• <strong>LCS và 0/1 Knapsack</strong> là 2 bài hay ra nhất — phải thuộc lòng công thức + truy vết.</p>
+  <p>• <strong>C(n, k)</strong> dễ, thường là bài khởi động — nhớ cải tiến 1D.</p>
+  <p>• <strong>LIS</strong> thường yêu cầu truy vết → phải dùng mảng <code>prev</code>.</p>
+  <p>• <strong>Phân tích số</strong> dễ nhầm công thức — nhớ dấu hiệu "$F[m, v-m]$" (cùng $m$, giảm $v$).</p>
+  <p>• Khi gặp bài lạ: <em>"Đếm số cách..."</em> hoặc <em>"Tìm max/min..."</em> với ràng buộc → nghĩ đến DP.</p>
+</div>
+
+<div class="nav-bottom">
+  <a href="03-greedy.html" class="btn btn-ghost">← Bài 3: Tham lam</a>
+  <a href="../index.html" class="btn">📚 Mục lục</a>
+</div>
+
+</body>
+</html>

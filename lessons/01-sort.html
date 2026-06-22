@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bài 1: Sắp xếp - PTTK Thuật Toán</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="../assets/common.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="../index.html">← Mục lục</a>
+  <strong>Bài 1: Sắp xếp (Sorting)</strong>
+  <span>1/4</span>
+</div>
+
+<h1>Bài 1: Thuật Toán Sắp Xếp</h1>
+
+<p class="text-center" style="color: var(--text-secondary); font-size: 1.05rem;">
+  7 thuật toán sắp xếp từ đơn giản đến nâng cao. Mỗi thuật toán có: ý tưởng, giả mã, Python, mô phỏng, phân tích BigO.
+</p>
+
+<!-- ============================== LÝ THUYẾT CHUNG ============================== -->
+<h2>📖 Bài toán sắp xếp là gì?</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">🔑 Định nghĩa</div>
+  <p>Cho một dãy gồm <code>n</code> phần tử <code>a₁, a₂, ..., aₙ</code>. Bài toán sắp xếp là sắp xếp lại các phần tử theo thứ tự tăng dần (hoặc giảm dần).</p>
+  <p>Mỗi phần tử <code>aᵢ</code> có một <strong>khóa</strong> (key) <code>aᵢ.key</code> dùng để so sánh. Khi sắp xếp, ta sắp các phần tử theo khóa của chúng.</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Độ phức tạp tối thiểu</div>
+  <p>Với bài toán sắp xếp <strong>dựa trên so sánh</strong> (comparison-based sorting), độ phức tạp tối thiểu là <strong>O(n log n)</strong>. Nghĩa là KHÔNG có thuật toán sắp xếp nào tốt hơn O(n log n) nếu chỉ dùng phép so sánh giữa các phần tử.</p>
+  <p>Muốn nhanh hơn (O(n)) phải dùng thuật toán <strong>không so sánh</strong> như BinSort, Bucket Sort (dựa vào giá trị khóa).</p>
+</div>
+
+<!-- ============================== BẢNG TỔNG QUAN ============================== -->
+<h2>📊 Bảng tổng quan 7 thuật toán</h2>
+
+<table>
+  <tr>
+    <th>Phương pháp</th>
+    <th>Tốt nhất</th>
+    <th>Trung bình</th>
+    <th>Xấu nhất</th>
+    <th>Bộ nhớ</th>
+    <th>Loại</th>
+  </tr>
+  <tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Đơn giản</td></tr>
+  <tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Đơn giản</td></tr>
+  <tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>Đơn giản</td></tr>
+  <tr><td>QuickSort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>Chia để trị</td></tr>
+  <tr><td>HeapSort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(1)</td><td>Heap</td></tr>
+  <tr><td>BinSort</td><td>O(n+k)</td><td>O(n+k)</td><td>O(n+k)</td><td>O(k)</td><td>Không so sánh</td></tr>
+  <tr><td>Bucket Sort</td><td>O(n)</td><td>O(n)</td><td>O(n²)</td><td>O(n)</td><td>Không so sánh</td></tr>
+</table>
+
+<!-- ============================== MÔ PHỎNG TƯƠNG TÁC ============================== -->
+<h2>🎮 Mô phỏng tương tác — So sánh các thuật toán</h2>
+
+<div class="visualizer">
+  <div class="visualizer-title">⚡ Sort Visualizer — Chạy từng bước</div>
+  <p class="text-center" style="color: var(--text-secondary); margin-bottom: 16px;">
+    Nhập mảng (cách nhau bởi dấu phẩy) → chọn thuật toán → bấm "Bước tiếp" để xem thuật toán chạy.
+  </p>
+
+  <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px;">
+    <input type="text" id="sort-input" value="5,3,8,1,9,2,7,4,6" style="max-width: 280px; font-family: var(--font-mono);">
+    <select id="sort-algo" style="max-width: 200px;">
+      <option value="selection">Selection Sort</option>
+      <option value="insertion">Insertion Sort</option>
+      <option value="bubble">Bubble Sort</option>
+      <option value="quick">QuickSort</option>
+    </select>
+    <button class="btn" onclick="sortInit()">▶ Bắt đầu</button>
+    <button class="btn btn-success" onclick="sortStep()">Bước tiếp →</button>
+    <button class="btn btn-warn" onclick="sortAuto()">⏩ Tự chạy</button>
+    <button class="btn btn-secondary" onclick="sortReset()">↺ Reset</button>
+  </div>
+
+  <div class="visualizer-canvas" style="min-height: 280px;">
+    <div id="sort-bars" style="display: flex; gap: 6px; justify-content: center; align-items: flex-end; min-height: 200px;"></div>
+    <div id="sort-status" style="text-align: center; font-size: 0.95rem; color: var(--text-secondary); margin-top: 12px;">
+      Bấm "Bắt đầu" để chạy mô phỏng.
+    </div>
+    <div id="sort-compare" style="text-align: center; font-size: 0.9rem; color: var(--primary-dark); font-family: var(--font-mono); margin-top: 8px;"></div>
+  </div>
+
+  <div class="visualizer-controls" style="margin-top: 16px;">
+    <div style="display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; font-size: 0.95rem;">
+      <div>📊 So sánh: <strong id="stat-compare" style="color: var(--primary);">0</strong></div>
+      <div>🔄 Hoán vị: <strong id="stat-swap" style="color: var(--accent);">0</strong></div>
+      <div>📍 Bước: <strong id="stat-step" style="color: var(--success);">0</strong></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== SORT VISUALIZER ====================
+let sortArr = [];
+let sortSteps = [];
+let sortStepIdx = 0;
+let sortAutoTimer = null;
+
+function parseInput() {
+  const txt = document.getElementById('sort-input').value.trim();
+  return txt.split(/[,\s]+/).map(Number).filter(n => !isNaN(n));
+}
+
+function renderBars(arr, highlights = {}, swaps = []) {
+  const container = document.getElementById('sort-bars');
+  container.innerHTML = '';
+  const max = Math.max(...arr, 1);
+  arr.forEach((v, i) => {
+    const bar = document.createElement('div');
+    const h = Math.max(30, (v / max) * 180);
+    bar.style.cssText = `
+      width: 44px; height: ${h}px;
+      background: ${highlights[i] || 'var(--gradient-primary)'};
+      color: white;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding: 6px 4px; border-radius: 6px 6px 0 0;
+      font-family: var(--font-mono); font-weight: 700;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s;
+      ${swaps.includes(i) ? 'transform: translateY(-10px); box-shadow: 0 0 12px var(--accent);' : ''}
+    `;
+    bar.innerHTML = `<span>${v}</span><span style="font-size:0.7rem; opacity:0.8;">[${i}]</span>`;
+    container.appendChild(bar);
+  });
+}
+
+// Generate all steps of algorithm (each step = 1 comparison or swap)
+function generateSteps(arr, algo) {
+  const steps = [];
+  const a = [...arr];
+  let comparisons = 0, swaps = 0;
+
+  function record(type, data) {
+    steps.push({ type, ...data, comparisons, swaps, array: [...a] });
+  }
+
+  if (algo === 'selection') {
+    // Selection Sort
+    for (let i = 0; i < a.length - 1; i++) {
+      let minIdx = i;
+      record('select_min', { i, minIdx, msg: `Tìm phần tử nhỏ nhất từ vị trí ${i}` });
+      for (let j = i + 1; j < a.length; j++) {
+        comparisons++;
+        record('compare', { i: minIdx, j, msg: `So sánh a[${minIdx}]=${a[minIdx]} với a[${j}]=${a[j]}` });
+        if (a[j] < a[minIdx]) {
+          minIdx = j;
+          record('new_min', { i, minIdx, msg: `→ Tìm thấy min mới tại vị trí ${minIdx}` });
+        }
+      }
+      if (minIdx !== i) {
+        [a[i], a[minIdx]] = [a[minIdx], a[i]];
+        swaps++;
+        record('swap', { i: minIdx, j: i, msg: `Hoán vị a[${i}] ↔ a[${minIdx}] → đặt ${a[i]} vào vị trí đã sắp` });
+      }
+      record('sorted', { upTo: i, msg: `Vị trí ${i} đã sắp xong: ${a.slice(0, i+1).join(', ')}` });
+    }
+  } else if (algo === 'insertion') {
+    for (let i = 1; i < a.length; i++) {
+      let j = i;
+      record('pick', { i, msg: `Lấy a[${i}]=${a[i]} chèn vào đoạn đã sắp` });
+      while (j > 0 && a[j - 1] > a[j]) {
+        comparisons++;
+        record('compare', { i: j-1, j, msg: `a[${j-1}]=${a[j-1]} > a[${j}]=${a[j]} → hoán vị` });
+        [a[j], a[j - 1]] = [a[j - 1], a[j]];
+        swaps++;
+        record('swap', { i: j-1, j, msg: `Hoán vị → mảng: ${a.join(', ')}` });
+        j--;
+      }
+      if (j > 0) comparisons++;
+      record('inserted', { i, msg: `Đã chèn xong a[${i}] vào vị trí ${j}` });
+    }
+  } else if (algo === 'bubble') {
+    for (let i = 0; i < a.length - 1; i++) {
+      let swapped = false;
+      for (let j = a.length - 1; j > i; j--) {
+        comparisons++;
+        record('compare', { i: j-1, j, msg: `So sánh a[${j-1}]=${a[j-1]} và a[${j}]=${a[j]}` });
+        if (a[j - 1] > a[j]) {
+          [a[j - 1], a[j]] = [a[j], a[j - 1]];
+          swaps++;
+          swapped = true;
+          record('swap', { i: j-1, j, msg: `${a[j-1]} > ${a[j]} → hoán vị` });
+        }
+      }
+      record('sorted', { upTo: i, msg: `Vị trí ${i} đã sắp xong` });
+      if (!swapped) {
+        record('done', { msg: 'Không có hoán vị → mảng đã sắp xong!' });
+        break;
+      }
+    }
+  } else if (algo === 'quick') {
+    function qs(lo, hi) {
+      if (lo >= hi) {
+        if (lo === hi) record('sorted', { upTo: lo, single: true, msg: `Vị trí ${lo} đã sắp xong` });
+        return;
+      }
+      const pivot = a[Math.floor((lo + hi) / 2)];
+      record('pick_pivot', { pivotIdx: Math.floor((lo+hi)/2), pivot, msg: `Chọn pivot = ${pivot} tại vị trí ${Math.floor((lo+hi)/2)}` });
+      let i = lo, j = hi;
+      while (i <= j) {
+        while (a[i] < pivot) { comparisons++; record('compare', { i, j, msg: `a[${i}]=${a[i]} < pivot=${pivot} → i++` }); i++; }
+        while (a[j] > pivot) { comparisons++; record('compare', { i, j, msg: `a[${j}]=${a[j]} > pivot=${pivot} → j--` }); j--; }
+        if (i <= j) {
+          if (i !== j) {
+            [a[i], a[j]] = [a[j], a[i]];
+            swaps++;
+            record('swap', { i, j, msg: `Hoán vị a[${i}] ↔ a[${j}]` });
+          }
+          i++; j--;
+        }
+      }
+      record('partition', { lo, hi, split: i, msg: `Phân hoạch xong: [${lo}..${j}] và [${i}..${hi}]` });
+      qs(lo, j);
+      qs(i, hi);
+    }
+    qs(0, a.length - 1);
+  }
+
+  record('finish', { msg: `✓ Hoàn thành! Mảng đã sắp: ${a.join(', ')}` });
+  return steps;
+}
+
+function sortInit() {
+  if (sortAutoTimer) { clearInterval(sortAutoTimer); sortAutoTimer = null; }
+  const arr = parseInput();
+  if (arr.length < 2) {
+    document.getElementById('sort-status').textContent = 'Cần ít nhất 2 phần tử.';
+    return;
+  }
+  sortArr = arr;
+  const algo = document.getElementById('sort-algo').value;
+  sortSteps = generateSteps(arr, algo);
+  sortStepIdx = 0;
+  renderBars(sortArr);
+  document.getElementById('stat-compare').textContent = '0';
+  document.getElementById('stat-swap').textContent = '0';
+  document.getElementById('stat-step').textContent = '0';
+  document.getElementById('sort-status').innerHTML = `Đã khởi tạo mảng: <strong>${sortArr.join(', ')}</strong>. Bấm "Bước tiếp" để chạy.`;
+  document.getElementById('sort-compare').textContent = '';
+}
+
+function sortStep() {
+  if (sortStepIdx >= sortSteps.length) {
+    document.getElementById('sort-status').innerHTML = '✓ Đã hoàn thành thuật toán!';
+    return;
+  }
+  const step = sortSteps[sortStepIdx];
+  const highlights = {};
+  const swaps = [];
+  if (step.type === 'compare' || step.type === 'pick') {
+    highlights[step.i] = 'var(--warning)';
+    if (step.j !== undefined) highlights[step.j] = 'var(--accent)';
+  } else if (step.type === 'swap') {
+    highlights[step.i] = 'var(--accent)';
+    highlights[step.j] = 'var(--accent)';
+    swaps.push(step.i, step.j);
+  } else if (step.type === 'select_min' || step.type === 'new_min' || step.type === 'pick_pivot') {
+    if (step.minIdx !== undefined) highlights[step.minIdx] = 'var(--success)';
+    if (step.i !== undefined) highlights[step.i] = 'var(--warning)';
+    if (step.pivotIdx !== undefined) highlights[step.pivotIdx] = 'var(--success)';
+  } else if (step.type === 'sorted') {
+    for (let k = 0; k <= (step.upTo || 0); k++) highlights[k] = 'var(--gradient-success)';
+  }
+  renderBars(step.array, highlights, swaps);
+  document.getElementById('stat-compare').textContent = step.comparisons;
+  document.getElementById('stat-swap').textContent = step.swaps;
+  document.getElementById('stat-step').textContent = sortStepIdx + 1;
+  document.getElementById('sort-status').innerHTML = step.msg;
+  document.getElementById('sort-compare').textContent = step.type.toUpperCase();
+  sortStepIdx++;
+}
+
+function sortAuto() {
+  if (sortAutoTimer) {
+    clearInterval(sortAutoTimer);
+    sortAutoTimer = null;
+    return;
+  }
+  sortAutoTimer = setInterval(() => {
+    if (sortStepIdx >= sortSteps.length) {
+      clearInterval(sortAutoTimer);
+      sortAutoTimer = null;
+      return;
+    }
+    sortStep();
+  }, 600);
+}
+
+function sortReset() {
+  if (sortAutoTimer) { clearInterval(sortAutoTimer); sortAutoTimer = null; }
+  sortInit();
+}
+
+// Init on load
+window.addEventListener('DOMContentLoaded', sortInit);
+</script>
+
+<!-- ============================== 1. SELECTION SORT ============================== -->
+<h2>1️⃣ Selection Sort (Sắp xếp chọn)</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng</div>
+  <p>Ở mỗi bước, <strong>tìm phần tử nhỏ nhất</strong> trong đoạn chưa sắp xếp và <strong>hoán vị</strong> nó với phần tử đầu tiên của đoạn chưa sắp xếp.</p>
+  <p>Sau bước <code>i</code>, <code>i</code> phần tử đầu tiên đã được sắp xếp đúng vị trí.</p>
+</div>
+
+<h3>📋 Giả mã</h3>
+<pre><code>PROCEDURE SelectionSort(VAR a: ARRAY[1..n] OF integer);
+VAR i, j, lowindex: Integer;
+    lowkey: Integer;
+BEGIN
+  FOR i := 1 TO n-1 DO
+  BEGIN
+    lowindex := i;
+    lowkey := a[i];
+    FOR j := i+1 TO n DO
+      IF a[j] &lt; lowkey THEN
+      BEGIN
+        lowkey := a[j];
+        lowindex := j;
+      END;
+    Swap(a[i], a[lowindex]);
+  END;
+END;</code></pre>
+
+<h3>🐍 Cài đặt Python</h3>
+<pre><code>def selection_sort(a):
+    n = len(a)
+    for i in range(n - 1):
+        lowindex = i
+        for j in range(i + 1, n):
+            if a[j] &lt; a[lowindex]:
+                lowindex = j
+        a[i], a[lowindex] = a[lowindex], a[i]
+    return a
+
+# Test
+arr = [5, 3, 8, 1, 9, 2, 7]
+print(selection_sort(arr))
+# Output: [1, 2, 3, 5, 7, 8, 9]</code></pre>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích</div>
+  <p><strong>Số lần so sánh:</strong> Vòng lặp ngoài chạy <code>n-1</code> lần. Vòng lặp trong chạy <code>n-i</code> lần cho mỗi <code>i</code>. Tổng: <code>(n-1) + (n-2) + ... + 1 = n(n-1)/2</code>.</p>
+  <p><strong>Số lần hoán vị:</strong> Tối đa <code>n-1</code> lần (mỗi bước 1 lần).</p>
+  <p><strong>Độ phức tạp:</strong> <code>T(n) = n(n-1)/2 = O(n²)</code> trong <strong>mọi trường hợp</strong> (tốt/xấu/trung bình).</p>
+  <p><strong>Bộ nhớ:</strong> O(1) — sắp xếp tại chỗ.</p>
+</div>
+
+<h3>🎯 Ví dụ chạy tay</h3>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Mảng: [5, 3, 8, 1, 9]</div>
+  <p><strong>Bước 1:</strong> Tìm min trong [5,3,8,1,9] → 1 ở vị trí 3. Swap với vị trí 0.</p>
+  <pre><code>[5, 3, 8, 1, 9] → [1, 3, 8, 5, 9]   (swap a[0]↔a[3])</code></pre>
+  <p><strong>Bước 2:</strong> Tìm min trong [3,8,5,9] → 3 ở vị trí 1. Đã đúng vị trí → không swap.</p>
+  <pre><code>[1, 3, 8, 5, 9]   (không đổi)</code></pre>
+  <p><strong>Bước 3:</strong> Tìm min trong [8,5,9] → 5 ở vị trí 3. Swap với vị trí 2.</p>
+  <pre><code>[1, 3, 8, 5, 9] → [1, 3, 5, 8, 9]</code></pre>
+  <p><strong>Bước 4:</strong> Tìm min trong [8,9] → 8. Đã đúng → không swap.</p>
+  <pre><code>[1, 3, 5, 8, 9]   ✓ HOÀN THÀNH</code></pre>
+</div>
+
+<!-- ============================== 2. INSERTION SORT ============================== -->
+<h2>2️⃣ Insertion Sort (Sắp xếp chèn)</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng</div>
+  <p>Ở mỗi bước, <strong>lấy phần tử tiếp theo</strong> và <strong>chèn nó vào vị trí thích hợp</strong> trong đoạn đã sắp xếp.</p>
+  <p>Giống như sắp bài trên tay — cứ rút 1 lá rồi chèn vào đúng vị trí trong số các lá đã có.</p>
+</div>
+
+<h3>📋 Giả mã</h3>
+<pre><code>PROCEDURE InsertionSort(VAR a: ARRAY[1..n] OF integer);
+VAR i, j: Integer;
+BEGIN
+  FOR i := 1 TO n-1 DO
+  BEGIN
+    j := i;
+    WHILE (j >= 1) AND (a[j] &lt; a[j-1]) DO
+    BEGIN
+      Swap(a[j], a[j-1]);
+      j := j - 1;
+    END;
+  END;
+END;</code></pre>
+
+<h3>🐍 Cài đặt Python</h3>
+<pre><code>def insertion_sort(a):
+    n = len(a)
+    for i in range(1, n):
+        j = i
+        while j >= 1 and a[j] &lt; a[j - 1]:
+            a[j], a[j - 1] = a[j - 1], a[j]
+            j -= 1
+    return a
+
+# Test
+arr = [5, 3, 8, 1, 9]
+print(insertion_sort(arr))
+# Output: [1, 3, 5, 8, 9]</code></pre>
+
+<h3>📊 Phân tích độ phức tạp</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích 3 trường hợp</div>
+  <p><strong>Trường hợp TỐT NHẤT (mảng đã sắp):</strong> Vòng while không bao giờ chạy (a[j] ≥ a[j-1]). Chỉ còn vòng for → <strong>O(n)</strong>.</p>
+  <p><strong>Trường hợp XẤU NHẤT (mảng sắp ngược):</strong> Vòng while chạy tối đa <code>i</code> lần cho mỗi <code>i</code>. Tổng: <code>1+2+...+(n-1) = n(n-1)/2</code> → <strong>O(n²)</strong>.</p>
+  <p><strong>Trung bình:</strong> Vòng while chạy i/2 lần trung bình → vẫn <strong>O(n²)</strong>.</p>
+  <p><strong>Bộ nhớ:</strong> O(1).</p>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Khi nào dùng Insertion Sort?</div>
+  <p>Insertion Sort <strong>rất hiệu quả</strong> khi:</p>
+  <ul style="padding-left: 20px;">
+    <li>Mảng đã <strong>gần sắp xếp</strong> (chỉ vài phần tử lệch) — gần O(n).</li>
+    <li>Mảng <strong>nhỏ</strong> (n &lt; 50) — overhead thấp hơn QuickSort.</li>
+    <li>Dùng làm bước cơ sở trong QuickSort (khi đoạn nhỏ đủ nhỏ, dùng Insertion Sort).</li>
+  </ul>
+</div>
+
+<h3>🎯 Ví dụ chạy tay</h3>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Mảng: [5, 3, 8, 1]</div>
+  <p><strong>Bước 1:</strong> Lấy a[1]=3. So sánh với a[0]=5 → 3&lt;5 → swap.</p>
+  <pre><code>[5, 3, 8, 1] → [3, 5, 8, 1]</code></pre>
+  <p><strong>Bước 2:</strong> Lấy a[2]=8. So sánh với a[1]=5 → 8&gt;5 → dừng. Không swap.</p>
+  <pre><code>[3, 5, 8, 1]   (không đổi)</code></pre>
+  <p><strong>Bước 3:</strong> Lấy a[3]=1. So sánh với a[2]=8 → 1&lt;8 → swap. Tiếp tục với a[1]=5 → swap. Tiếp tục với a[0]=3 → swap.</p>
+  <pre><code>[3, 5, 8, 1] → [3, 5, 1, 8] → [3, 1, 5, 8] → [1, 3, 5, 8]   ✓</code></pre>
+</div>
+
+<!-- ============================== 3. BUBBLE SORT ============================== -->
+<h2>3️⃣ Bubble Sort (Sắp xếp nổi bọt)</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng</div>
+  <p>Lặp lại việc duyệt qua dãy, <strong>hoán vị các cặp phần tử liền kề</strong> nếu chúng sai thứ tự.</p>
+  <p>Sau mỗi lần duyệt, phần tử lớn nhất "nổi" lên cuối dãy (như bong bóng nổi lên).</p>
+</div>
+
+<h3>📋 Giả mã</h3>
+<pre><code>PROCEDURE BubbleSort(VAR a: ARRAY[1..n] OF integer);
+VAR i, j: Integer;
+BEGIN
+  FOR i := 1 TO n-1 DO
+    FOR j := n DOWNTO i+1 DO
+      IF a[j-1] &gt; a[j] THEN
+        Swap(a[j-1], a[j]);
+END;</code></pre>
+
+<h3>🐍 Cài đặt Python (có tối ưu flag)</h3>
+<pre><code>def bubble_sort(a):
+    n = len(a)
+    for i in range(n - 1):
+        swapped = False
+        for j in range(n - 1, i, -1):
+            if a[j - 1] &gt; a[j]:
+                a[j - 1], a[j] = a[j], a[j - 1]
+                swapped = True
+        if not swapped:  # Tối ưu: nếu không có swap → đã sắp xong
+            break
+    return a
+
+# Test
+arr = [5, 3, 8, 1, 9]
+print(bubble_sort(arr))  # [1, 3, 5, 8, 9]</code></pre>
+
+<h3>📊 Phân tích</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích</div>
+  <p><strong>TỐT NHẤT (đã sắp, có tối ưu flag):</strong> Vòng for trong chạy 1 lần không có swap → thoát sớm → <strong>O(n)</strong>.</p>
+  <p><strong>XẤU NHẤT (sắp ngược):</strong> Tổng số lần so sánh = <code>(n-1)+(n-2)+...+1 = n(n-1)/2</code> → <strong>O(n²)</strong>.</p>
+  <p><strong>Trung bình:</strong> O(n²).</p>
+  <p><strong>Bộ nhớ:</strong> O(1).</p>
+</div>
+
+<!-- ============================== 4. QUICKSORT ============================== -->
+<h2>4️⃣ QuickSort — Thuật toán quan trọng nhất</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng (Chia để trị)</div>
+  <p>1. <strong>Chọn pivot</strong> (trục) — thường là phần tử giữa.</p>
+  <p>2. <strong>Phân hoạch (Partition)</strong>: Sắp xếp sao cho mọi phần tử bên trái pivot ≤ pivot, mọi phần tử bên phải ≥ pivot.</p>
+  <p>3. <strong>Đệ quy</strong> sắp xếp 2 phần bên trái và bên phải pivot.</p>
+</div>
+
+<h3>📋 Giả mã QuickSort</h3>
+<pre><code>PROCEDURE QuickSort(VAR a: ARRAY[1..n] OF integer; l, r: Integer);
+VAR i, j, pivot: Integer;
+BEGIN
+  IF l &lt; r THEN
+  BEGIN
+    i := l; j := r;
+    pivot := a[(l + r) DIV 2];   { Chọn pivot ở giữa }
+    REPEAT
+      WHILE a[i] &lt; pivot DO i := i + 1;
+      WHILE a[j] &gt; pivot DO j := j - 1;
+      IF i &lt;= j THEN
+      BEGIN
+        Swap(a[i], a[j]);
+        i := i + 1; j := j - 1;
+      END;
+    UNTIL i &gt; j;
+    IF l &lt; j THEN QuickSort(a, l, j);   { Đệ quy trái }
+    IF i &lt; r THEN QuickSort(a, i, r);   { Đệ quy phải }
+  END;
+END;</code></pre>
+
+<h3>🐍 Cài đặt Python</h3>
+<pre><code>def quick_sort(a, l, r):
+    if l &lt; r:
+        i, j = l, r
+        pivot = a[(l + r) // 2]
+        while i &lt;= j:
+            while a[i] &lt; pivot:
+                i += 1
+            while a[j] &gt; pivot:
+                j -= 1
+            if i &lt;= j:
+                a[i], a[j] = a[j], a[i]
+                i += 1
+                j -= 1
+        if l &lt; j:
+            quick_sort(a, l, j)
+        if i &lt; r:
+            quick_sort(a, i, r)
+    return a
+
+# Test
+arr = [5, 3, 8, 1, 9, 2, 7]
+print(quick_sort(arr, 0, len(arr) - 1))
+# Output: [1, 2, 3, 5, 7, 8, 9]</code></pre>
+
+<h3>📊 Phân tích QuickSort</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích 3 trường hợp</div>
+  <p><strong>TỐT NHẤT:</strong> Mỗi lần phân hoạch chia mảng làm 2 nửa gần bằng nhau.</p>
+  <p>Phương trình đệ quy: <code>T(n) = 2T(n/2) + O(n)</code> → <strong>O(n log n)</strong>.</p>
+  <p><strong>XẤU NHẤT:</strong> Pivot luôn là phần tử lớn nhất/nhỏ nhất → phân hoạch lệch hoàn toàn (1 bên rỗng, 1 bên n-1).</p>
+  <p>Phương trình: <code>T(n) = T(n-1) + O(n)</code> → <strong>O(n²)</strong>.</p>
+  <p>Xảy ra khi mảng <strong>đã sắp xếp</strong> và chọn pivot sai (đầu/cuối).</p>
+  <p><strong>TRUNG BÌNH:</strong> O(n log n) — đây là lý do QuickSort được dùng rộng rãi.</p>
+  <p><strong>Bộ nhớ:</strong> O(log n) cho stack đệ quy.</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Bài toán con cân bằng</div>
+  <p>Sẽ tốt hơn nếu ta chia bài toán thành các bài toán con có <strong>kích thước gần bằng nhau</strong>.</p>
+  <p>Ví dụ: MergeSort chia mảng thành 2 nửa bằng nhau → luôn O(n log n).</p>
+  <p>QuickSort trong trường hợp xấu chia lệch hoàn toàn → O(n²).</p>
+  <p><strong>Nguyên tắc chung:</strong> Chia bài toán thành các bài toán con có kích thước xấp xỉ bằng nhau thì hiệu suất sẽ cao hơn.</p>
+</div>
+
+<h3>🎯 Ví dụ chạy tay QuickSort</h3>
+<div class="callout callout-example">
+  <div class="callout-title">📝 Mảng: [5, 3, 8, 1, 9, 2, 7]</div>
+  <p><strong>Lần 1:</strong> l=0, r=6. Pivot = a[3] = 1.</p>
+  <p>Phân hoạch: i=0 (5≥1 dừng), j=6→...→3 (a[3]=1 không &gt; 1 dừng). Swap a[0]↔a[3]: [1, 3, 8, 5, 9, 2, 7]. i=1, j=2.</p>
+  <p>i=1 (a[1]=3≥1 dừng), j=2 (a[2]=8&gt;1 j--=1). i&gt;j → dừng.</p>
+  <p>→ Đệ quy trái [0..2] và phải [1..6].</p>
+  <p>(Tiếp tục... mỗi bước con chạy như trên.)</p>
+  <p><strong>Kết quả cuối:</strong> [1, 2, 3, 5, 7, 8, 9] ✓</p>
+</div>
+
+<!-- ============================== 5. HEAPSORT ============================== -->
+<h2>5️⃣ HeapSort — Dùng cấu trúc Heap</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">🔑 Cấu trúc Heap</div>
+  <p><strong>Heap</strong> là cây nhị phân đầy đủ có tính chất: giá trị tại mỗi nút lớn hơn hoặc bằng (hoặc nhỏ hơn hoặc bằng) giá trị tại các nút con.</p>
+  <p><strong>Max-heap:</strong> Nút cha ≥ nút con. Gốc chứa phần tử lớn nhất.</p>
+  <p><strong>Min-heap:</strong> Nút cha ≤ nút con. Gốc chứa phần tử nhỏ nhất.</p>
+</div>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng HeapSort (2 giai đoạn)</div>
+  <p><strong>Giai đoạn 1 — Xây dựng heap:</strong> Biến mảng thành max-heap (phần tử lớn nhất ở gốc a[1]).</p>
+  <p><strong>Giai đoạn 2 — Rút gốc:</strong> Lần lượt lấy phần tử lớn nhất (gốc heap) ra, đặt vào cuối mảng, rồi phục hồi tính chất heap cho phần còn lại.</p>
+</div>
+
+<h3>📋 Giả mã HeapSort + Heapify</h3>
+<pre><code>PROCEDURE Heapify(VAR a: ARRAY[1..n] OF integer; i, n: Integer);
+VAR largest, left, right: Integer;
+BEGIN
+  largest := i;
+  left := 2 * i;
+  right := 2 * i + 1;
+  IF (left &lt;= n) AND (a[left] &gt; a[largest]) THEN
+    largest := left;
+  IF (right &lt;= n) AND (a[right] &gt; a[largest]) THEN
+    largest := right;
+  IF largest &lt;&gt; i THEN
+  BEGIN
+    Swap(a[i], a[largest]);
+    Heapify(a, largest, n);   { Đệ quy phục hồi }
+  END;
+END;
+
+PROCEDURE HeapSort(VAR a: ARRAY[1..n] OF integer);
+VAR i: Integer;
+BEGIN
+  { Giai đoạn 1: Xây heap }
+  FOR i := n DIV 2 DOWNTO 1 DO
+    Heapify(a, i, n);
+  { Giai đoạn 2: Rút gốc }
+  FOR i := n DOWNTO 2 DO
+  BEGIN
+    Swap(a[1], a[i]);       { Đưa gốc (max) về cuối }
+    Heapify(a, 1, i - 1);   { Phục hồi heap cho phần còn lại }
+  END;
+END;</code></pre>
+
+<h3>🐍 Cài đặt Python (0-indexed)</h3>
+<pre><code>def heapify(a, n, i):
+    """Phục hồi tính chất max-heap cho cây con gốc i."""
+    largest = i
+    left = 2 * i + 1   # 0-indexed: left = 2i+1
+    right = 2 * i + 2  # right = 2i+2
+    if left &lt; n and a[left] &gt; a[largest]:
+        largest = left
+    if right &lt; n and a[right] &gt; a[largest]:
+        largest = right
+    if largest != i:
+        a[i], a[largest] = a[largest], a[i]
+        heapify(a, n, largest)
+
+def heap_sort(a):
+    n = len(a)
+    # Giai đoạn 1: Xây heap (từ n//2 - 1 xuống 0)
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(a, n, i)
+    # Giai đoạn 2: Rút gốc
+    for i in range(n - 1, 0, -1):
+        a[0], a[i] = a[i], a[0]  # Đưa max về cuối
+        heapify(a, i, 0)         # Phục hồi heap cho phần [0..i-1]
+    return a
+
+# Test
+arr = [5, 3, 8, 1, 9]
+print(heap_sort(arr))  # [1, 3, 5, 8, 9]</code></pre>
+
+<h3>📊 Phân tích HeapSort</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích</div>
+  <p><strong>Xây dựng heap:</strong> O(n) — gọi heapify từ n/2 xuống 1, tổng thời gian tuyến tính.</p>
+  <p><strong>Mỗi lần rút gốc + heapify:</strong> O(log n) — heapify đi từ gốc xuống lá (chiều cao log n).</p>
+  <p><strong>Tổng:</strong> O(n) + n × O(log n) = <strong>O(n log n)</strong> trong <strong>mọi trường hợp</strong> (tốt/xấu/trung bình).</p>
+  <p><strong>Bộ nhớ:</strong> O(1) — sắp xếp tại chỗ.</p>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Ưu điểm HeapSort</div>
+  <p>• Đảm bảo <strong>O(n log n)</strong> trong mọi trường hợp (không như QuickSort có thể O(n²)).</p>
+  <p>• Sắp xếp tại chỗ (O(1) bộ nhớ).</p>
+  <p>• Tuy nhiên thực tế <strong>chậm hơn QuickSort</strong> do cache-unfriendly (truy cập heap nhảy xa).</p>
+</div>
+
+<!-- ============================== 6. BINSORT ============================== -->
+<h2>6️⃣ BinSort (Sắp xếp theo xô)</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng</div>
+  <p>Nếu các phần tử có khóa trong phạm vi nhỏ (từ 1 đến k), ta có thể sắp xếp trong thời gian <strong>O(n+k)</strong>.</p>
+  <p>Tạo mảng đếm <code>b[1..k]</code>, đếm số lần xuất hiện của từng giá trị, rồi viết lại mảng theo thứ tự.</p>
+</div>
+
+<h3>📋 Giả mã</h3>
+<pre><code>PROCEDURE BinSort(VAR a: ARRAY[1..n] OF integer; k: Integer);
+VAR b: ARRAY[1..k] OF integer;
+    i, j: Integer;
+BEGIN
+  FOR i := 1 TO k DO b[i] := 0;        { Khởi tạo xô rỗng }
+  FOR i := 1 TO n DO b[a[i]] := b[a[i]] + 1;  { Đếm }
+  j := 1;
+  FOR i := 1 TO k DO                    { Viết lại mảng }
+    WHILE b[i] &gt; 0 DO
+    BEGIN
+      a[j] := i;
+      j := j + 1;
+      b[i] := b[i] - 1;
+    END;
+END;</code></pre>
+
+<h3>🐍 Cài đặt Python</h3>
+<pre><code>def bin_sort(a, k):
+    """k = giá trị lớn nhất có thể có trong a."""
+    b = [0] * (k + 1)  # b[0..k], chỉ dùng b[1..k]
+    for x in a:
+        b[x] += 1
+    j = 0
+    for i in range(1, k + 1):
+        while b[i] &gt; 0:
+            a[j] = i
+            j += 1
+            b[i] -= 1
+    return a
+
+# Test: mảng các giá trị 1-9
+arr = [5, 3, 8, 1, 9, 3, 7]
+print(bin_sort(arr, 9))  # [1, 3, 3, 5, 7, 8, 9]</code></pre>
+
+<h3>📊 Phân tích</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích</div>
+  <p><strong>T(n) = O(n + k)</strong> — phải duyệt qua mảng n phần tử + duyệt qua k xô.</p>
+  <p>Nếu <code>k = O(n)</code> (giá trị khóa cùng bậc với n) thì <strong>T(n) = O(n)</strong> — nhanh hơn mọi thuật toán so sánh!</p>
+  <p><strong>Bộ nhớ:</strong> O(k) — mảng đếm.</p>
+  <p><strong>Điều kiện:</strong> Chỉ dùng được khi khóa là số nguyên trong phạm vi nhỏ.</p>
+</div>
+
+<!-- ============================== 7. BUCKET SORT ============================== -->
+<h2>7️⃣ Bucket Sort</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">💡 Ý tưởng</div>
+  <p>Khi các phần tử là các số thực trong khoảng [0, 1), ta dùng Bucket Sort:</p>
+  <ol style="padding-left: 20px;">
+    <li>Chia khoảng [0, 1) thành <strong>n xô</strong> (bucket) bằng nhau (mỗi xô rộng 1/n).</li>
+    <li>Đưa mỗi phần tử vào xô tương ứng (xô <code>⌊n·a[i]⌋</code>).</li>
+    <li>Sắp xếp từng xô (dùng Insertion Sort — xô thường ít phần tử).</li>
+    <li>Nối các xô lại theo thứ tự.</li>
+  </ol>
+</div>
+
+<h3>🐍 Cài đặt Python</h3>
+<pre><code>def bucket_sort(a):
+    n = len(a)
+    buckets = [[] for _ in range(n)]
+    # 1. Phân phối vào xô
+    for x in a:
+        idx = min(int(x * n), n - 1)  # Đảm bảo không vượt biên
+        buckets[idx].append(x)
+    # 2. Sắp xếp từng xô (Insertion Sort)
+    for b in buckets:
+        b.sort()  # Python dùng Timsort, gần ý tưởng Insertion
+    # 3. Nối các xô
+    result = []
+    for b in buckets:
+        result.extend(b)
+    return result
+
+# Test: số thực trong [0, 1)
+arr = [0.78, 0.17, 0.39, 0.26, 0.72, 0.94, 0.21, 0.12, 0.23, 0.68]
+print(bucket_sort(arr))
+# [0.12, 0.17, 0.21, 0.23, 0.26, 0.39, 0.68, 0.72, 0.78, 0.94]</code></pre>
+
+<h3>📊 Phân tích</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích</div>
+  <p><strong>Trung bình:</strong> O(n) — giả sử phần tử phân bố đều, mỗi xô có trung bình 1 phần tử.</p>
+  <p><strong>XẤU NHẤT:</strong> O(n²) — mọi phần tử rơi vào cùng 1 xô → Insertion Sort trên n phần tử.</p>
+  <p><strong>Bộ nhớ:</strong> O(n) — cần n xô.</p>
+</div>
+
+<!-- ============================== BÀI TẬP TỰ GIẢI ============================== -->
+<h2>✍️ Bài tập tự giải (có đáp án chi tiết)</h2>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 1</div>
+  <p>Cho mảng <code>a = [4, 2, 7, 1, 3]</code>. Hãy chạy tay Selection Sort qua từng bước.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-1-1').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-1-1" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức áp dụng:</strong> Selection Sort — mỗi bước tìm min trong đoạn chưa sắp, swap với đầu đoạn.</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
+    <div class="code-block">Bước 1 (i=0): Tìm min trong [4,2,7,1,3] → 1 ở vị trí 3.
+  Swap a[0]↔a[3]: [4,2,7,1,3] → [1,2,7,4,3]
+
+Bước 2 (i=1): Tìm min trong [2,7,4,3] → 2 ở vị trí 1. Đã đúng.
+  Không swap: [1,2,7,4,3]
+
+Bước 3 (i=2): Tìm min trong [7,4,3] → 3 ở vị trí 4.
+  Swap a[2]↔a[4]: [1,2,7,4,3] → [1,2,3,4,7]
+
+Bước 4 (i=3): Tìm min trong [4,7] → 4 ở vị trí 3. Đã đúng.
+  Không swap: [1,2,3,4,7]</div>
+    <p><strong>✓ Kết quả:</strong> [1, 2, 3, 4, 7] sau 4 bước, 2 lần swap.</p>
+    <p><strong>🔍 Kiểm tra:</strong> Mảng đã tăng dần ✓. Độ phức tạp: n(n-1)/2 = 5·4/2 = 10 lần so sánh = O(n²).</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 2</div>
+  <p>Cho mảng <code>a = [3, 1, 4, 1, 5, 9, 2, 6]</code>. Chạy QuickSort 1 bước phân hoạch đầu tiên (l=0, r=7, pivot = a[3] = 1). Cho biết mảng sau phân hoạch và 2 đoạn cần đệ quy.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-1-2').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-1-2" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức áp dụng:</strong> QuickSort phân hoạch — 2 con trỏ i, j di chuyển từ 2 đầu vào giữa, swap khi gặp cặp sai vị trí.</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
+    <div class="code-block">l=0, r=7. Pivot = a[(0+7)/2] = a[3] = 1.
+i=0, j=7.
+
+Bước lặp:
+- a[i]=a[0]=3, 3 &lt; 1? Không. i dừng tại 0.
+- a[j]=a[7]=6, 6 &gt; 1? Có. j-- → j=6.
+- a[j]=a[6]=2, 2 &gt; 1? Có. j-- → j=5.
+- a[j]=a[5]=9, 9 &gt; 1? Có. j-- → j=4.
+- a[j]=a[4]=5, 5 &gt; 1? Có. j-- → j=3.
+- a[j]=a[3]=1, 1 &gt; 1? Không. j dừng tại 3.
+- i=0 &lt;= j=3 → swap a[0]↔a[3]: [3,1,4,1,5,9,2,6] → [1,1,4,3,5,9,2,6]
+  i=1, j=2.
+- a[i]=a[1]=1, 1 &lt; 1? Không. i dừng tại 1.
+- a[j]=a[2]=4, 4 &gt; 1? Có. j-- → j=1.
+- a[j]=a[1]=1, 1 &gt; 1? Không. j dừng tại 1.
+- i=1 &lt;= j=1 → swap a[1]↔a[1]: (không đổi). i=2, j=0.
+- i=2 &gt; j=0 → dừng.
+
+Mảng sau phân hoạch: [1, 1, 4, 3, 5, 9, 2, 6]
+Đoạn trái cần đệ quy: l=0..j=0 → [1] (1 phần tử, không cần)
+Đoạn phải cần đệ quy: i=2..r=7 → [4, 3, 5, 9, 2, 6]</div>
+    <p><strong>✓ Kết quả:</strong> Mảng [1, 1, 4, 3, 5, 9, 2, 6]. Đoạn phải [4, 3, 5, 9, 2, 6] cần đệ quy tiếp.</p>
+    <p><strong>🔍 Kiểm tra:</strong> Phần tử a[0]=a[1]=1 ≤ pivot, a[2..7] ≥ pivot. Phân hoạch đúng.</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 3</div>
+  <p>Cho mảng <code>a = [4, 10, 3, 5, 1]</code> (1-indexed). Xây max-heap từ mảng này. Cho biết mảng sau khi xây heap.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-1-3').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-1-3" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức áp dụng:</strong> Heapify từ n/2 xuống 1. Tại mỗi nút i, so sánh a[i] với a[2i] (left) và a[2i+1] (right), swap với con lớn hơn nếu cần, đệ quy xuống.</p>
+    <p><strong>🧮 Tính toán từng bước (1-indexed):</strong></p>
+    <div class="code-block">Mảng ban đầu: [4, 10, 3, 5, 1] (vị trí 1, 2, 3, 4, 5)
+n=5, bắt đầu heapify từ i = n/2 = 2 xuống 1.
+
+Heapify(i=2): nút a[2]=10, left=a[4]=5, right=a[5]=1.
+  largest=2 (a[2]=10 ≥ a[4]=5, ≥ a[5]=1) → không swap.
+
+Heapify(i=1): nút a[1]=4, left=a[2]=10, right=a[3]=3.
+  largest=2 (a[2]=10 &gt; a[1]=4). Swap a[1]↔a[2]:
+  Mảng: [10, 4, 3, 5, 1]
+  Đệ quy Heapify(i=2): nút a[2]=4, left=a[4]=5, right=a[5]=1.
+    largest=4 (a[4]=5 &gt; a[2]=4). Swap a[2]↔a[4]:
+    Mảng: [10, 5, 3, 4, 1]
+    Đệ quy Heapify(i=4): a[4]=4 không có con (2*4=8 &gt; n=5) → dừng.
+
+Kết quả: max-heap = [10, 5, 3, 4, 1]
+       10
+      /  \
+     5    3
+    / \
+   4   1</div>
+    <p><strong>✓ Kết quả:</strong> Mảng sau khi xây heap: [10, 5, 3, 4, 1].</p>
+    <p><strong>🔍 Kiểm tra:</strong> Mỗi nút cha ≥ nút con: 10≥5,3; 5≥4,1. ✓ Đúng max-heap.</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 4</div>
+  <p>Phân tích độ phức tạp QuickSort trong trường hợp tốt nhất, xấu nhất, trung bình. Viết phương trình đệ quy.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-1-4').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-1-4" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức áp dụng:</strong> Phân tích đệ quy — <code>T(n) = a·T(n/b) + f(n)</code>. Số phần tử giảm theo b, mỗi lần chia thành a bài toán con, mất f(n) để phân hoạch.</p>
+    <p><strong>🧮 Tính toán từng trường hợp:</strong></p>
+    <div class="code-block">1. TỐT NHẤT (chia đều 2 nửa):
+   T(n) = 2T(n/2) + O(n)
+   Áp dụng Định lý Master: a=2, b=2, f(n)=n → n^(log_b a) = n^1 = n
+   f(n) = Θ(n^1) → case 2 → T(n) = O(n log n)
+
+2. XẤU NHẤT (chia lệch 1-1):
+   Pivot luôn là min hoặc max → 1 bên rỗng, 1 bên n-1.
+   T(n) = T(n-1) + O(n)
+   Giải: T(n) = T(n-1) + n
+                      = T(n-2) + (n-1) + n
+                      = ... = 1 + 2 + ... + n = n(n+1)/2
+   → T(n) = O(n²)
+
+3. TRUNG BÌNH:
+   Pivot chia theo tỉ lệ α:(1-α) với α ngẫu nhiên.
+   T(n) = T(αn) + T((1-α)n) + O(n)
+   → T(n) = O(n log n) với α bất kỳ ∈ (0,1) cố định.</div>
+    <p><strong>✓ Kết quả:</strong> Tốt O(n log n), Xấu O(n²), Trung bình O(n log n).</p>
+    <p><strong>🔍 Kiểm tra:</strong> QuickSort thực tế nhanh hơn HeapSort (cùng O(n log n)) vì cache-friendly — truy cập mảng tuần tự, không nhảy xa như heap.</p>
+  </div>
+</div>
+
+<!-- ============================== QUIZ ============================== -->
+<h2>❓ Kiểm tra hiểu bài</h2>
+<div id="quiz-sort"></div>
+
+<script>
+new Quiz('quiz-sort', [
+  {
+    question: "Độ phức tạp tối thiểu của thuật toán sắp xếp DỰA TRÊN SO SÁNH là gì?",
+    options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"],
+    correct: 1,
+    explanation: "Comparison-based sorting không thể tốt hơn O(n log n). Muốn O(n) phải dùng BinSort/Bucket (không so sánh)."
+  },
+  {
+    question: "Selection Sort có độ phức tạp nào trong trường hợp tốt nhất?",
+    options: ["O(n)", "O(n log n)", "O(n²)", "O(1)"],
+    correct: 2,
+    explanation: "Selection Sort luôn quét toàn bộ đoạn chưa sắp để tìm min → O(n²) trong mọi trường hợp."
+  },
+  {
+    question: "Insertion Sort có độ phức tạp nào trong trường hợp tốt nhất (mảng đã sắp)?",
+    options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"],
+    correct: 0,
+    explanation: "Khi mảng đã sắp, vòng while không chạy → chỉ còn vòng for n lần → O(n)."
+  },
+  {
+    question: "QuickSort trong trường hợp XẤU NHẤT có độ phức tạp bao nhiêu?",
+    options: ["O(n)", "O(n log n)", "O(n²)", "O(2^n)"],
+    correct: 2,
+    explanation: "Khi pivot luôn là min/max → phân hoạch lệch 1-(n-1) → T(n) = T(n-1) + O(n) → O(n²)."
+  },
+  {
+    question: "HeapSort có độ phức tạp nào trong trường hợp xấu nhất?",
+    options: ["O(n)", "O(n log n)", "O(n²)", "O(n log² n)"],
+    correct: 1,
+    explanation: "HeapSort luôn O(n log n) trong mọi trường hợp — đây là ưu điểm so với QuickSort."
+  },
+  {
+    question: "BinSort có độ phức tạp O(n+k). Khi nào thì T(n) = O(n)?",
+    options: ["k = 0", "k = O(n)", "k = O(n²)", "k = O(log n)"],
+    correct: 1,
+    explanation: "Khi k = O(n) (giá trị khóa cùng bậc với n) thì T(n) = O(n+k) = O(n)."
+  },
+  {
+    question: "QuickSort dùng kỹ thuật thiết kế nào?",
+    options: ["Tham lam", "Quy hoạch động", "Chia để trị", "Quay lui"],
+    correct: 2,
+    explanation: "QuickSort chia mảng thành 2 phần rồi đệ quy sắp xếp từng phần → chia để trị."
+  },
+  {
+    question: "Bucket Sort có độ phức tạp trung bình bao nhiêu?",
+    options: ["O(n)", "O(n log n)", "O(n²)", "O(n+k)"],
+    correct: 0,
+    explanation: "Khi phần tử phân bố đều, mỗi bucket có 1 phần tử → O(n). Xấu nhất O(n²) khi cùng r vào 1 bucket."
+  }
+]);
+</script>
+
+<!-- ============================== TƯ DUY ============================== -->
+<h2>🧠 Tư duy thuật toán sắp xếp</h2>
+
+<div class="callout callout-exam">
+  <div class="callout-title">🏆 Cách tư duy để giải bài lạ</div>
+
+  <h4>1. Khi gặp bài "sắp xếp + điều kiện gì đó"</h4>
+  <p>• Nếu chỉ cần sắp xếp tăng/giảm → dùng thư viện (Python <code>sort()</code> dùng Timsort — O(n log n)).</p>
+  <p>• Nếu yêu cầu "không dùng thư viện" → QuickSort hoặc HeapSort (đều O(n log n)).</p>
+  <p>• Nếu mảng <strong>gần sắp xếp</strong> → Insertion Sort (gần O(n)).</p>
+  <p>• Nếu mảng <strong>nhỏ</strong> (n &lt; 50) → Insertion Sort (overhead thấp).</p>
+  <p>• Nếu khóa là <strong>số nguyên nhỏ</strong> → BinSort (O(n+k)).</p>
+  <p>• Nếu là <strong>số thực [0,1)</strong> → Bucket Sort.</p>
+
+  <h4 class="mt-2">2. Khi cần chọn thuật toán cho đề thi</h4>
+  <p>• <strong>Đề yêu cầu O(n log n) ổn định</strong> → HeapSort (không sợ xấu nhất).</p>
+  <p>• <strong>Đề yêu cầu sắp xếp tại chỗ (O(1) bộ nhớ)</strong> → HeapSort hoặc QuickSort.</p>
+  <p>• <strong>Đề yêu cầu ổn định (stable sort)</strong> → Insertion Sort, MergeSort (KHÔNG phải Selection/QuickSort).</p>
+  <p>• <strong>Đề cho dữ liệu đặc biệt</strong> (số nguyên nhỏ, real [0,1)) → BinSort/Bucket.</p>
+
+  <h4 class="mt-2">3. Khi gặp bài "tìm k phần tử lớn nhất/nhỏ nhất"</h4>
+  <p>• Nếu k nhỏ → dùng Heap (min-heap k phần tử, O(n log k)).</p>
+  <p>• Nếu k ≈ n/2 → sắp xếp xong lấy O(n log n).</p>
+  <p>• QuickSelect — biến thể QuickSort — trung bình O(n).</p>
+
+  <h4 class="mt-2">4. Bài "kiểm tra 2 mảng có là hoán vị không"</h4>
+  <p>• Sắp xếp cả 2 → so sánh → O(n log n).</p>
+  <p>• Hoặc dùng hash map đếm tần suất → O(n).</p>
+</div>
+
+<!-- ============================== CÁCH TRÌNH BÀY BÀI THI ============================== -->
+<h2>🏆 Cách trình bày bài thi</h2>
+
+<div class="callout callout-exam">
+  <div class="callout-title">📋 Mẫu trình bày chuẩn cho bài sắp xếp</div>
+  <p>Đề bài mẫu: <em>"Trình bày giải thuật QuickSort. Phân tích độ phức tạp."</em></p>
+
+  <h4>Trình bày chuẩn:</h4>
+  <pre><code>1. Ý TƯỞNG:
+   QuickSort dựa trên kỹ thuật chia để trị:
+   - Chọn 1 phần tử làm pivot (thường là phần tử giữa).
+   - Phân hoạch mảng thành 2 phần: bên trái ≤ pivot, bên phải ≥ pivot.
+   - Đệ quy sắp xếp 2 phần.
+
+2. GIẢ MÃ:
+   PROCEDURE QuickSort(VAR a; l, r);
+   BEGIN
+     IF l &lt; r THEN
+       i := l; j := r;
+       pivot := a[(l+r) DIV 2];
+       REPEAT
+         WHILE a[i] &lt; pivot DO i++;
+         WHILE a[j] &gt; pivot DO j--;
+         IF i &lt;= j THEN BEGIN Swap(a[i], a[j]); i++; j--; END;
+       UNTIL i &gt; j;
+       QuickSort(a, l, j);
+       QuickSort(a, i, r);
+     END;
+   END;
+
+3. VÍ DỤ MINH HỌA:
+   Mảng [5, 3, 8, 1, 9]. Pivot = a[2] = 8.
+   (chạy tay từng bước...)
+
+4. PHÂN TÍCH ĐỘ PHỨC TẠP:
+   - Tốt nhất: T(n) = 2T(n/2) + O(n) → O(n log n).
+   - Xấu nhất: T(n) = T(n-1) + O(n) → O(n²) (mảng đã sắp, pivot sai).
+   - Trung bình: O(n log n).
+   - Bộ nhớ: O(log n) (stack đệ quy).
+
+5. NHẬN XÉT:
+   - Thực tế nhanh hơn HeapSort (cache-friendly).
+   - Không ổn định (có thể đổi vị trí tương đối các phần tử bằng nhau).
+   - Dùng trong hàm sort() của nhiều ngôn ngữ.</code></pre>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 5 bí kíp để được điểm tối đa</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Luôn viết "1. Ý TƯỞNG" trước</strong> — giám khảo xem ý tưởng trước khi đọc mã.</li>
+    <li><strong>Giả mã dùng cú pháp rõ ràng</strong> — PROCEDURE/BEGIN/END hoặc def/for/if Python.</li>
+    <li><strong>Cho 1 ví dụ nhỏ chạy tay</strong> — chứng tỏ hiểu thuật toán không chỉ copy mã.</li>
+    <li><strong>Phân tích 3 trường hợp: tốt/xấu/trung bình</strong> — viết phương trình đệ quy để chứng minh.</li>
+    <li><strong>Cuối bài nhận xét ưu/nhược điểm</strong> — được điểm cộng nếu so sánh với thuật toán khác.</li>
+  </ol>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Lỗi mất điểm thường gặp</div>
+  <ul style="padding-left: 20px;">
+    <li>❌ Chỉ viết mã không có ý tưởng → mất 30-40% điểm.</li>
+    <li>❌ Không phân tích độ phức tạp → mất 20% điểm.</li>
+    <li>❌ Quên trường hợp xấu nhất (QuickSort O(n²)) → mất điểm phân tích.</li>
+    <li>❌ Nhầm Bubble Sort với Insertion Sort (cả 2 đều swap cặp liền kề, nhưng Bubble đi từ cuối lên, Insertion từ vị trí hiện tại lùi về).</li>
+    <li>❌ HeapSort 0-indexed vs 1-indexed: chú ý index khi cài đặt (left = 2i+1 nếu 0-indexed, 2i nếu 1-indexed).</li>
+  </ul>
+</div>
+
+<!-- ============================== TÓM TẮT ============================== -->
+<h2>📌 Tóm tắt cuối bài</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">✅ Điểm cần nhớ</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Sắp xếp so sánh</strong> tối thiểu O(n log n). <strong>Không so sánh</strong> có thể O(n).</li>
+    <li><strong>Selection Sort:</strong> O(n²) mọi TH — chọn min hoán vị đầu.</li>
+    <li><strong>Insertion Sort:</strong> O(n) tốt, O(n²) xấu — chèn vào đoạn đã sắp.</li>
+    <li><strong>Bubble Sort:</strong> O(n²) — nổi bọt lớn lên cuối.</li>
+    <li><strong>QuickSort:</strong> O(n log n) trung bình, O(n²) xấu — chia để trị với pivot.</li>
+    <li><strong>HeapSort:</strong> O(n log n) mọi TH — dùng max-heap, rút gốc.</li>
+    <li><strong>BinSort:</strong> O(n+k) — đếm tần suất, cho số nguyên nhỏ.</li>
+    <li><strong>Bucket Sort:</strong> O(n) trung bình — chia xô cho số thực [0,1).</li>
+  </ol>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">🎯 Mẹo thi nhanh</div>
+  <p>• QuickSort và HeapSort là 2 thuật toán hay ra nhất — phải biết viết + phân tích.</p>
+  <p>• Insertion Sort có ưu điểm O(n) khi gần sắp — hay dùng làm base case.</p>
+  <p>• BinSort/Bucket Sort là thuật toán "đặc biệt" — chỉ dùng được khi dữ liệu thỏa mãn điều kiện.</p>
+  <p>• Khi nghi ngờ → dùng QuickSort (tốt nhất thực tế) hoặc HeapSort (đảm bảo không xấu).</p>
+</div>
+
+<div class="nav-bottom">
+  <a href="../index.html" class="btn btn-ghost">← Mục lục</a>
+  <a href="02-bigo.html" class="btn">Bài 2: Độ phức tạp BigO →</a>
+</div>
+
+</body>
+</html>

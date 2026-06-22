@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bài 2: Độ phức tạp BigO - PTTK Thuật Toán</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="../assets/common.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="../index.html">← Mục lục</a>
+  <strong>Bài 2: Độ phức tạp BigO</strong>
+  <span>2/4</span>
+</div>
+
+<h1>Bài 2: Độ Phức Tạp Thuật Toán (BigO)</h1>
+
+<p class="text-center" style="color: var(--text-secondary); font-size: 1.05rem;">
+  Khi n rất lớn, chúng ta chỉ quan tâm <strong>tốc độ tăng</strong> của thời gian thực hiện, bỏ qua hằng số. Đây là ngôn ngữ chung để so sánh thuật toán.
+</p>
+
+<!-- ============================== 1. LÝ THUYẾT BIGO ============================== -->
+<h2>📖 1. Tỷ suất tăng &amp; khái niệm BigO</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">🔑 Tỷ suất tăng (growth rate)</div>
+  <p>Khi phân tích thuật toán, ta gọi <code>T(n)</code> là thời gian thực hiện khi đầu vào có kích thước <code>n</code>. Khi <code>n → ∞</code>, ta quan tâm đến <strong>tốc độ tăng</strong> của <code>T(n)</code> chứ không quan tâm các hằng số.</p>
+  <p>Ví dụ: <code>T(n) = 3n² + 5n + 100</code>. Khi <code>n = 1000</code> thì <code>3n² = 3.000.000</code> lấn át hoàn toàn <code>5n = 5000</code> và <code>100</code>. Nên ta nói <code>T(n)</code> "tăng như" <code>n²</code>.</p>
+  <p><strong>Quy ước:</strong> Bỏ hằng số, giữ bậc cao nhất &rarr; <code>T(n) ≈ O(n²)</code>.</p>
+</div>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Định nghĩa hình thức</div>
+  <p>Ta nói <code>T(n) = O(f(n))</code> nếu tồn tại các hằng số dương <code>c</code> và <code>n₀</code> sao cho:</p>
+  <p style="text-align:center; font-size:1.2rem; margin: 12px 0;">
+    <code>T(n) ≤ c · f(n)</code> với mọi <code>n ≥ n₀</code>
+  </p>
+  <p><strong>Ý nghĩa:</strong> Từ một ngưỡng <code>n₀</code> trở đi, <code>T(n)</code> luôn bị chặn trên bởi một hằng số lần <code>f(n)</code>. Khi đó <code>f(n)</code> là "tốc độ tăng" của <code>T(n)</code>.</p>
+  <p><strong>Ví dụ:</strong> <code>T(n) = 3n² + 5n + 100</code>. Chọn <code>c = 4</code>, <code>n₀ = 110</code>. Khi <code>n ≥ 110</code> ta có <code>3n² + 5n + 100 ≤ 4n²</code>. Vậy <code>T(n) = O(n²)</code>.</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Vì sao phải bỏ hằng số?</div>
+  <p>• Hằng số phụ thuộc vào phần cứng (CPU, RAM, trình dịch) — thuật toán A chạy nhanh gấp 2 lần B trên máy này có thể chậm hơn trên máy khác.</p>
+  <p>• Khi <code>n → ∞</code>, bậc của <code>n</code> mới quyết định: <code>n²</code> luôn thắng <code>1000n</code> khi <code>n &gt; 1000</code>.</p>
+  <p>• Vì vậy BigO là <strong>thước đo độc lập phần cứng</strong> — chỉ nói về "bản chất" của thuật toán.</p>
+</div>
+
+<!-- ============================== 2. CÁC HÀM BIGO ============================== -->
+<h2>📊 2. Các hàm BigO theo thứ tự tăng</h2>
+
+<p>Theo giáo trình Nguyễn Văn Linh (ĐH Cần Thơ 2003), các hàm BigO quan trọng xếp theo tốc độ tăng (từ chậm nhất = tốt nhất đến nhanh nhất = xấu nhất):</p>
+
+<table>
+  <tr>
+    <th>Hàm f(n)</th>
+    <th>Tên gọi</th>
+    <th>Ví dụ thuật toán</th>
+    <th>Đánh giá</th>
+  </tr>
+  <tr><td><code>O(1)</code></td><td>Hằng số</td><td>Lấy phần tử a[i]</td><td>🟢 Tuyệt vời</td></tr>
+  <tr><td><code>O(log n)</code></td><td>Logarit</td><td>Binary Search</td><td>🟢 Rất tốt</td></tr>
+  <tr><td><code>O(√n)</code></td><td>Căn bậc 2</td><td>Ktra SNT kiểu √n</td><td>🔵 Tốt</td></tr>
+  <tr><td><code>O(n)</code></td><td>Tuyến tính</td><td>Duyệt mảng 1 lần</td><td>🔵 Tốt</td></tr>
+  <tr><td><code>O(n log n)</code></td><td>Tuyến tính log</td><td>MergeSort, HeapSort</td><td>🟡 Khả dụng</td></tr>
+  <tr><td><code>O(n²)</code></td><td>Bình phương</td><td>Selection, Bubble</td><td>🟠 Chậm</td></tr>
+  <tr><td><code>O(n³)</code></td><td>Lập phương</td><td>Nhân ma trận naïve</td><td>🟠 Rất chậm</td></tr>
+  <tr><td><code>O(2^n)</code></td><td>Mũ</td><td>Fibonacci đệ quy</td><td>🔴 Khủng hoảng</td></tr>
+  <tr><td><code>O(n!)</code></td><td>Giai thừa</td><td>Hoán vị (Brute TSP)</td><td>🔴 Không thể dùng</td></tr>
+</table>
+
+<h3>📈 Bảng so sánh giá trị thực tại các n khác nhau</h3>
+
+<table>
+  <tr>
+    <th>f(n)</th>
+    <th>n = 10</th>
+    <th>n = 100</th>
+    <th>n = 1000</th>
+    <th>n = 10 000</th>
+  </tr>
+  <tr><td><code>1</code></td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+  <tr><td><code>log₂ n</code></td><td>3.3</td><td>6.6</td><td>10</td><td>13.3</td></tr>
+  <tr><td><code>√n</code></td><td>3.2</td><td>10</td><td>31.6</td><td>100</td></tr>
+  <tr><td><code>n</code></td><td>10</td><td>100</td><td>1 000</td><td>10 000</td></tr>
+  <tr><td><code>n log n</code></td><td>33</td><td>664</td><td>10 000</td><td>133 000</td></tr>
+  <tr><td><code>n²</code></td><td>100</td><td>10 000</td><td>1 000 000</td><td>100 000 000</td></tr>
+  <tr><td><code>n³</code></td><td>1 000</td><td>1 000 000</td><td>10⁹</td><td>10¹²</td></tr>
+  <tr><td><code>2^n</code></td><td>1 024</td><td>≈10³⁰</td><td>≈10³⁰¹</td><td>😱 vô nghĩa</td></tr>
+  <tr><td><code>n!</code></td><td>3 628 800</td><td>≈10¹⁵⁸</td><td>💥 vỡ vũ trụ</td><td>💥💥💥</td></tr>
+</table>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Quan sát quan trọng</div>
+  <p>• Khi <code>n = 10 000</code>: thuật toán <code>O(n)</code> mất 10 000 phép toán (vài micro giây), <code>O(n²)</code> mất 100 triệu phép toán (vài giây), <code>O(2^n)</code> không thể tính xong trong đời người.</p>
+  <p>• <strong>Logarithmic rất "rẻ"</strong>: log₂(1 tỷ) ≈ 30 — Binary Search 1 tỷ phần tử chỉ mất 30 bước!</p>
+  <p>• <strong>Bậc cao ăn thịt bậc thấp</strong>: n³ luôn thắng n²·1000 khi n đủ lớn.</p>
+</div>
+
+<!-- ============================== 3. QUY TẮC ============================== -->
+<h2>📐 3. Quy tắc tính BigO</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">➕ Quy tắc cộng</div>
+  <p>Nếu <code>T(n) = T₁(n) + T₂(n)</code> thì:</p>
+  <p style="text-align:center; font-size:1.15rem;"><code>T(n) = O(max(T₁(n), T₂(n)))</code></p>
+  <p><strong>Vì sao?</strong> Khi n→∞, số bậc cao hơn sẽ lấn át bậc thấp. Ví dụ <code>T(n) = n² + n</code>: <code>n²</code> "nuốt" <code>n</code>, chỉ còn <code>O(n²)</code>.</p>
+  <p><strong>Ứng dụng:</strong> Nếu thuật toán có 2 khối thực hiện nối tiếp nhau (for rồi lại for), lấy max.</p>
+</div>
+
+<div class="callout callout-theory">
+  <div class="callout-title">✖️ Quy tắc nhân</div>
+  <p>Nếu <code>T(n) = T₁(n) × T₂(n)</code> thì:</p>
+  <p style="text-align:center; font-size:1.15rem;"><code>T(n) = O(T₁(n) × T₂(n))</code></p>
+  <p><strong>Vì sao?</strong> Đây là trường hợp <strong>vòng lặp lồng nhau</strong>: thân vòng lặp ngoài mất T₁, mỗi lần lặp lại chạy vòng trong T₂ → tổng = T₁·T₂.</p>
+  <p><strong>Ví dụ:</strong> 2 vòng for lồng nhau, mỗi vòng n lần, thân O(1) &rarr; <code>O(n·n·1) = O(n²)</code>.</p>
+</div>
+
+<div class="callout callout-theory">
+  <div class="callout-title">🔧 Quy tắc tổng quát</div>
+  <ul style="padding-left: 22px;">
+    <li><strong>Vòng lặp for:</strong> Độ phức tạp = (số lần lặp) × (độ phức tạp thân vòng lặp).</li>
+    <li><strong>Vòng lặp while:</strong> Đếm số lần lặp dựa trên điều kiện dừng × độ phức tạp thân.</li>
+    <li><strong>Lệnh if-else:</strong> Lấy <code>max</code> của các nhánh (vì tệ nhất là nhánh nặng nhất).</li>
+    <li><strong>Hàm con:</strong> Thay lời gọi bằng độ phức tạp của hàm con đó.</li>
+  </ul>
+</div>
+
+<!-- ============================== 4. VÒNG LẶP FOR ============================== -->
+<h2>🔁 4. Phân tích vòng lặp for</h2>
+
+<h3>4.1 Một vòng for đơn giản</h3>
+<pre><code>for i = 1 to n:        # n lần lặp
+    print(i)            # O(1)
+# Tổng: n × O(1) = O(n)</code></pre>
+<p><strong>Vì sao:</strong> Thân vòng lặp là <code>print</code> — chi phí cố định O(1). Vòng lặp chạy <code>n</code> lần → nhân lại → <strong>O(n)</strong>.</p>
+
+<h3>4.2 Hai vòng for lồng nhau</h3>
+<pre><code>for i = 1 to n:        # n lần
+    for j = 1 to n:     # n lần
+        print(i, j)     # O(1)
+# Tổng: n × n × O(1) = O(n²)</code></pre>
+<p><strong>Vì sao:</strong> Quy tắc nhân: O(n) × O(n) × O(1) = <strong>O(n²)</strong>. Số cặp (i,j) = n².</p>
+
+<h3>4.3 Vòng for với bước nhảy log</h3>
+<pre><code>for i = 1; i &lt; n; i *= 2:    # i: 1, 2, 4, 8, ..., &lt; n
+    print(i)                  # O(1)
+# Tổng: log₂(n) × O(1) = O(log n)</code></pre>
+<p><strong>Vì sao:</strong> Sau k lần lặp, <code>i = 2^k</code>. Vòng dừng khi <code>2^k ≥ n</code>, tức <code>k ≥ log₂(n)</code>. Vậy có đúng <code>⌈log₂(n)⌉</code> lần lặp → <strong>O(log n)</strong>.</p>
+
+<h3>4.4 Vòng for giảm nửa</h3>
+<pre><code>for i = n; i &gt;= 1; i /= 2:   # i: n, n/2, n/4, ..., 1
+    print(i)                  # O(1)
+# Tổng: log₂(n) lần → O(log n)</code></pre>
+<p><strong>Vì sao:</strong> Sau k lần, <code>i = n / 2^k</code>. Dừng khi <code>i &lt; 1</code> ⇔ <code>2^k &gt; n</code> ⇔ <code>k &gt; log₂(n)</code>. Cũng <strong>O(log n)</strong>.</p>
+
+<!-- ============================== 5. VÒNG LẶP WHILE ============================== -->
+<h2>🔄 5. Phân tích vòng lặp while</h2>
+
+<h3>5.1 While chia đôi</h3>
+<pre><code>n = input
+while n &gt; 0:
+    n = n / 2          # chia đôi mỗi lần
+# Sau k lần: n / 2^k ≤ 0 (≈) → k ≈ log₂(n)
+# → O(log n)</code></pre>
+<p><strong>Vì sao:</strong> Mỗi lần lặp <code>n</code> giảm đi một nửa. Để <code>n</code> giảm từ giá trị ban đầu xuống 1 cần <code>log₂(n)</code> lần chia.</p>
+
+<h3>5.2 While giảm 1</h3>
+<pre><code>n = input
+while n &gt; 0:
+    n = n - 1          # giảm 1 mỗi lần
+# Cần n lần để n = 0
+# → O(n)</code></pre>
+<p><strong>Vì sao:</strong> Mỗi lần chỉ trừ 1 → cần đúng <code>n</code> lần để từ <code>n</code> về 0.</p>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Mẹo nhớ nhanh</div>
+  <p>• Biến <strong>chia đôi</strong> mỗi lần → <code>O(log n)</code>.</p>
+  <p>• Biến <strong>giảm 1</strong> mỗi lần → <code>O(n)</code>.</p>
+  <p>• Biến <strong>nhân đôi</strong> mỗi lần (từ 1 lên n) → <code>O(log n)</code>.</p>
+  <p>• Vòng lặp <strong>lồng</strong> nhau → <strong>nhân</strong> độ phức tạp.</p>
+  <p>• Vòng lặp <strong>nối tiếp</strong> nhau → <strong>cộng</strong> (lấy max).</p>
+</div>
+
+<!-- ============================== 6. CHƯƠNG TRÌNH CON KHÔNG ĐỆ QUY ============================== -->
+<h2>🧩 6. Phân tích chương trình con không đệ quy</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">🔑 Quy tắc</div>
+  <p>Thay <strong>lời gọi hàm</strong> bằng <strong>độ phức tạp của hàm đó</strong> trong biểu thức.</p>
+  <p><strong>Ví dụ:</strong> Hàm <code>A</code> gọi hàm <code>B</code> (vốn O(n²)) <strong>3 lần</strong>:</p>
+  <pre><code>def A(n):
+    B(n)         # O(n²)
+    B(n)         # O(n²)
+    B(n)         # O(n²)
+# T_A(n) = 3 · O(n²) = O(n²)   (hằng số 3 bị bỏ)</code></pre>
+  <p><strong>Vì sao bỏ được hằng 3?</strong> Vì BigO bỏ hằng số — <code>3·n²</code> và <code>n²</code> có cùng tốc độ tăng khi <code>n→∞</code>.</p>
+</div>
+
+<!-- ============================== 7. ĐỆ QUY — QUAN TRỌNG NHẤT ============================== -->
+<h2>🌳 7. Phân tích chương trình đệ quy — Phần QUAN TRỌNG NHẤT</h2>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Đệ quy là phần khó nhất, cũng là phần hay ra thi nhất!</div>
+  <p>Hầu hết thuật toán "chia để trị" (MergeSort, QuickSort, Binary Search, Strassen) đều là đệ quy. Phân tích đúng cần 2 bước: <strong>(1) Lập phương trình đệ quy</strong> &rarr; <strong>(2) Giải phương trình đó</strong>.</p>
+</div>
+
+<h3>7.1 Thành lập phương trình đệ quy</h3>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Dạng tổng quát</div>
+  <p style="text-align:center; font-size:1.2rem; margin: 12px 0;">
+    <code>T(n) = a · T(n/b) + f(n)</code>
+  </p>
+  <p>Trong đó:</p>
+  <ul style="padding-left: 22px;">
+    <li><code>a</code> = số bài toán con (số lần đệ quy gọi lại chính nó).</li>
+    <li><code>n/b</code> = kích thước mỗi bài toán con (chia bài toán gốc thành b phần bằng nhau).</li>
+    <li><code>f(n)</code> = chi phí để <em>chia</em> bài toán và <em>trộn</em> kết quả các bài toán con.</li>
+  </ul>
+  <p><strong>Ý nghĩa:</strong> Để giải bài toán cỡ <code>n</code>, ta chia thành <code>a</code> bài toán con cỡ <code>n/b</code>, mất thêm <code>f(n)</code> để chia &amp; trộn.</p>
+</div>
+
+<table>
+  <tr><th>Thuật toán</th><th>Phương trình</th><th>Giải thích</th></tr>
+  <tr>
+    <td>MergeSort</td>
+    <td><code>T(n) = 2T(n/2) + O(n)</code></td>
+    <td>Chia mảng làm 2 (T(n/2) × 2), trộn 2 mảng mất O(n).</td>
+  </tr>
+  <tr>
+    <td>Binary Search</td>
+    <td><code>T(n) = T(n/2) + O(1)</code></td>
+    <td>Chia đôi dãy (1 T(n/2)), so sánh với mid mất O(1).</td>
+  </tr>
+  <tr>
+    <td>QuickSort (xấu nhất)</td>
+    <td><code>T(n) = T(n-1) + O(n)</code></td>
+    <td>Pivot lệch: 1 bên rỗng, 1 bên n-1; partition mất O(n).</td>
+  </tr>
+  <tr>
+    <td>Strassen (nhân ma trận)</td>
+    <td><code>T(n) = 7T(n/2) + O(n²)</code></td>
+    <td>7 phép nhân ma trận con n/2, cộng/trộn O(n²).</td>
+  </tr>
+  <tr>
+    <td>Fibonacci đệ quy</td>
+    <td><code>T(n) = T(n-1) + T(n-2) + O(1)</code></td>
+    <td>2 lời gọi đệ quy cỡ n-1 và n-2 (không chia đều → phải dùng cây đệ quy).</td>
+  </tr>
+</table>
+
+<h3>7.2 Ba phương pháp giải</h3>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📝 Phương pháp 1: Thay thế liên tiếp (substitution)</div>
+  <p>Liên tục thay <code>T(n/b)</code> bằng công thức đến khi thấy quy luật.</p>
+  <p><strong>Ví dụ:</strong> Giải <code>T(n) = 2T(n/2) + n</code></p>
+  <pre><code>T(n) = 2·T(n/2) + n
+     = 2·[2·T(n/4) + n/2] + n     = 4·T(n/4) + 2n
+     = 4·[2·T(n/8) + n/4] + 2n    = 8·T(n/8) + 3n
+     = ...
+     = 2^k · T(n/2^k) + k·n</code></pre>
+  <p>Đặt <code>n/2^k = 1</code> (tức chạm base case) → <code>k = log₂(n)</code>:</p>
+  <pre><code>T(n) = n · T(1) + n·log₂(n) = n + n·log n = O(n log n) ✓</code></pre>
+</div>
+
+<div class="callout callout-theory">
+  <div class="callout-title">🌳 Phương pháp 2: Cây đệ quy (recursion tree)</div>
+  <p>Vẽ cây đệ quy: mỗi node là một lời gọi hàm, ghi giá trị <code>n</code> và chi phí <code>f(n)</code>. Tổng chi phí = tổng chi phí tất cả node.</p>
+  <p><strong>Ví dụ:</strong> <code>T(n) = 2T(n/2) + n</code> vẽ cây:</p>
+  <pre><code>           n              (tầng 0: chi phí n)
+          / \
+        n/2  n/2          (tầng 1: 2·n/2 = n)
+       / \  / \
+     n/4 ... ...          (tầng 2: 4·n/4 = n)
+     ...
+     1 1 1 ... 1          (tầng log n: n·1 = n)</code></pre>
+  <p>Có <code>log₂(n) + 1</code> tầng, mỗi tầng chi phí <code>n</code> → tổng = <code>n·(log n + 1) = O(n log n)</code> ✓</p>
+</div>
+
+<div class="callout callout-exam">
+  <div class="callout-title">🏆 Phương pháp 3: ĐỊNH LÝ MASTER (Master Theorem) — quan trọng nhất!</div>
+  <p>Cho <code>T(n) = a·T(n/b) + f(n)</code> với <code>a ≥ 1</code>, <code>b &gt; 1</code>. Đặt <code>c* = log<sub>b</sub>(a)</code>. So sánh <code>f(n)</code> với <code>n^c*</code>:</p>
+  <p style="text-align:center; font-size:1.15rem; margin: 14px 0;">
+    <code>c* = log<sub>b</sub> a</code>
+  </p>
+  <table>
+    <tr><th>Case</th><th>Điều kiện</th><th>Kết luận</th></tr>
+    <tr>
+      <td><strong>1</strong></td>
+      <td><code>f(n) = O(n^c)</code> với <code>c &lt; c*</code> (f nhỏ hơn)</td>
+      <td><code>T(n) = Θ(n^(log<sub>b</sub> a))</code></td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td><code>f(n) = Θ(n^c · log^k n)</code> với <code>c = c*</code>, <code>k ≥ 0</code> (f cân bằng)</td>
+      <td><code>T(n) = Θ(n^c · log^(k+1) n)</code></td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td><code>f(n) = Ω(n^c)</code> với <code>c &gt; c*</code> VÀ điều kiện chính quy <code>a·f(n/b) ≤ d·f(n)</code></td>
+      <td><code>T(n) = Θ(f(n))</code></td>
+    </tr>
+  </table>
+  <p><strong>Ý nghĩa trực quan:</strong></p>
+  <ul style="padding-left: 22px;">
+    <li><strong>Case 1:</strong> Lá cây "nặng" hơn gốc → T(n) bị chi phối bởi số lá = <code>n^(log_b a)</code>.</li>
+    <li><strong>Case 2:</strong> Gốc và lá "cân bằng" → mỗi tầng đều đóng góp ≈ f(n), có log n tầng → nhân thêm log.</li>
+    <li><strong>Case 3:</strong> Gốc "nặng" hơn lá → T(n) bị chi phối bởi gốc = f(n).</li>
+  </ul>
+</div>
+
+<h3>7.3 Áp dụng định lý Master cho các thuật toán quen thuộc</h3>
+
+<table>
+  <tr><th>Thuật toán</th><th>a, b, f(n)</th><th>c* = log<sub>b</sub> a</th><th>So sánh</th><th>Case</th><th>T(n)</th></tr>
+  <tr><td>Binary Search</td><td>a=1, b=2, f=O(1)</td><td>log₂1 = 0</td><td>f = n⁰ = n^c*</td><td>2 (k=0)</td><td>Θ(log n)</td></tr>
+  <tr><td>MergeSort</td><td>a=2, b=2, f=O(n)</td><td>log₂2 = 1</td><td>f = n¹ = n^c*</td><td>2 (k=0)</td><td>Θ(n log n)</td></tr>
+  <tr><td>Strassen</td><td>a=7, b=2, f=O(n²)</td><td>log₂7 ≈ 2.81</td><td>f = n² &lt; n^2.81</td><td>1</td><td>Θ(n^2.81)</td></tr>
+  <tr><td>Nhân ma trận naïve</td><td>a=8, b=2, f=O(n²)</td><td>log₂8 = 3</td><td>f = n² &lt; n³</td><td>1</td><td>Θ(n³)</td></tr>
+  <tr><td>"Karatsuba-like"</td><td>a=3, b=2, f=O(n)</td><td>log₂3 ≈ 1.58</td><td>f = n &lt; n^1.58</td><td>1</td><td>Θ(n^1.58)</td></tr>
+  <tr><td>Trộn nặng</td><td>a=2, b=2, f=O(n²)</td><td>log₂2 = 1</td><td>f = n² &gt; n¹</td><td>3</td><td>Θ(n²)</td></tr>
+</table>
+
+<!-- ============================== 8. MÔ PHỎNG TƯƠNG TÁC ============================== -->
+<h2>🎮 8. Mô phỏng tương tác — 4 công cụ học BigO</h2>
+
+<div class="visualizer" id="bigo-tools" data-tabs>
+  <div class="visualizer-title">⚡ BigO Toolkit — 4 công cụ tương tác</div>
+
+  <div class="tabs">
+    <button class="tab active">1️⃣ BigO Calculator</button>
+    <button class="tab">2️⃣ Biểu đồ so sánh</button>
+    <button class="tab">3️⃣ Định lý Master</button>
+    <button class="tab">4️⃣ Cây đệ quy</button>
+  </div>
+
+  <!-- ====== TAB 1: BigO CALCULATOR ====== -->
+  <div class="tab-content active">
+    <p>Chọn một <strong>mẫu code</strong> phổ biến (hoặc nhập code Python đơn giản) → công cụ tự phát hiện BigO.</p>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
+      <select id="bigo-pattern">
+        <option value="single-for">Vòng for đơn: for i in 1..n: O(1)</option>
+        <option value="nested-for">2 vòng for lồng: for i: for j: O(1)</option>
+        <option value="triple-for">3 vòng for lồng: for i: for j: for k: O(1)</option>
+        <option value="log-for">Vòng for log: for i*=2</option>
+        <option value="while-half">While n/=2</option>
+        <option value="while-dec">While n-=1</option>
+        <option value="merge">Đệ quy: T(n)=2T(n/2)+n</option>
+        <option value="binsearch">Đệ quy: T(n)=T(n/2)+1</option>
+        <option value="fib">Đệ quy: T(n)=T(n-1)+T(n-2)</option>
+        <option value="custom">Nhập code tự do</option>
+      </select>
+      <button class="btn" onclick="bigoAnalyze()">🔍 Phân tích BigO</button>
+    </div>
+
+    <textarea id="bigo-code" rows="6" style="width: 100%; max-width: 600px; font-family: var(--font-mono); padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-elevated);" placeholder="# Chọn mẫu ở trên hoặc nhập code Python tại đây"></textarea>
+
+    <div id="bigo-result" class="result-box" style="margin-top: 16px; display: none;"></div>
+
+    <div id="bigo-explain" style="margin-top: 12px; color: var(--text-secondary); font-size: 0.95rem;"></div>
+  </div>
+
+  <!-- ====== TAB 2: BIỂU ĐỒ SO SÁNH ====== -->
+  <div class="tab-content">
+    <p>So sánh <strong>các hàm BigO</strong> tại <code>n = 1..20</code>. Bật/tắt từng hàm bằng checkbox.</p>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;" id="bigo-chart-toggles">
+      <label><input type="checkbox" checked data-fn="1"> O(1)</label>
+      <label><input type="checkbox" checked data-fn="log"> O(log n)</label>
+      <label><input type="checkbox" checked data-fn="sqrt"> O(√n)</label>
+      <label><input type="checkbox" checked data-fn="n"> O(n)</label>
+      <label><input type="checkbox" checked data-fn="nlog"> O(n log n)</label>
+      <label><input type="checkbox" checked data-fn="n2"> O(n²)</label>
+      <label><input type="checkbox" checked data-fn="2n"> O(2^n)</label>
+    </div>
+
+    <div style="text-align:center;">
+      <label style="margin-right: 8px;">Chế độ trục Y:</label>
+      <input type="radio" name="yscale" value="linear" checked> Tuyến tính
+      <input type="radio" name="yscale" value="log" style="margin-left: 12px;"> Log (xem rõ hàm nhỏ)
+    </div>
+
+    <svg id="bigo-chart" width="100%" height="380" viewBox="0 0 700 380" style="margin-top: 12px;"></svg>
+  </div>
+
+  <!-- ====== TAB 3: ĐỊNH LÝ MASTER ====== -->
+  <div class="tab-content">
+    <p>Nhập <code>a</code>, <code>b</code>, <code>f(n)</code> &rarr; công cụ tự xác định <strong>Case</strong> và tính <code>T(n)</code>.</p>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
+      <label>a = <input type="number" id="mt-a" value="2" min="1" style="width: 70px;"></label>
+      <label>b = <input type="number" id="mt-b" value="2" min="2" style="width: 70px;"></label>
+      <label>f(n) = <select id="mt-fn">
+        <option value="1">O(1) = n⁰</option>
+        <option value="n">O(n) = n¹</option>
+        <option value="n^2">O(n²)</option>
+        <option value="n^3">O(n³)</option>
+        <option value="n^2*log">O(n² log n)</option>
+        <option value="n*log">O(n log n)</option>
+      </select></label>
+      <button class="btn" onclick="masterSolve()">🎯 Giải</button>
+    </div>
+
+    <p style="text-align:center; color: var(--text-secondary);">Hoặc chọn ví dụ mẫu:</p>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
+      <button class="btn btn-ghost" onclick="loadMasterExample('merge')">MergeSort: a=2,b=2,n</button>
+      <button class="btn btn-ghost" onclick="loadMasterExample('bin')">Binary Search: a=1,b=2,1</button>
+      <button class="btn btn-ghost" onclick="loadMasterExample('strassen')">Strassen: a=7,b=2,n²</button>
+      <button class="btn btn-ghost" onclick="loadMasterExample('quad')">T(n)=4T(n/2)+n²</button>
+      <button class="btn btn-ghost" onclick="loadMasterExample('nlogn')">T(n)=2T(n/2)+n log n</button>
+    </div>
+
+    <div id="master-result" class="result-box" style="display: none;"></div>
+    <div id="master-steps" style="margin-top: 12px; color: var(--text-secondary); font-size: 0.95rem;"></div>
+  </div>
+
+  <!-- ====== TAB 4: CÂY ĐỆ QUY ====== -->
+  <div class="tab-content">
+    <p>Nhập <code>T(n) = a·T(n/b) + f(n)</code> &rarr; vẽ <strong>cây đệ quy</strong> với từng node hiển thị kích thước bài toán &amp; chi phí.</p>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px;">
+      <label>a = <input type="number" id="rt-a" value="2" min="1" style="width: 70px;"></label>
+      <label>b = <input type="number" id="rt-b" value="2" min="2" style="width: 70px;"></label>
+      <label>n₀ = <input type="number" id="rt-n" value="8" min="1" style="width: 80px;"></label>
+      <label>f(n) = <select id="rt-fn">
+        <option value="1">1</option>
+        <option value="n" selected>n</option>
+        <option value="n^2">n²</option>
+      </select></label>
+      <button class="btn" onclick="drawRecursionTree()">🌳 Vẽ cây</button>
+    </div>
+
+    <div id="tree-summary" style="margin-top: 12px; color: var(--text-secondary); font-size: 0.95rem;"></div>
+    <svg id="recursion-tree" width="100%" height="380" viewBox="0 0 700 380" style="margin-top: 12px;"></svg>
+  </div>
+</div>
+
+<script>
+// ==================== TAB 1: BIGO CALCULATOR ====================
+const bigoPatterns = {
+  'single-for': {
+    code: 'for i in range(n):\n    print(i)  # O(1)',
+    bigO: 'O(n)',
+    explain: '1 vòng for chạy n lần, thân O(1) → n × O(1) = O(n).'
+  },
+  'nested-for': {
+    code: 'for i in range(n):\n    for j in range(n):\n        print(i, j)  # O(1)',
+    bigO: 'O(n²)',
+    explain: '2 vòng for lồng nhau, quy tắc nhân: O(n) × O(n) × O(1) = O(n²).'
+  },
+  'triple-for': {
+    code: 'for i in range(n):\n    for j in range(n):\n        for k in range(n):\n            print(i,j,k)',
+    bigO: 'O(n³)',
+    explain: '3 vòng for lồng: O(n) × O(n) × O(n) = O(n³).'
+  },
+  'log-for': {
+    code: 'i = 1\nwhile i < n:\n    print(i)\n    i *= 2   # nhân đôi',
+    bigO: 'O(log n)',
+    explain: 'i chạy 1,2,4,...,2^k < n → có log₂(n) lần lặp → O(log n).'
+  },
+  'while-half': {
+    code: 'while n > 0:\n    n = n // 2   # chia đôi',
+    bigO: 'O(log n)',
+    explain: 'n giảm nửa mỗi lần → cần log₂(n) lần để về 0 → O(log n).'
+  },
+  'while-dec': {
+    code: 'while n > 0:\n    n = n - 1',
+    bigO: 'O(n)',
+    explain: 'n giảm 1 mỗi lần → cần n lần → O(n).'
+  },
+  'merge': {
+    code: 'def merge_sort(n):\n    if n <= 1: return\n    merge_sort(n/2)   # 2 lần\n    merge_sort(n/2)\n    merge()  # O(n)',
+    bigO: 'O(n log n)',
+    explain: 'T(n) = 2T(n/2) + n. Master: a=2,b=2,c*=log₂2=1. f=n=n^c* → Case 2 → Θ(n log n).'
+  },
+  'binsearch': {
+    code: 'def bsearch(n):\n    if n <= 1: return\n    bsearch(n/2)   # 1 lần\n    compare()  # O(1)',
+    bigO: 'O(log n)',
+    explain: 'T(n) = T(n/2) + 1. Master: a=1,b=2,c*=log₂1=0. f=1=n⁰=n^c* → Case 2 → Θ(log n).'
+  },
+  'fib': {
+    code: 'def fib(n):\n    if n <= 1: return n\n    return fib(n-1) + fib(n-2)',
+    bigO: 'O(2^n)',
+    explain: 'Mỗi lời gọi sinh 2 lời gọi mới → cây đệ quy có ≈2^n node lá → O(2^n).'
+  },
+  'custom': {
+    code: '# Nhập code Python của bạn tại đây',
+    bigO: '',
+    explain: ''
+  }
+};
+
+function bigoAnalyze() {
+  const sel = document.getElementById('bigo-pattern').value;
+  const code = document.getElementById('bigo-code').value;
+  const resultBox = document.getElementById('bigo-result');
+  const explainBox = document.getElementById('bigo-explain');
+  let bigO = '', explain = '';
+
+  if (sel === 'custom') {
+    const analysis = analyzeCustomCode(code);
+    bigO = analysis.bigO;
+    explain = analysis.explain;
+  } else {
+    const p = bigoPatterns[sel];
+    bigO = p.bigO;
+    explain = p.explain;
+  }
+
+  resultBox.style.display = 'block';
+  resultBox.innerHTML = `<strong>Độ phức tạp: ${bigO}</strong>`;
+  explainBox.innerHTML = `<strong>Giải thích:</strong> ${explain}`;
+}
+
+function analyzeCustomCode(code) {
+  const c = code.toLowerCase();
+  // Đếm số vòng lặp for/while lồng nhau (đơn giản hóa)
+  const forCount = (c.match(/\bfor\b/g) || []).length;
+  const whileCount = (c.match(/\bwhile\b/g) || []).length;
+  const loops = forCount + whileCount;
+  const hasMultiply = /\*\s*=/.test(c) || /i\s*\*\s*2/.test(c);
+  const hasDivide = /\/\/\s*2/.test(c) || /\/\s*2/.test(c);
+  const hasRecursive = /\bdef\b.*\(.*\).*:\s*(?:.|\n)*?\1\(/.test(code) ||
+                      (/\bdef\b/.test(c) && new RegExp('def\\s+(\\w+)').test(code) &&
+                       code.match(/def\s+(\w+)/) && code.indexOf(code.match(/def\s+(\w+)/)[1] + '(') > 0);
+
+  if (hasMultiply && loops > 0) {
+    return { bigO: 'O(log n)', explain: 'Phát hiện vòng lặp nhân đôi biến (i*=2) → O(log n).' };
+  }
+  if (hasDivide && loops > 0 && /n\s*\/\s*2|n\s*\/\/\s*2/.test(c)) {
+    return { bigO: 'O(log n)', explain: 'Phát hiện vòng lặp chia đôi n → O(log n).' };
+  }
+  if (hasRecursive) {
+    return { bigO: 'O(?) — cần lập phương trình đệ quy', explain: 'Phát hiện đệ quy. Hãy lập T(n) = a·T(n/b) + f(n) rồi áp dụng định lý Master.' };
+  }
+  if (loops >= 3) return { bigO: 'O(n³)', explain: `Phát hiện ${loops} vòng lặp lồng nhau → O(n^${loops}).` };
+  if (loops === 2) return { bigO: 'O(n²)', explain: 'Phát hiện 2 vòng lặp lồng nhau → O(n²).' };
+  if (loops === 1) return { bigO: 'O(n)', explain: 'Phát hiện 1 vòng lặp tuyến tính → O(n).' };
+  return { bigO: 'O(1)', explain: 'Không có vòng lặp/đệ quy rõ ràng → có thể là O(1).' };
+}
+
+document.getElementById('bigo-pattern').addEventListener('change', function() {
+  if (this.value !== 'custom') {
+    document.getElementById('bigo-code').value = bigoPatterns[this.value].code;
+  } else {
+    document.getElementById('bigo-code').value = '';
+  }
+});
+window.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('bigo-code').value = bigoPatterns['single-for'].code;
+});
+
+// ==================== TAB 2: BIGO CHART ====================
+const bigoFns = {
+  '1':    n => 1,
+  'log':  n => Math.log2(Math.max(1, n)),
+  'sqrt': n => Math.sqrt(n),
+  'n':    n => n,
+  'nlog': n => n * Math.log2(Math.max(1, n)),
+  'n2':   n => n * n,
+  '2n':   n => Math.pow(2, n)
+};
+const bigoColors = {
+  '1': '#10b981', 'log': '#6366f1', 'sqrt': '#0ea5e9',
+  'n': '#f59e0b', 'nlog': '#ec4899', 'n2': '#ef4444', '2n': '#7c3aed'
+};
+const bigoLabels = {
+  '1': 'O(1)', 'log': 'O(log n)', 'sqrt': 'O(√n)',
+  'n': 'O(n)', 'nlog': 'O(n log n)', 'n2': 'O(n²)', '2n': 'O(2^n)'
+};
+
+function drawBigoChart() {
+  const svg = document.getElementById('bigo-chart');
+  svg.innerHTML = '';
+  const N_MAX = 20;
+  const W = 700, H = 380;
+  const padding = 50;
+  const plotW = W - padding * 2;
+  const plotH = H - padding * 2;
+  const scale = document.querySelector('input[name="yscale"]:checked').value;
+
+  // Determine y-max
+  let activeFns = [];
+  document.querySelectorAll('#bigo-chart-toggles input').forEach(cb => {
+    if (cb.checked) activeFns.push(cb.dataset.fn);
+  });
+  let yMax = 0;
+  for (let n = 1; n <= N_MAX; n++) {
+    activeFns.forEach(f => {
+      const v = bigoFns[f](n);
+      const yv = scale === 'log' ? Math.log10(Math.max(1, v)) : v;
+      if (yv > yMax) yMax = yv;
+    });
+  }
+  if (yMax === 0) yMax = 1;
+
+  // Background
+  const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  bg.setAttribute('x', padding); bg.setAttribute('y', padding);
+  bg.setAttribute('width', plotW); bg.setAttribute('height', plotH);
+  bg.setAttribute('fill', 'var(--bg-subtle)');
+  bg.setAttribute('stroke', 'var(--border)');
+  svg.appendChild(bg);
+
+  // Grid + Y axis labels
+  for (let i = 0; i <= 5; i++) {
+    const y = padding + plotH - (i / 5) * plotH;
+    const val = (yMax * i / 5);
+    const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ln.setAttribute('x1', padding); ln.setAttribute('x2', W - padding);
+    ln.setAttribute('y1', y); ln.setAttribute('y2', y);
+    ln.setAttribute('stroke', 'var(--border)');
+    ln.setAttribute('stroke-dasharray', '2,3');
+    svg.appendChild(ln);
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    lbl.setAttribute('x', padding - 6); lbl.setAttribute('y', y + 4);
+    lbl.setAttribute('text-anchor', 'end');
+    lbl.setAttribute('font-size', '10');
+    lbl.setAttribute('fill', 'var(--text-secondary)');
+    lbl.textContent = scale === 'log' ? '10^' + val.toFixed(1) : val.toFixed(0);
+    svg.appendChild(lbl);
+  }
+
+  // X axis labels
+  for (let n = 1; n <= N_MAX; n += 2) {
+    const x = padding + ((n - 1) / (N_MAX - 1)) * plotW;
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    lbl.setAttribute('x', x); lbl.setAttribute('y', H - padding + 16);
+    lbl.setAttribute('text-anchor', 'middle');
+    lbl.setAttribute('font-size', '10');
+    lbl.setAttribute('fill', 'var(--text-secondary)');
+    lbl.textContent = n;
+    svg.appendChild(lbl);
+  }
+
+  // Axis titles
+  const xTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  xTitle.setAttribute('x', W / 2); xTitle.setAttribute('y', H - 8);
+  xTitle.setAttribute('text-anchor', 'middle');
+  xTitle.setAttribute('fill', 'var(--text)');
+  xTitle.textContent = 'n (kích thước đầu vào)';
+  svg.appendChild(xTitle);
+
+  // Draw each function
+  activeFns.forEach(f => {
+    let path = '';
+    for (let n = 1; n <= N_MAX; n++) {
+      const v = bigoFns[f](n);
+      const yv = scale === 'log' ? Math.log10(Math.max(1, v)) : v;
+      const x = padding + ((n - 1) / (N_MAX - 1)) * plotW;
+      const y = padding + plotH - (yv / yMax) * plotH;
+      path += (n === 1 ? 'M' : 'L') + x + ',' + y + ' ';
+    }
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', path);
+    p.setAttribute('stroke', bigoColors[f]);
+    p.setAttribute('stroke-width', '2.5');
+    p.setAttribute('fill', 'none');
+    svg.appendChild(p);
+  });
+
+  // Legend
+  let lx = padding + 10, ly = padding + 16;
+  activeFns.forEach(f => {
+    const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    r.setAttribute('x', lx); r.setAttribute('y', ly - 10);
+    r.setAttribute('width', 12); r.setAttribute('height', 12);
+    r.setAttribute('fill', bigoColors[f]);
+    svg.appendChild(r);
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', lx + 16); t.setAttribute('y', ly);
+    t.setAttribute('font-size', '11');
+    t.setAttribute('fill', 'var(--text)');
+    t.textContent = bigoLabels[f];
+    svg.appendChild(t);
+    ly += 18;
+  });
+}
+
+document.querySelectorAll('#bigo-chart-toggles input').forEach(cb => {
+  cb.addEventListener('change', drawBigoChart);
+});
+document.querySelectorAll('input[name="yscale"]').forEach(r => {
+  r.addEventListener('change', drawBigoChart);
+});
+window.addEventListener('DOMContentLoaded', drawBigoChart);
+
+// ==================== TAB 3: MASTER THEOREM ====================
+function parseFn(fnStr) {
+  // Returns {c, k} meaning f(n) = Θ(n^c · log^k n)
+  if (fnStr === '1') return { c: 0, k: 0, label: '1 = n⁰' };
+  if (fnStr === 'n') return { c: 1, k: 0, label: 'n = n¹' };
+  if (fnStr === 'n^2') return { c: 2, k: 0, label: 'n²' };
+  if (fnStr === 'n^3') return { c: 3, k: 0, label: 'n³' };
+  if (fnStr === 'n^2*log') return { c: 2, k: 1, label: 'n² log n' };
+  if (fnStr === 'n*log') return { c: 1, k: 1, label: 'n log n' };
+  return { c: 0, k: 0, label: '?' };
+}
+
+function logB(base, x) {
+  return Math.log(x) / Math.log(base);
+}
+
+function masterSolve() {
+  const a = parseFloat(document.getElementById('mt-a').value);
+  const b = parseFloat(document.getElementById('mt-b').value);
+  const fnStr = document.getElementById('mt-fn').value;
+  const f = parseFn(fnStr);
+  const cStar = logB(b, a);
+  const result = document.getElementById('master-result');
+  const steps = document.getElementById('master-steps');
+  result.style.display = 'block';
+
+  let caseNum, Tn, explain;
+  if (f.c < cStar - 1e-9) {
+    caseNum = 1;
+    Tn = `Θ(n^${cStar.toFixed(3)})`;
+    explain = `Vì c=${f.c} < c*=log_${b}(${a})=${cStar.toFixed(3)} → f(n) nhỏ hơn n^c* → Case 1: T(n) bị chi phối bởi số lá = n^(log_b a).`;
+  } else if (Math.abs(f.c - cStar) < 1e-9) {
+    caseNum = 2;
+    const k1 = f.k + 1;
+    Tn = k1 === 1 ? `Θ(n^${f.c} · log n)` : `Θ(n^${f.c} · log^${k1} n)`;
+    explain = `Vì c=${f.c} = c*=log_${b}(${a})=${cStar.toFixed(3)} và k=${f.k} → Case 2: T(n) = Θ(n^c · log^(k+1) n).`;
+  } else {
+    caseNum = 3;
+    Tn = `Θ(${f.label})`;
+    explain = `Vì c=${f.c} > c*=log_${b}(${a})=${cStar.toFixed(3)} → f(n) lớn hơn n^c* → Case 3: T(n) bị chi phối bởi gốc = f(n). (Giả sử điều kiện chính quy a·f(n/b) ≤ d·f(n) thoả mãn.)`;
+  }
+
+  result.innerHTML = `<strong>T(n) = ${Tn}</strong> &nbsp; (Case ${caseNum})`;
+  steps.innerHTML = `
+    <p><strong>Chi tiết:</strong></p>
+    <ul style="padding-left: 22px;">
+      <li>T(n) = ${a}·T(n/${b}) + ${f.label}</li>
+      <li>c* = log<sub>${b}</sub>(${a}) = ${cStar.toFixed(4)}</li>
+      <li>f(n) = ${f.label} → c=${f.c}, k=${f.k}</li>
+      <li>So sánh c với c*: ${f.c} ${f.c < cStar - 1e-9 ? '<' : (Math.abs(f.c - cStar) < 1e-9 ? '=' : '>')} ${cStar.toFixed(3)}</li>
+      <li><strong>→ Case ${caseNum}</strong> → <strong>T(n) = ${Tn}</strong></li>
+    </ul>
+    <p>${explain}</p>
+  `;
+  if (typeof renderMathInElement !== 'undefined') renderMathInElement(steps, {delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}], throwOnError:false});
+}
+
+function loadMasterExample(key) {
+  const presets = {
+    'merge':    { a: 2, b: 2, fn: 'n' },
+    'bin':      { a: 1, b: 2, fn: '1' },
+    'strassen': { a: 7, b: 2, fn: 'n^2' },
+    'quad':     { a: 4, b: 2, fn: 'n^2' },
+    'nlogn':    { a: 2, b: 2, fn: 'n*log' }
+  };
+  const p = presets[key];
+  document.getElementById('mt-a').value = p.a;
+  document.getElementById('mt-b').value = p.b;
+  document.getElementById('mt-fn').value = p.fn;
+  masterSolve();
+}
+
+// ==================== TAB 4: RECURSION TREE ====================
+function drawRecursionTree() {
+  const a = parseInt(document.getElementById('rt-a').value);
+  const b = parseInt(document.getElementById('rt-b').value);
+  const n0 = parseInt(document.getElementById('rt-n').value);
+  const fnStr = document.getElementById('rt-fn').value;
+  const svg = document.getElementById('recursion-tree');
+  const summary = document.getElementById('tree-summary');
+  svg.innerHTML = '';
+
+  // Compute levels
+  const levels = [];
+  let level = 0;
+  let curN = n0;
+  while (curN > 1 && level < 8) {
+    const count = Math.pow(a, level);
+    const eachN = Math.max(1, Math.floor(n0 / Math.pow(b, level)));
+    let cost;
+    if (fnStr === '1') cost = 1;
+    else if (fnStr === 'n') cost = eachN;
+    else if (fnStr === 'n^2') cost = eachN * eachN;
+    levels.push({ level, count, eachN, cost, total: cost * count });
+    level++;
+    curN = Math.floor(curN / b);
+    if (Math.pow(b, level) > n0 * b) break;  // safety
+  }
+  // Add leaf level (T(1))
+  const leafCount = Math.pow(a, levels.length);
+  levels.push({ level: levels.length, count: leafCount, eachN: 1, cost: 1, total: leafCount, leaf: true });
+
+  const W = 700, H = 380;
+  const padding = 20;
+  const levelH = (H - padding * 2) / (levels.length + 0.5);
+
+  // Draw nodes per level
+  levels.forEach((lv, li) => {
+    const y = padding + (li + 1) * levelH;
+    // Limit nodes drawn (avoid clutter when a^level > 12)
+    const maxDraw = 12;
+    const drawCount = Math.min(lv.count, maxDraw);
+    const stepX = (W - padding * 2) / Math.max(drawCount, 1);
+    for (let i = 0; i < drawCount; i++) {
+      const x = padding + (i + 0.5) * stepX;
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y);
+      c.setAttribute('r', '12');
+      c.setAttribute('fill', lv.leaf ? '#10b981' : '#6366f1');
+      c.setAttribute('opacity', '0.85');
+      svg.appendChild(c);
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', x); t.setAttribute('y', y + 4);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('font-size', '10');
+      t.setAttribute('fill', 'white');
+      t.setAttribute('font-weight', 'bold');
+      t.textContent = lv.eachN;
+      svg.appendChild(t);
+    }
+    if (lv.count > maxDraw) {
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', W - padding - 8); t.setAttribute('y', y + 4);
+      t.setAttribute('font-size', '10');
+      t.setAttribute('fill', 'var(--text-secondary)');
+      t.textContent = `...×${lv.count - maxDraw}`;
+      svg.appendChild(t);
+    }
+    // Edge to parent level (line connecting) - draw thin lines from each node upward
+    if (li > 0) {
+      const prevLv = levels[li - 1];
+      const prevY = padding + li * levelH;
+      const prevDrawCount = Math.min(prevLv.count, maxDraw);
+      const prevStepX = (W - padding * 2) / Math.max(prevDrawCount, 1);
+      for (let i = 0; i < drawCount; i++) {
+        const x = padding + (i + 0.5) * stepX;
+        // Find parent
+        const parentI = Math.floor(i / a);
+        if (parentI < prevDrawCount) {
+          const px = padding + (parentI + 0.5) * prevStepX;
+          const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          ln.setAttribute('x1', px); ln.setAttribute('y1', prevY);
+          ln.setAttribute('x2', x); ln.setAttribute('y2', y);
+          ln.setAttribute('stroke', 'var(--border-strong)');
+          ln.setAttribute('stroke-width', '1');
+          svg.appendChild(ln);
+        }
+      }
+    }
+    // Level label on left
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    lbl.setAttribute('x', padding - 4); lbl.setAttribute('y', y + 4);
+    lbl.setAttribute('text-anchor', 'end');
+    lbl.setAttribute('font-size', '10');
+    lbl.setAttribute('fill', 'var(--text-secondary)');
+    lbl.textContent = `T${li}(n/${Math.pow(b, li)}): ${lv.count}×${lv.eachN}=${lv.total}`;
+    svg.appendChild(lbl);
+  });
+
+  // Summary
+  const total = levels.reduce((s, lv) => s + lv.total, 0);
+  const cStar = logB(b, a);
+  let caseInfo = '';
+  const f = fnStr === '1' ? {c:0,k:0} : fnStr === 'n' ? {c:1,k:0} : {c:2,k:0};
+  if (f.c < cStar - 1e-9) caseInfo = `Case 1 → T(n) = Θ(n^${cStar.toFixed(3)})`;
+  else if (Math.abs(f.c - cStar) < 1e-9) caseInfo = `Case 2 → T(n) = Θ(n^${f.c} log n)`;
+  else caseInfo = `Case 3 → T(n) = Θ(${fnStr})`;
+
+  summary.innerHTML = `
+    <p><strong>Tóm tắt cây đệ quy:</strong> ${levels.length} tầng.</p>
+    <p>Chi phí mỗi tầng: ${levels.map(lv => lv.total).join(' + ')}</p>
+    <p>Tổng chi phí = <strong>${total}</strong> (số đầu vào, có thể bỏ hằng).</p>
+    <p>Áp dụng Master: a=${a}, b=${b}, f=${fnStr}, c*=log<sub>${b}</sub>${a}=${cStar.toFixed(3)} → <strong>${caseInfo}</strong></p>
+  `;
+}
+window.addEventListener('DOMContentLoaded', drawRecursionTree);
+</script>
+
+<!-- ============================== 9. VÍ DỤ MẪU ============================== -->
+<h2>🎯 9. Ví dụ mẫu (bấm từng bước)</h2>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ 1: Vòng for đơn giản</div>
+  <pre><code>for i in 1..n:
+    print(i)</code></pre>
+  <div id="ex1-steps"></div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ 2: 2 vòng for lồng</div>
+  <pre><code>for i in 1..n:
+    for j in 1..n:
+        print(i, j)</code></pre>
+  <div id="ex2-steps"></div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ 3: Vòng for log</div>
+  <pre><code>for i = 1; i &lt; n; i *= 2:
+    print(i)</code></pre>
+  <div id="ex3-steps"></div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ 4: MergeSort — áp dụng định lý Master</div>
+  <pre><code>def merge_sort(arr):
+    if len(arr) &lt;= 1: return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])   # T(n/2)
+    right = merge_sort(arr[mid:])  # T(n/2)
+    return merge(left, right)      # O(n)</code></pre>
+  <div id="ex4-steps"></div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ 5: Fibonacci đệ quy — cây đệ quy</div>
+  <pre><code>def fib(n):
+    if n &lt;= 1: return n
+    return fib(n-1) + fib(n-2)</code></pre>
+  <div id="ex5-steps"></div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Ví dụ 6: Tính tổng 1..n</div>
+  <pre><code>s = 0
+for i in 1..n:
+    s += i</code></pre>
+  <div id="ex6-steps"></div>
+</div>
+
+<script>
+new StepReveal('ex1-steps', [
+  { title: 'Nhận diện cấu trúc',
+    content: '<p>Đây là 1 vòng <code>for</code> chạy từ 1 đến <code>n</code>. Thân vòng lặp là <code>print(i)</code> — chi phí cố định O(1).</p>' },
+  { title: 'Đếm số lần lặp',
+    content: '<p>Vòng lặp <code>for i in 1..n</code> chạy đúng <strong>n</strong> lần (i = 1, 2, ..., n).</p>' },
+  { title: 'Áp dụng quy tắc for',
+    content: '<p>Độ phức tạp = (số lần lặp) × (độ phức tạp thân) = <code>n × O(1)</code>.</p>' },
+  { title: 'Rút gọn',
+    content: '<p><code>n × O(1) = O(n)</code>. Vậy BigO = <strong>O(n)</strong> — tuyến tính.</p>' }
+]);
+
+new StepReveal('ex2-steps', [
+  { title: 'Nhận diện cấu trúc',
+    content: '<p>2 vòng <code>for</code> lồng nhau, mỗi vòng chạy từ 1 đến n. Thân là <code>print(i, j)</code> — O(1).</p>' },
+  { title: 'Phân tích vòng ngoài',
+    content: '<p>Vòng ngoài <code>for i</code>: chạy n lần. Mỗi lần chạy toàn bộ vòng trong.</p>' },
+  { title: 'Phân tích vòng trong',
+    content: '<p>Vòng trong <code>for j</code>: mỗi lần i cố định, j chạy n lần → chi phí mỗi i là <code>O(n)</code>.</p>' },
+  { title: 'Quy tắc nhân',
+    content: '<p>Tổng = (vòng ngoài) × (vòng trong) × (thân) = <code>O(n) × O(n) × O(1) = O(n²)</code>.</p>' },
+  { title: 'Kết luận',
+    content: '<p>BigO = <strong>O(n²)</strong>. Tổng số cặp (i, j) = n × n = n², mỗi cặp in 1 lần.</p>' }
+]);
+
+new StepReveal('ex3-steps', [
+  { title: 'Quan sát bước nhảy',
+    content: '<p>Vòng lặp không tăng <code>i</code> lên 1, mà <strong>nhân đôi</strong>: <code>i *= 2</code>. i nhận giá trị 1, 2, 4, 8, 16, ...</p>' },
+  { title: 'Đếm số lần lặp',
+    content: '<p>Sau k lần lặp, <code>i = 2^k</code>. Vòng dừng khi <code>2^k ≥ n</code> ⇔ <code>k ≥ log₂(n)</code>.</p><p>Vậy số lần lặp = ⌈log₂(n)⌉.</p>' },
+  { title: 'Tính BigO',
+    content: '<p>Thân O(1), số lần lặp = log₂(n) → <code>O(log n)</code>.</p>' },
+  { title: 'Kết luận',
+    content: '<p>BigO = <strong>O(log n)</strong>. Đây là dạng điển hình của "bước nhảy log".</p>' }
+]);
+
+new StepReveal('ex4-steps', [
+  { title: 'Lập phương trình đệ quy',
+    content: '<p>MergeSort chia mảng làm 2 nửa, đệ quy sắp xếp từng nửa, rồi trộn. Mỗi nửa có kích thước n/2 → 2 lời gọi T(n/2). Trộn 2 mảng mất O(n).</p><p style="text-align:center;font-size:1.15rem;">T(n) = 2·T(n/2) + O(n)</p>' },
+  { title: 'Xác định a, b, f(n)',
+    content: '<p>Theo dạng tổng quát T(n) = a·T(n/b) + f(n):</p><ul style="padding-left:22px;"><li>a = 2 (số bài toán con)</li><li>b = 2 (kích thước con = n/2)</li><li>f(n) = n (chi phí chia &amp; trộn)</li></ul>' },
+  { title: 'Tính c* = log_b(a)',
+    content: '<p>c* = log₂(2) = <strong>1</strong>.</p>' },
+  { title: 'So sánh f(n) với n^c*',
+    content: '<p>f(n) = n = n¹ = n^c*. Đây là trường hợp cân bằng → <strong>Case 2</strong> (với k=0).</p>' },
+  { title: 'Áp dụng công thức Case 2',
+    content: '<p>Theo Case 2: T(n) = Θ(n^c · log^(k+1) n) = Θ(n¹ · log¹ n) = Θ(n log n).</p>' },
+  { title: 'Kết luận',
+    content: '<p>BigO = <strong>O(n log n)</strong>. Đây là lý do MergeSort luôn ổn định O(n log n) trong mọi trường hợp.</p>' }
+]);
+
+new StepReveal('ex5-steps', [
+  { title: 'Quan sát lời gọi đệ quy',
+    content: '<p><code>fib(n)</code> gọi <code>fib(n-1)</code> và <code>fib(n-2)</code>. Đây không phải dạng a·T(n/b) — không chia đều!</p>' },
+  { title: 'Vẽ cây đệ quy',
+    content: '<pre><code>            fib(n)\n           /       \\\n       fib(n-1)   fib(n-2)\n       /    \\      /     \\\n   fib(n-2) fib(n-3) fib(n-3) fib(n-4)\n      ...\n   fib(1) fib(0) fib(1) fib(0) ... (cây nhị phân)</code></pre>' },
+  { title: 'Đếm số node lá',
+    content: '<p>Cây đệ quy gần như một cây nhị phân đầy đủ với chiều cao ≈ n. Số node lá ≈ 2^n.</p>' },
+  { title: 'Tính BigO',
+    content: '<p>Tổng số lời gọi hàm ≈ 2·(số lá) ≈ 2^n → T(n) = O(2^n).</p>' },
+  { title: 'Kết luận',
+    content: '<p>BigO = <strong>O(2^n)</strong> — đây là lý do Fibonacci đệ quy cực kỳ chậm với n=40+. Có thể tối ưu về O(n) bằng quy hoạch động.</p>' }
+]);
+
+new StepReveal('ex6-steps', [
+  { title: 'Nhận diện cấu trúc',
+    content: '<p>1 vòng for chạy n lần, thân là <code>s += i</code> — O(1).</p>' },
+  { title: 'Áp dụng quy tắc for',
+    content: '<p>T(n) = (số lần lặp) × (độ phức tạp thân) = n × O(1).</p>' },
+  { title: 'Rút gọn',
+    content: '<p>T(n) = O(n). Lưu ý: kết quả <code>s = n(n+1)/2</code> không phải O(n²) — chỉ số phép <em>thực hiện</em> là O(n).</p>' },
+  { title: 'Kết luận',
+    content: '<p>BigO = <strong>O(n)</strong> — tuyến tính. (Nếu dùng công thức s = n(n+1)/2 thì tính trong O(1) — đây là tối ưu hóa thuật toán, không phải BigO của đoạn code trên.)</p>' }
+]);
+</script>
+
+<!-- ============================== 10. BÀI TẬP TỰ GIẢI ============================== -->
+<h2>✍️ 10. Bài tập tự giải (có đáp án chi tiết)</h2>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 1</div>
+  <p>Tính BigO của đoạn mã sau:</p>
+  <pre><code>for i = 1; i &lt; n; i *= 2:
+    print(i)</code></pre>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-2-1').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-2-1" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức áp dụng:</strong> Vòng lặp với bước nhảy nhân đôi → BigO = O(log n).</p>
+    <p><strong>💡 Cách áp dụng:</strong> Đếm số lần lặp k sao cho i = 2^k ≥ n.</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
+    <div class="code-block">i nhận giá trị: 1, 2, 4, 8, 16, 32, ..., 2^k
+Sau k lần lặp: i = 2^k.
+Vòng dừng khi i ≥ n, tức 2^k ≥ n
+   → k ≥ log₂(n)
+Vậy số lần lặp = ⌈log₂(n)⌉
+
+Thân vòng lặp: print(i) = O(1)
+Tổng = log₂(n) × O(1) = O(log n)</div>
+    <p><strong>✓ Kết quả:</strong> BigO = <strong>O(log n)</strong>.</p>
+    <p><strong>🔍 Kiểm tra:</strong> Với n = 1024, log₂(1024) = 10 → chỉ 10 lần in. Với n = 1 tỷ, log₂ ≈ 30 → 30 lần in. Rất hiệu quả!</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 2</div>
+  <p>Tính BigO của đoạn mã:</p>
+  <pre><code>for i in 1..n:
+    for j in 1..i:
+        print(i * j)</code></pre>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-2-2').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-2-2" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức áp dụng:</strong> 2 vòng for lồng nhau, vòng trong chạy theo i → quy tắc nhân + tính tổng.</p>
+    <p><strong>💡 Cách áp dụng:</strong> Vòng ngoài i từ 1→n. Với mỗi i, vòng trong j chạy i lần. Tổng số lần in = 1 + 2 + 3 + ... + n.</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
+    <div class="code-block">Tổng số lần lặp = Σ (i=1..n) i
+                = 1 + 2 + 3 + ... + n
+                = n(n+1)/2
+                = (n² + n) / 2
+
+Bỏ hằng số 1/2 và bậc thấp n:
+   = n²/2 + n/2 → O(n²) khi n→∞</div>
+    <p><strong>✓ Kết quả:</strong> BigO = <strong>O(n²)</strong>.</p>
+    <p><strong>🔍 Kiểm tra:</strong> n(n+1)/2 cùng bậc với n² → O(n²). Đúng vì dù vòng trong chạy ít hơn n lần (chỉ i lần), tổng vẫn có bậc n².</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 3</div>
+  <p>Giải phương trình đệ quy <code>T(n) = 4T(n/2) + n²</code> bằng định lý Master.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-2-3').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-2-3" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức áp dụng:</strong> Định lý Master với T(n) = a·T(n/b) + f(n).</p>
+    <p><strong>💡 Cách áp dụng:</strong> Xác định a, b, f(n) → tính c* = log_b(a) → so sánh f(n) với n^c* → chọn case.</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
+    <div class="code-block">Bước 1: T(n) = 4·T(n/2) + n²
+   → a = 4, b = 2, f(n) = n²
+
+Bước 2: Tính c* = log_b(a) = log₂(4) = 2
+
+Bước 3: f(n) = n² = n^c* (vì c* = 2)
+   → Đây là Case 2 (cân bằng), với c = 2, k = 0
+
+Bước 4: Áp dụng công thức Case 2:
+   T(n) = Θ(n^c · log^(k+1) n)
+        = Θ(n² · log^(0+1) n)
+        = Θ(n² · log n)</div>
+    <p><strong>✓ Kết quả:</strong> T(n) = <strong>Θ(n² log n)</strong>.</p>
+    <p><strong>🔍 Kiểm tra:</strong> Case 2 vì f(n) = n^c* → cân bằng giữa gốc và lá. Mỗi tầng cây đệ quy có chi phí n² (gốc n², 4 con × (n/2)² = n², ...), có log₂(n) tầng → tổng = n² log n. ✓</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 4</div>
+  <p>Giải phương trình đệ quy <code>T(n) = 2T(n/2) + n log n</code>.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-2-4').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-2-4" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức áp dụng:</strong> Định lý Master dạng tổng quát Case 2 với f(n) có thêm log^k n.</p>
+    <p><strong>💡 Cách áp dụng:</strong> f(n) = n·log n = n¹·log¹ n → c = 1, k = 1. So sánh c với c*.</p>
+    <p><strong>🧮 Tính toán từng bước:</strong></p>
+    <div class="code-block">Bước 1: T(n) = 2·T(n/2) + n log n
+   → a = 2, b = 2, f(n) = n·log n
+
+Bước 2: c* = log₂(2) = 1
+
+Bước 3: f(n) = n·log n = n^1 · log^1 n
+   → c = 1 = c* → Case 2 với k = 1
+
+Bước 4: Áp dụng công thức Case 2:
+   T(n) = Θ(n^c · log^(k+1) n)
+        = Θ(n¹ · log^(1+1) n)
+        = Θ(n · log² n)</div>
+    <p><strong>✓ Kết quả:</strong> T(n) = <strong>Θ(n log² n)</strong>.</p>
+    <p><strong>🔍 Kiểm tra:</strong> Đây là một biến thể của MergeSort khi thao tác trộn tốn O(n log n) thay vì O(n). Cây đệ quy có log₂(n) tầng, mỗi tầng i có chi phí ≈ (n/2^i)·log(n/2^i) × 2^i = n·log(n/2^i). Tổng = Σ n·log(n/2^i) = n·Σ(log n - i) = O(n log² n). ✓</p>
+  </div>
+</div>
+
+<!-- ============================== 11. QUIZ ============================== -->
+<h2>❓ 11. Kiểm tra hiểu bài</h2>
+<div id="quiz-bigo"></div>
+
+<script>
+new Quiz('quiz-bigo', [
+  {
+    question: "Trong các hàm BigO sau, hàm nào NHANH NHẤT (tăng chậm nhất)?",
+    options: ["O(n)", "O(log n)", "O(n²)", "O(√n)"],
+    correct: 1,
+    explanation: "O(log n) tăng chậm hơn O(√n), O(n), O(n²). log₂(1 tỷ) ≈ 30 — cực kỳ hiệu quả."
+  },
+  {
+    question: "Hàm nào CHẬM NHẤT (tăng nhanh nhất)?",
+    options: ["O(n²)", "O(n log n)", "O(2^n)", "O(n³)"],
+    correct: 2,
+    explanation: "O(2^n) là hàm mũ — tăng cực nhanh. Với n=50, 2^50 ≈ 10^15 — không thể tính trong đời người."
+  },
+  {
+    question: "Vòng lặp `for i=1; i<n; i*=2` có BigO là gì?",
+    options: ["O(n)", "O(log n)", "O(n²)", "O(2^n)"],
+    correct: 1,
+    explanation: "i nhân đôi mỗi lần (1,2,4,...,2^k<n) → có log₂(n) lần lặp → O(log n)."
+  },
+  {
+    question: "QuickSort trong trường hợp XẤU NHẤT có BigO bao nhiêu?",
+    options: ["O(n log n)", "O(n²)", "O(n)", "O(2^n)"],
+    correct: 1,
+    explanation: "Khi pivot luôn là min/max → phân hoạch lệch 1-(n-1) → T(n) = T(n-1) + O(n) → O(n²)."
+  },
+  {
+    question: "Cho T(n) = 2T(n/2) + O(n) (MergeSort). Áp dụng Master, kết quả là?",
+    options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"],
+    correct: 1,
+    explanation: "a=2, b=2, c*=log₂2=1, f(n)=n=n^c* → Case 2 → Θ(n log n)."
+  },
+  {
+    question: "Cho T(n) = 4T(n/2) + n². Áp dụng Master, kết quả là?",
+    options: ["O(n²)", "O(n² log n)", "O(n³)", "O(n log n)"],
+    correct: 1,
+    explanation: "a=4, b=2, c*=log₂4=2, f(n)=n²=n^c* → Case 2 → Θ(n² log n)."
+  },
+  {
+    question: "Binary Search có BigO là gì?",
+    options: ["O(n)", "O(log n)", "O(1)", "O(n log n)"],
+    correct: 1,
+    explanation: "T(n) = T(n/2) + O(1). Master: a=1, b=2, c*=0, f=1=n⁰ → Case 2 → Θ(log n)."
+  },
+  {
+    question: "Định lý Master áp dụng cho dạng phương trình nào?",
+    options: ["T(n) = T(n-1) + f(n)", "T(n) = a·T(n/b) + f(n)", "T(n) = T(n) + T(n-1)", "T(n) = T(n²)"],
+    correct: 1,
+    explanation: "Master áp dụng cho T(n) = a·T(n/b) + f(n) — chia đều thành a bài toán con cỡ n/b."
+  }
+]);
+</script>
+
+<!-- ============================== 12. TƯ DUY BIGO ============================== -->
+<h2>🧠 12. Tư duy BigO — Cách giải bài lạ</h2>
+
+<div class="callout callout-exam">
+  <div class="callout-title">🏆 Tư duy phân tích BigO cho mọi bài toán</div>
+
+  <h4>1. Khi gặp code lạ (không đệ quy)</h4>
+  <p>• Đếm <strong>số vòng lặp lồng nhau</strong> → mỗi vòng nhân thêm bậc n.</p>
+  <p>• Quan sát <strong>bước nhảy</strong> của biến đếm: i+=1 → tuyến tính; i*=2 hoặc i/=2 → log.</p>
+  <p>• Vòng lặp <strong>nối tiếp</strong> → lấy max (quy tắc cộng).</p>
+  <p>• Vòng lặp <strong>lồng nhau</strong> → nhân (quy tắc nhân).</p>
+  <p>• Lệnh if-else → lấy max của các nhánh.</p>
+
+  <h4 class="mt-2">2. Khi gặp đệ quy</h4>
+  <p>• Bước 1: Viết phương trình <code>T(n) = a·T(n/b) + f(n)</code>.</p>
+  <p>• Bước 2: Tính <code>c* = log<sub>b</sub>(a)</code>.</p>
+  <p>• Bước 3: So sánh <code>f(n)</code> với <code>n^c*</code> → xác định Case 1/2/3.</p>
+  <p>• Bước 4: Áp dụng công thức tương ứng → kết luận.</p>
+
+  <h4 class="mt-2">3. Khi không chắc (đệ quy không chia đều)</h4>
+  <p>• Vẽ <strong>cây đệ quy</strong>: mỗi node là 1 lời gọi, ghi chi phí f(n).</p>
+  <p>• Đếm tổng chi phí = tổng chi phí tất cả node trên cây.</p>
+  <p>• Ví dụ: Fibonacci <code>T(n) = T(n-1) + T(n-2) + 1</code> → cây có ≈2^n lá → O(2^n).</p>
+  <p>• Phương pháp <strong>thay thế liên tiếp</strong>: thay T(n/b) bằng công thức đến khi thấy quy luật.</p>
+</div>
+
+<!-- ============================== 13. CÁCH TRÌNH BÀY BÀI THI ============================== -->
+<h2>🏆 13. Cách trình bày bài thi phân tích BigO</h2>
+
+<div class="callout callout-exam">
+  <div class="callout-title">📋 Mẫu trình bày chuẩn khi phân tích thuật toán</div>
+  <p>Đề bài mẫu: <em>"Phân tích độ phức tạp của MergeSort."</em></p>
+
+  <h4>Trình bày chuẩn:</h4>
+  <pre><code>1. XÁC ĐỊNH CẤU TRÚC:
+   MergeSort là thuật toán ĐỆ QUY (chia để trị).
+   Chia mảng làm 2 nửa, đệ quy sắp xếp từng nửa,
+   rồi trộn 2 mảng đã sắp.
+
+2. VIẾT PHƯƠNG TRÌNH T(n):
+   - Chia: 2 bài toán con, mỗi bài cỡ n/2 → 2·T(n/2)
+   - Trộn: mất O(n) để trộn 2 mảng
+   - Vậy: T(n) = 2·T(n/2) + O(n)
+   - Base case: T(1) = O(1)
+
+3. ÁP DỤNG ĐỊNH LÝ MASTER:
+   - a = 2, b = 2, f(n) = n
+   - c* = log_b(a) = log₂(2) = 1
+   - f(n) = n = n^c* → Case 2 (k=0)
+
+4. KẾT LUẬN BIGO:
+   - Case 2: T(n) = Θ(n^c · log^(k+1) n)
+                   = Θ(n · log n)
+   - Vậy: T(n) = O(n log n) trong MỌI trường hợp.
+
+5. NHẬN XÉT:
+   - MergeSort ổn định (stable sort).
+   - Tốn thêm O(n) bộ nhớ cho mảng phụ.
+   - Lúc nào cũng O(n log n) — ưu điểm so với QuickSort (xấu nhất O(n²)).</code></pre>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 5 bí kíp để được điểm tối đa khi phân tích BigO</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Luôn bắt đầu bằng "Xác định cấu trúc"</strong> — đệ quy hay vòng lặp? Giám khảo chấm theo từng bước.</li>
+    <li><strong>Viết rõ phương trình T(n) = a·T(n/b) + f(n)</strong> — đây là chìa khóa, không có thì không thể áp dụng Master.</li>
+    <li><strong>Tính c* = log<sub>b</sub>(a) trước khi so sánh</strong> — sai c* là sai cả bài. Luôn viết rõ c* = ?.</li>
+    <li><strong>Nêu rõ đang ở Case nào và VÌ SAO</strong> — "Case 2 vì f(n) = n^c*" thay vì chỉ kết luận.</li>
+    <li><strong>Cuối bài so sánh/nhận xét</strong> — ưu nhược điểm so với thuật toán cùng loại được điểm cộng.</li>
+  </ol>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Lỗi mất điểm thường gặp</div>
+  <ul style="padding-left: 20px;">
+    <li>❌ Nhầm Case 1 với Case 2 vì quên tính c* hoặc tính sai log_b(a).</li>
+    <li>❌ Quên quy tắc "bỏ hằng số": viết O(2n²) thay vì O(n²) — hằng số 2 phải bị bỏ.</li>
+    <li>❌ Nhầm vòng for i*=2 là O(n) thay vì O(log n) — phải xem bước nhảy!</li>
+    <li>❌ Áp dụng Master cho T(n) = T(n-1) + f(n) (QuickSort xấu) — Master chỉ dùng cho T(n/b).</li>
+    <li>❌ Quên "điều kiện chính quy" trong Case 3 — Master Case 3 cần a·f(n/b) ≤ d·f(n).</li>
+    <li>❌ Phân tích BigO của kết quả (output) thay vì số phép toán — ví dụ s = n(n+1)/2 không phải O(n²), mà for tính s là O(n).</li>
+    <li>❌ Không nêu base case T(1) = O(1) khi giải đệ quy.</li>
+  </ul>
+</div>
+
+<!-- ============================== TÓM TẮT ============================== -->
+<h2>📌 Tóm tắt cuối bài</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">✅ Điểm cần nhớ</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>BigO</strong> = tốc độ tăng khi n → ∞, bỏ hằng số, giữ bậc cao nhất.</li>
+    <li><strong>Thứ tự tăng:</strong> O(1) &lt; O(log n) &lt; O(√n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(n³) &lt; O(2^n) &lt; O(n!).</li>
+    <li><strong>Quy tắc cộng:</strong> T₁ + T₂ → lấy max.</li>
+    <li><strong>Quy tắc nhân:</strong> T₁ × T₂ → vòng lặp lồng.</li>
+    <li><strong>Vòng for i*=2 / i/=2:</strong> O(log n).</li>
+    <li><strong>Vòng for i+=1:</strong> O(n).</li>
+    <li><strong>Định lý Master:</strong> T(n) = a·T(n/b) + f(n), c* = log<sub>b</sub>(a). Case 1: f &lt; n^c* → Θ(n^c*). Case 2: f = n^c* log^k → Θ(n^c* log^(k+1)). Case 3: f &gt; n^c* → Θ(f).</li>
+    <li><strong>MergeSort:</strong> T(n) = 2T(n/2) + n → O(n log n).</li>
+    <li><strong>Binary Search:</strong> T(n) = T(n/2) + 1 → O(log n).</li>
+    <li><strong>Fibonacci đệ quy:</strong> T(n) ≈ 2T(n-1) → O(2^n) (qua cây đệ quy).</li>
+  </ol>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">🎯 Mẹo thi nhanh</div>
+  <p>• Khi gặp đệ quy dạng chia đều (T(n/b)) → <strong>Master</strong> ngay.</p>
+  <p>• Khi gặp đệ quy không đều (T(n-1), T(n-2)) → <strong>cây đệ quy</strong>.</p>
+  <p>• Khi gặp vòng lặp lạ → <strong>đếm số lần lặp</strong> bằng cách giải bất phương trình điều kiện dừng.</p>
+  <p>• Khi gặp nhiều vòng lặp → phân tích <strong>từng vòng</strong> rồi kết hợp (nhân nếu lồng, max nếu nối).</p>
+  <p>• Phương trình <code>T(n) = T(n-1) + O(n)</code> → O(n²) (QuickSort xấu, Selection Sort).</p>
+  <p>• Phương trình <code>T(n) = 2T(n/2) + O(n)</code> → O(n log n) (MergeSort, QuickSort tốt).</p>
+</div>
+
+<div class="nav-bottom">
+  <a href="../index.html" class="btn btn-ghost">← Mục lục</a>
+  <a href="03-greedy.html" class="btn">Bài 3: Tham lam →</a>
+</div>
+
+</body>
+</html>

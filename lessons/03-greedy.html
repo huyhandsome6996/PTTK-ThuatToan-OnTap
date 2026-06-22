@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bài 3: Thuật toán Tham lam - PTTK Thuật Toán</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="../assets/common.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="02-bigo.html">← Bài 2: BigO</a>
+  <strong>Bài 3: Thuật toán Tham lam (Greedy)</strong>
+  <span>3/4</span>
+</div>
+
+<h1>Bài 3: Thuật Toán Tham Lam (Greedy)</h1>
+
+<p class="text-center" style="color: var(--text-secondary); font-size: 1.05rem;">
+  Kỹ thuật "tham ăn" — chọn tối ưu cục bộ từng bước. 3 bài toán kinh điển: ATM, TSP, Cái ba lô. Có mô phỏng, ví dụ chạy tay, bài tập + quiz.
+</p>
+
+<!-- ============================== LÝ THUYẾT CHUNG ============================== -->
+<h2>📖 Thuật toán Tham lam là gì?</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">🔑 Nguyên lý (bám sát giáo trình Nguyễn Văn Linh - ĐH Cần Thơ 2003, mục 3.3)</div>
+  <p>Kỹ thuật <strong>tham ăn (Greedy)</strong> giải bài toán tối ưu tổ hợp bằng cách xây dựng phương án <code>X</code>. Mỗi thành phần <code>Xᵢ</code> được chọn <strong>tối ưu cục bộ</strong> (tốt nhất tại thời điểm xét).</p>
+  <p>Sau khi chọn <code>Xᵢ</code>, ta KHÔNG bao giờ quay lại thay đổi lựa chọn đó. Greedy cứ "tham" chọn cái tốt nhất trước mắt, hy vọng kết quả cuối cùng cũng tốt.</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Lưu ý cực kỳ quan trọng</div>
+  <p>Greedy cho <strong>giải thuật thời gian đa thức</strong> (nhanh), nhưng thường chỉ được phương án <strong>TỐT</strong> chứ chưa chắc <strong>TỐI ƯU</strong>.</p>
+  <p>Muốn chắc chắn Greedy tối ưu, bài toán phải có 2 tính chất (xem phần "Tư duy Greedy" cuối bài). Nếu không có → Greedy chỉ là heuristic (đoán mò tương đối).</p>
+</div>
+
+<h3>📐 Bài toán tối ưu tổ hợp</h3>
+<div class="callout callout-theory">
+  <div class="callout-title">Định nghĩa hình thức</div>
+  <p>Một bài toán tối ưu tổ hợp có:</p>
+  <ul style="padding-left: 20px;">
+    <li><strong>Hàm mục tiêu</strong> $f(X)$ cần tối đa (max) hoặc tối thiểu (min).</li>
+    <li><strong>Phương án</strong> $X = (x_1, x_2, \dots, x_n)$ — một bộ giá trị thỏa mãn điều kiện bài toán.</li>
+    <li>Tìm $X^*$ sao cho $f(X^*) = \min f(X)$ hoặc $\max f(X)$.</li>
+  </ul>
+  <p><strong>Phương pháp vét cạn</strong> (brute-force): duyệt tất cả $2^n$ phương án (chọn/không) hoặc $n!$ hoán vị → không khả thi khi $n$ lớn.</p>
+  <p><strong>Greedy</strong> cố gắng tìm $X^*$ trong thời gian đa thức bằng cách "tham lam" chọn từng $x_i$ tốt nhất.</p>
+</div>
+
+<!-- ============================== BẢNG TỔNG QUAN ============================== -->
+<h2>📊 Bảng tổng quan 3 bài toán Greedy</h2>
+
+<table>
+  <tr>
+    <th>Bài toán</th>
+    <th>Tiêu chí tham lam</th>
+    <th>Độ phức tạp</th>
+    <th>Tối ưu?</th>
+  </tr>
+  <tr><td>1. ATM (đổi tiền)</td><td>Chọn tờ mệnh giá lớn trước</td><td>O(m)</td><td>✓ Tối ưu (nếu mệnh giá "chuẩn")</td></tr>
+  <tr><td>2. TSP (người giao hàng)</td><td>Chọn cạnh ngắn nhất trước</td><td>O(n²)</td><td>✗ Chỉ tốt (thường sai)</td></tr>
+  <tr><td>3. Cái ba lô vô hạn</td><td>Chọn đơn giá cao nhất trước</td><td>O(n log n)</td><td>✓ Tối ưu (vô hạn)</td></tr>
+  <tr><td>4. Cái ba lô 0/1</td><td>Chọn đơn giá cao nhất trước</td><td>O(n log n)</td><td>✗ KHÔNG tối ưu → phải dùng DP</td></tr>
+</table>
+
+<p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">
+  💡 <strong>m</strong> = số mệnh giá tiền, <strong>n</strong> = số đồ vật / số thành phố.
+</p>
+
+<!-- ============================== MÔ PHỎNG TƯƠNG TÁC ============================== -->
+<h2>🎮 Mô phỏng tương tác — 4 bài toán</h2>
+
+<div id="tabs-greedy" data-tabs>
+  <div class="tabs">
+    <button class="tab active">1. ATM</button>
+    <button class="tab">2. TSP</button>
+    <button class="tab">3. Ba lô vô hạn</button>
+    <button class="tab">4. Greedy vs DP</button>
+  </div>
+
+  <!-- ============== TAB 1: ATM ============== -->
+  <div class="tab-content active">
+    <div class="visualizer">
+      <div class="visualizer-title">💵 Máy ATM — Rút tiền ít tờ nhất</div>
+      <p style="color: var(--text-secondary); margin-bottom: 12px;">
+        Nhập số tiền n (chia hết cho 10.000đ). Greedy sẽ chọn lần lượt mệnh giá lớn → nhỏ.
+      </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px;">
+        <input type="number" id="atm-input" value="1290000" step="10000" min="10000" style="max-width: 200px; font-family: var(--font-mono);">
+        <button class="btn" onclick="atmCalculate()">▶ Rút tiền</button>
+        <button class="btn btn-secondary" onclick="atmCalculate(true)">⏩ Tự chạy</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('atm-input').value='1550000'; atmCalculate();">Ví dụ 1.550.000đ</button>
+      </div>
+      <div id="atm-result" style="min-height: 200px;">
+        <p style="text-align: center; color: var(--text-muted);">Bấm "Rút tiền" để xem Greedy hoạt động.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== TAB 2: TSP ============== -->
+  <div class="tab-content">
+    <div class="visualizer">
+      <div class="visualizer-title">🚚 TSP — Người giao hàng (Greedy)</div>
+      <p style="color: var(--text-secondary); margin-bottom: 12px;">
+        Nhập ma trận khoảng cách n×n (mỗi dòng cách nhau bởi dấu xuống dòng, mỗi giá trị bởi dấu phẩy). Greedy chọn cạnh ngắn nhất trước.
+      </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+        <textarea id="tsp-input" rows="5" style="flex: 1; font-family: var(--font-mono); min-width: 280px;">0,10,15,20
+10,0,35,25
+15,35,0,30
+20,25,30,0</textarea>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button class="btn" onclick="tspSolve()">▶ Giải bằng Greedy</button>
+          <button class="btn btn-secondary" onclick="tspReset()">↺ Reset</button>
+        </div>
+      </div>
+      <div id="tsp-result" style="min-height: 300px;">
+        <p style="text-align: center; color: var(--text-muted);">Bấm "Giải" để Greedy chọn cạnh và vẽ chu trình.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== TAB 3: Knapsack vô hạn ============== -->
+  <div class="tab-content">
+    <div class="visualizer">
+      <div class="visualizer-title">🎒 Cái ba lô vô hạn (Unbounded Knapsack)</div>
+      <p style="color: var(--text-secondary); margin-bottom: 12px;">
+        Nhập sức chứa W + danh sách đồ vật (tên, trọng lượng, giá trị). Mỗi loại có số lượng KHÔNG HẠN CHẾ.
+      </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
+        <label>W = <input type="number" id="knap-W" value="37" style="width: 80px; font-family: var(--font-mono);"></label>
+        <button class="btn" onclick="knapSolve()">▶ Giải bằng Greedy</button>
+        <button class="btn btn-ghost" onclick="loadKnapExample()">Nạp ví dụ W=37</button>
+      </div>
+      <textarea id="knap-input" rows="5" style="width: 100%; font-family: var(--font-mono); margin-bottom: 12px;">B,10,25
+A,15,30
+D,4,6
+C,2,2</textarea>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Mỗi dòng: <code>tên,trọng_lượng,giá_trị</code>. Đơn giá = giá trị / trọng lượng.</p>
+      <div id="knap-result" style="min-height: 220px; margin-top: 12px;">
+        <p style="text-align: center; color: var(--text-muted);">Bấm "Giải" để Greedy sắp xếp theo đơn giá giảm và chọn đồ.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== TAB 4: So sánh Greedy vs DP ============== -->
+  <div class="tab-content">
+    <div class="visualizer">
+      <div class="visualizer-title">⚔️ So sánh Greedy vs DP — 0/1 Knapsack</div>
+      <p style="color: var(--text-secondary); margin-bottom: 12px;">
+        Bài 0/1 Knapsack: mỗi vật chỉ có 1 cái (chọn hoặc không). Greedy có thể SAI. DP luôn cho TỐI ƯU.
+      </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
+        <label>W = <input type="number" id="cmp-W" value="10" style="width: 80px; font-family: var(--font-mono);"></label>
+        <button class="btn" onclick="compareSolve()">▶ Giải cả 2 cách</button>
+        <button class="btn btn-ghost" onclick="loadCmpExample()">Nạp ví dụ Greedy sai</button>
+      </div>
+      <textarea id="cmp-input" rows="4" style="width: 100%; font-family: var(--font-mono); margin-bottom: 12px;">A,6,12
+B,5,9
+C,5,9</textarea>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Mỗi dòng: <code>tên,trọng_lượng,giá_trị</code>. Mỗi vật chỉ có 1 cái.</p>
+      <div id="cmp-result" style="min-height: 240px; margin-top: 12px;">
+        <p style="text-align: center; color: var(--text-muted);">Bấm "Giải" để xem Greedy và DP đưa ra 2 kết quả khác nhau.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== TAB 1: ATM ====================
+function atmCalculate(animate) {
+  const n = parseInt(document.getElementById('atm-input').value);
+  if (isNaN(n) || n <= 0 || n % 10000 !== 0) {
+    document.getElementById('atm-result').innerHTML = '<p style="color: var(--danger);">⚠️ Số tiền phải chia hết cho 10.000đ và lớn hơn 0.</p>';
+    return;
+  }
+  const tigia = [100000, 50000, 20000, 10000];
+  const labels = ['100.000đ', '50.000đ', '20.000đ', '10.000đ'];
+  const colors = ['var(--gradient-primary)', 'var(--gradient-blue)', 'var(--gradient-success)', 'var(--gradient-warm)'];
+  let remaining = n;
+  const counts = tigia.map(g => { const c = Math.floor(remaining / g); remaining %= g; return c; });
+  const total = counts.reduce((s, c) => s + c, 0);
+
+  if (animate) {
+    let i = 0;
+    document.getElementById('atm-result').innerHTML = '<div id="atm-bills" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;"></div>';
+    const stepFn = () => {
+      if (i >= counts.length) {
+        document.getElementById('atm-result').innerHTML += `
+          <div class="callout callout-tip" style="margin-top:16px;">
+            <div class="callout-title">✓ Phương án tối ưu</div>
+            <p><strong>Tổng số tờ:</strong> ${total} tờ — rút đúng ${n.toLocaleString('vi-VN')}đ.</p>
+            <p><strong>Phương án X:</strong> (${counts.join(', ')}) tương ứng (tờ 100k, 50k, 20k, 10k).</p>
+          </div>`;
+        return;
+      }
+      const c = counts[i];
+      const bills = Array(c).fill(0).map((_, k) => {
+        const b = document.createElement('div');
+        b.style.cssText = `width:60px;height:36px;background:${colors[i]};color:white;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;box-shadow:var(--shadow-sm);animation:fadeIn 0.3s;`;
+        b.textContent = labels[i];
+        return b;
+      });
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px;';
+      bills.forEach(b => row.appendChild(b));
+      document.getElementById('atm-bills').appendChild(row);
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'text-align:center;color:var(--text-secondary);font-size:0.9rem;margin-bottom:12px;';
+      lbl.innerHTML = `<strong>${labels[i]}:</strong> ${c} tờ = ${(c*tigia[i]).toLocaleString('vi-VN')}đ`;
+      document.getElementById('atm-bills').appendChild(lbl);
+      i++;
+      setTimeout(stepFn, 500);
+    };
+    stepFn();
+  } else {
+    let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+    for (let i = 0; i < counts.length; i++) {
+      const c = counts[i];
+      html += `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg-subtle);border-radius:8px;">
+          <div style="width:80px;height:42px;background:${colors[i]};color:white;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">${labels[i]}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;">${c} tờ × ${labels[i]}</div>
+            <div style="color:var(--text-secondary);font-size:0.85rem;">= ${(c*tigia[i]).toLocaleString('vi-VN')}đ</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px;max-width:200px;">
+            ${Array(Math.min(c, 15)).fill(0).map(() => `<div style="width:14px;height:10px;background:${colors[i]};border-radius:2px;"></div>`).join('')}
+            ${c > 15 ? '<span style="font-size:0.75rem;color:var(--text-muted);">...</span>' : ''}
+          </div>
+        </div>`;
+    }
+    html += '</div>';
+    html += `<div class="callout callout-tip" style="margin-top:16px;">
+      <div class="callout-title">✓ Kết quả Greedy</div>
+      <p><strong>Tổng số tờ:</strong> ${total} tờ — đây là số tờ ÍT NHẤT với bộ mệnh giá chuẩn.</p>
+      <p><strong>Phương án X:</strong> (${counts.join(', ')}) — số tờ tương ứng mệnh giá (100k, 50k, 20k, 10k).</p>
+    </div>`;
+    document.getElementById('atm-result').innerHTML = html;
+  }
+}
+
+// ==================== TAB 2: TSP ====================
+function tspParseMatrix() {
+  const txt = document.getElementById('tsp-input').value.trim();
+  const rows = txt.split(/\n+/).map(r => r.trim().split(/[,\s]+/).map(Number));
+  const n = rows.length;
+  for (let i = 0; i < n; i++) if (rows[i].length !== n || rows[i].some(isNaN)) return null;
+  return rows;
+}
+
+function tspSolve() {
+  const m = tspParseMatrix();
+  if (!m) { document.getElementById('tsp-result').innerHTML = '<p style="color:var(--danger);">⚠️ Ma trận không hợp lệ. Cần ma trận vuông n×n, mỗi dòng n số.</p>'; return; }
+  const n = m.length;
+  // Sinh danh sách cạnh (chỉ lấy nửa trên để tránh trùng)
+  const edges = [];
+  for (let i = 0; i < n; i++) for (let j = i+1; j < n; j++) edges.push({u:i, v:j, w:m[i][j]});
+  edges.sort((a, b) => a.w - b.w);
+
+  // Greedy: chọn cạnh theo luật
+  const selected = [];
+  const degree = new Array(n).fill(0);
+  const parent = Array.from({length: n}, (_, i) => i);
+  function find(x) { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+  const log = [];
+  for (const e of edges) {
+    if (selected.length >= n) break;
+    const reason = [];
+    if (degree[e.u] >= 2 || degree[e.v] >= 2) { log.push({e, action:'bỏ', reason:'tạo đỉnh bậc 3'}); continue; }
+    const ru = find(e.u), rv = find(e.v);
+    if (ru === rv && selected.length !== n - 1) { log.push({e, action:'bỏ', reason:'khép kín chu trình sớm'}); continue; }
+    selected.push(e);
+    degree[e.u]++; degree[e.v]++;
+    if (ru !== rv) parent[ru] = rv;
+    log.push({e, action:'chọn', reason:'OK'});
+  }
+  const total = selected.reduce((s, e) => s + e.w, 0);
+  tspRender(m, selected, log, total);
+}
+
+function tspRender(m, selected, log, total) {
+  const n = m.length;
+  const labels = 'ABCDEFGH'.slice(0, n).split('');
+  // Vị trí đỉnh trên vòng tròn
+  const cx = 180, cy = 180, r = 130;
+  const pos = labels.map((_, i) => {
+    const angle = -Math.PI/2 + i * 2*Math.PI/n;
+    return {x: cx + r*Math.cos(angle), y: cy + r*Math.sin(angle)};
+  });
+
+  // Tất cả cạnh (mờ)
+  let allEdges = '';
+  for (let i = 0; i < n; i++) for (let j = i+1; j < n; j++) {
+    const isSel = selected.some(e => (e.u===i&&e.v===j)||(e.u===j&&e.v===i));
+    if (!isSel) allEdges += `<line x1="${pos[i].x}" y1="${pos[i].y}" x2="${pos[j].x}" y2="${pos[j].y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3"/>`;
+  }
+  // Cạnh được chọn (đậm, đỏ)
+  let selEdges = '';
+  selected.forEach(e => {
+    selEdges += `<line x1="${pos[e.u].x}" y1="${pos[e.u].y}" x2="${pos[e.v].x}" y2="${pos[e.v].y}" stroke="var(--accent)" stroke-width="3"/>`;
+    const mx = (pos[e.u].x + pos[e.v].x)/2, my = (pos[e.u].y + pos[e.v].y)/2;
+    selEdges += `<text x="${mx}" y="${my-4}" text-anchor="middle" fill="var(--accent-dark)" font-size="12" font-weight="700">${e.w}</text>`;
+  });
+  // Đỉnh
+  let nodes = '';
+  labels.forEach((l, i) => {
+    nodes += `<circle cx="${pos[i].x}" cy="${pos[i].y}" r="20" fill="var(--primary)" stroke="white" stroke-width="2"/>`;
+    nodes += `<text x="${pos[i].x}" y="${pos[i].y+5}" text-anchor="middle" fill="white" font-weight="700" font-size="14">${l}</text>`;
+  });
+
+  let logHtml = '<div style="margin-top:16px;"><strong>📋 Nhật ký Greedy:</strong><ol style="padding-left:20px;margin-top:8px;">';
+  log.forEach(l => {
+    const color = l.action === 'chọn' ? 'var(--success)' : 'var(--danger)';
+    logHtml += `<li style="color:${color};">Cạnh ${labels[l.e.u]}-${labels[l.e.v]} (=${l.e.w}): <strong>${l.action}</strong> — ${l.reason}.</li>`;
+  });
+  logHtml += '</ol></div>';
+
+  document.getElementById('tsp-result').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;">
+      <svg width="360" height="360" style="background:var(--bg-subtle);border-radius:12px;flex-shrink:0;">
+        ${allEdges}${selEdges}${nodes}
+      </svg>
+      <div style="flex:1;min-width:240px;">
+        <div class="callout callout-tip" style="margin-bottom:12px;">
+          <div class="callout-title">✓ Chu trình Greedy</div>
+          <p><strong>Cạnh đã chọn:</strong> ${selected.map(e => `${labels[e.u]}-${labels[e.v]}`).join(', ')}</p>
+          <p><strong>Tổng độ dài:</strong> ${selected.map(e=>e.w).join(' + ')} = <strong style="color:var(--accent);">${total}</strong></p>
+        </div>
+        ${logHtml}
+      </div>
+    </div>
+    <div class="callout callout-warn" style="margin-top:12px;">
+      <div class="callout-title">⚠️ Nhận xét</div>
+      <p>Greedy TSP thường <strong>không tối ưu</strong> — nó chỉ chọn "cạnh ngắn nhất trước mắt" mà không xét tổng thể. Đây là kết quả TỐT, chưa chắc TỐI ƯU. Để có chu trình ngắn nhất thực sự cần thuật toán khác (như DP bitmask Held-Karp O(n²·2^n) hoặc vét cạn).</p>
+    </div>`;
+}
+
+function tspReset() {
+  document.getElementById('tsp-result').innerHTML = '<p style="text-align:center;color:var(--text-muted);">Bấm "Giải" để Greedy chọn cạnh và vẽ chu trình.</p>';
+}
+
+// ==================== TAB 3: Knapsack vô hạn ====================
+function knapParse() {
+  const txt = document.getElementById('knap-input').value.trim();
+  const W = parseFloat(document.getElementById('knap-W').value);
+  const items = txt.split(/\n+/).map(line => {
+    const [name, g, v] = line.trim().split(/[,\s]+/);
+    return {name, g: parseFloat(g), v: parseFloat(v)};
+  }).filter(it => it.name && !isNaN(it.g) && !isNaN(it.v) && it.g > 0);
+  return {W, items};
+}
+
+function knapSolve() {
+  const {W, items} = knapParse();
+  if (!items.length || isNaN(W) || W <= 0) { document.getElementById('knap-result').innerHTML = '<p style="color:var(--danger);">⚠️ Dữ liệu không hợp lệ.</p>'; return; }
+  items.forEach(it => it.unit = it.v / it.g);
+  // Sắp xếp đơn giá giảm
+  const sorted = [...items].sort((a, b) => b.unit - a.unit);
+  // Greedy
+  let remaining = W, totalV = 0, totalG = 0;
+  sorted.forEach(it => {
+    it.count = Math.floor(remaining / it.g);
+    remaining -= it.count * it.g;
+    totalV += it.count * it.v;
+    totalG += it.count * it.g;
+  });
+
+  let html = '<div class="callout callout-theory" style="margin-bottom:12px;"><div class="callout-title">Bước 1: Sắp xếp theo đơn giá giảm</div>';
+  html += '<table><tr><th>STT</th><th>Tên</th><th>Trọng lượng g</th><th>Giá trị v</th><th>Đơn giá v/g</th></tr>';
+  sorted.forEach((it, i) => html += `<tr><td>${i+1}</td><td>${it.name}</td><td>${it.g}</td><td>${it.v}</td><td><strong style="color:var(--accent);">${it.unit.toFixed(3)}</strong></td></tr>`);
+  html += '</table></div>';
+
+  html += '<div class="callout callout-theory" style="margin-bottom:12px;"><div class="callout-title">Bước 2: Lấy tối đa mỗi loại (số lượng không hạn chế)</div>';
+  html += '<table><tr><th>Vật</th><th>SL lấy</th><th>Trọng lượng</th><th>Giá trị</th><th>Còn lại</th></tr>';
+  let rem = W;
+  sorted.forEach(it => {
+    const c = it.count;
+    const usedG = c * it.g;
+    const usedV = c * it.v;
+    const before = rem;
+    rem -= usedG;
+    html += `<tr><td><strong>${it.name}</strong> (đơn giá ${it.unit.toFixed(2)})</td><td>${c}</td><td>${usedG}</td><td>${usedV}</td><td>${rem.toFixed(2)}</td></tr>`;
+  });
+  html += '</table></div>';
+
+  html += `<div class="callout callout-tip">
+    <div class="callout-title">✓ Kết quả</div>
+    <p><strong>Tổng trọng lượng đã dùng:</strong> ${totalG} / ${W} (còn dư ${W - totalG})</p>
+    <p><strong>Tổng giá trị:</strong> <strong style="color:var(--success);font-size:1.2em;">${totalV}</strong></p>
+    <p><strong>Phương án X:</strong> (${sorted.map(it => it.count).join(', ')}) theo thứ tự đã sắp.</p>
+  </div>`;
+  document.getElementById('knap-result').innerHTML = html;
+}
+
+function loadKnapExample() {
+  document.getElementById('knap-W').value = '37';
+  document.getElementById('knap-input').value = 'B,10,25\nA,15,30\nD,4,6\nC,2,2';
+}
+
+// ==================== TAB 4: Greedy vs DP (0/1 Knapsack) ====================
+function cmpParse() {
+  const txt = document.getElementById('cmp-input').value.trim();
+  const W = parseInt(document.getElementById('cmp-W').value);
+  const items = txt.split(/\n+/).map(line => {
+    const [name, g, v] = line.trim().split(/[,\s]+/);
+    return {name, g: parseInt(g), v: parseInt(v)};
+  }).filter(it => it.name && !isNaN(it.g) && !isNaN(it.v) && it.g > 0);
+  return {W, items};
+}
+
+function compareSolve() {
+  const {W, items} = cmpParse();
+  if (!items.length || isNaN(W) || W <= 0) { document.getElementById('cmp-result').innerHTML = '<p style="color:var(--danger);">⚠️ Dữ liệu không hợp lệ.</p>'; return; }
+  items.forEach(it => it.unit = it.v / it.g);
+
+  // --- GREEDY ---
+  const sortedG = [...items].sort((a, b) => b.unit - a.unit);
+  let gW = W, gV = 0;
+  const gSel = [];
+  for (const it of sortedG) {
+    if (it.g <= gW) { gW -= it.g; gV += it.v; gSel.push(it); }
+  }
+
+  // --- DP (0/1 Knapsack, 1D array) ---
+  const n = items.length;
+  const dp = Array.from({length: n+1}, () => new Array(W+1).fill(0));
+  for (let i = 1; i <= n; i++) {
+    for (let w = 0; w <= W; w++) {
+      dp[i][w] = dp[i-1][w];
+      if (items[i-1].g <= w) dp[i][w] = Math.max(dp[i][w], dp[i-1][w - items[i-1].g] + items[i-1].v);
+    }
+  }
+  const dpV = dp[n][W];
+  // Truy vết
+  const dSel = [];
+  let w = W;
+  for (let i = n; i >= 1; i--) {
+    if (dp[i][w] !== dp[i-1][w]) {
+      dSel.push(items[i-1]);
+      w -= items[i-1].g;
+    }
+  }
+
+  const better = gV === dpV ? 'Bằng nhau' : (gV < dpV ? 'DP TỐT HƠN' : 'Greedy tốt hơn (hiếm)');
+  const betterColor = gV === dpV ? 'var(--success)' : (gV < dpV ? 'var(--danger)' : 'var(--success)');
+
+  document.getElementById('cmp-result').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:16px;">
+      <div style="flex:1;min-width:240px;background:var(--bg-subtle);padding:16px;border-radius:12px;border-left:4px solid var(--accent);">
+        <h4 style="color:var(--accent);margin-bottom:8px;">🤑 Greedy (đơn giá giảm)</h4>
+        <p style="font-size:0.9rem;">Sắp xếp: ${sortedG.map(it => `${it.name}(${it.unit.toFixed(2)})`).join(' → ')}</p>
+        <p>Chọn: ${gSel.length ? gSel.map(it => `${it.name}(g=${it.g},v=${it.v})`).join(' + ') : 'không vật nào'}</p>
+        <p>Trọng lượng: ${gSel.reduce((s,it)=>s+it.g,0)} / ${W}</p>
+        <p style="font-size:1.3em;font-weight:700;color:var(--accent);">Giá trị = ${gV}</p>
+      </div>
+      <div style="flex:1;min-width:240px;background:var(--bg-subtle);padding:16px;border-radius:12px;border-left:4px solid var(--success);">
+        <h4 style="color:var(--success);margin-bottom:8px;">🧠 DP (Quy hoạch động)</h4>
+        <p style="font-size:0.9rem;">Bảng DP ${n+1}×${W+1}, xét tất cả tổ hợp con.</p>
+        <p>Chọn: ${dSel.length ? dSel.map(it => `${it.name}(g=${it.g},v=${it.v})`).join(' + ') : 'không vật nào'}</p>
+        <p>Trọng lượng: ${dSel.reduce((s,it)=>s+it.g,0)} / ${W}</p>
+        <p style="font-size:1.3em;font-weight:700;color:var(--success);">Giá trị = ${dpV}</p>
+      </div>
+    </div>
+    <div class="callout callout-${gV === dpV ? 'tip' : 'warn'}" style="margin-top:12px;">
+      <div class="callout-title">📊 So sánh</div>
+      <p><strong>Greedy:</strong> ${gV} &nbsp;|&nbsp; <strong>DP:</strong> ${dpV} &nbsp;|&nbsp; <strong style="color:${betterColor};">${better}</strong></p>
+      <p>Greedy thời gian O(n log n), DP thời gian O(n·W). Greedy nhanh hơn nhưng có thể <strong>sai</strong>; DP chậm hơn nhưng luôn <strong>tối ưu</strong>.</p>
+      <p>💡 Bài 0/1 Knapsack <strong>phải dùng DP</strong>, KHÔNG dùng Greedy vì Greedy không có "tính chất chọn tham lam".</p>
+    </div>`;
+}
+
+function loadCmpExample() {
+  document.getElementById('cmp-W').value = '10';
+  document.getElementById('cmp-input').value = 'A,6,12\nB,5,9\nC,5,9';
+}
+</script>
+
+<!-- ============================== VÍ DỤ MẪU STEP-BY-STEP ============================== -->
+<h2>📚 Ví dụ mẫu — Chạy tay từng bước</h2>
+
+<h3>Ví dụ 1: ATM rút 1.290.000đ</h3>
+<div id="step-atm"></div>
+
+<h3>Ví dụ 2: Cái ba lô vô hạn — W=37, 4 đồ vật</h3>
+<div id="step-knap"></div>
+
+<h3>Ví dụ 3: TSP 4 thành phố A-B-C-D</h3>
+<div id="step-tsp"></div>
+
+<script>
+new StepReveal('step-atm', [
+  { title: 'Đề bài', content: '<p>Rút <strong>1.290.000đ</strong> từ máy ATM có mệnh giá 100k, 50k, 20k, 10k. Tìm số tờ ít nhất.</p><p>Mệnh giá: <code>[100000, 50000, 20000, 10000]</code>. Greedy: chọn mệnh giá lớn nhất trước.</p>' },
+  { title: 'Bước 1: Tờ 100.000đ (X₁)', content: '<p><code>n = 1.290.000</code>. <code>X₁ = 1.290.000 / 100.000 = 12</code> (tờ 100k).</p><p>Đã dùng: 12 × 100.000 = 1.200.000đ. Còn lại: 1.290.000 − 1.200.000 = 90.000đ.</p><p>Vì sao? Mệnh giá 100k là lớn nhất → lấy tối đa để giảm số tờ.</p>' },
+  { title: 'Bước 2: Tờ 50.000đ (X₂)', content: '<p><code>n = 90.000</code>. <code>X₂ = 90.000 / 50.000 = 1</code> (tờ 50k).</p><p>Đã dùng: 1 × 50.000 = 50.000đ. Còn lại: 90.000 − 50.000 = 40.000đ.</p><p>Vì sao? 90.000 chia 100.000 = 0 → không lấy thêm tờ 100k. Lấy 1 tờ 50k.</p>' },
+  { title: 'Bước 3: Tờ 20.000đ (X₃)', content: '<p><code>n = 40.000</code>. <code>X₃ = 40.000 / 20.000 = 2</code> (tờ 20k).</p><p>Đã dùng: 2 × 20.000 = 40.000đ. Còn lại: 40.000 − 40.000 = 0đ.</p><p>Vì sao? 40.000 không chia hết cho 50k → lấy 2 tờ 20k.</p>' },
+  { title: 'Bước 4: Tờ 10.000đ (X₄)', content: '<p><code>n = 0</code>. <code>X₄ = 0 / 10.000 = 0</code> (tờ 10k).</p><p>Vì sao? Đã hết tiền → không cần tờ 10k nào.</p>' },
+  { title: 'Kết quả', content: '<p><strong>Phương án X = (12, 1, 2, 0)</strong> — tương ứng (tờ 100k, 50k, 20k, 10k).</p><p><strong>Tổng số tờ = 12 + 1 + 2 + 0 = 15 tờ.</strong></p><p>✓ Đây là tối ưu với bộ mệnh giá chuẩn. Độ phức tạp O(m) với m = 4 mệnh giá.</p>' }
+]);
+
+new StepReveal('step-knap', [
+  { title: 'Đề bài', content: '<p>Ba lô W=37. 4 đồ vật: B(g=10, v=25), A(g=15, v=30), D(g=4, v=6), C(g=2, v=2). Mỗi loại không hạn chế số lượng.</p>' },
+  { title: 'Bước 1: Tính đơn giá', content: '<p>Đơn giá = giá trị / trọng lượng:</p><ul style="padding-left:20px;"><li>B: 25/10 = <strong>2.5</strong></li><li>A: 30/15 = <strong>2.0</strong></li><li>D: 6/4 = <strong>1.5</strong></li><li>C: 2/2 = <strong>1.0</strong></li></ul><p>Vì sao tính đơn giá? Vì mỗi đơn vị trọng lượng mang lại bao nhiêu giá trị — vật nào "hời" nhất thì ưu tiên lấy.</p>' },
+  { title: 'Bước 2: Sắp xếp đơn giá giảm', content: '<p>Thứ tự xét: <strong>B (2.5) → A (2.0) → D (1.5) → C (1.0)</strong>.</p><p>Vì sao giảm? Lấy vật "hời nhất" trước để tối đa giá trị trong trọng lượng ít nhất.</p>' },
+  { title: 'Bước 3: Lấy tối đa vật B', content: '<p>W=37, g_B=10 → số lượng tối đa = ⌊37/10⌋ = <strong>3</strong>.</p><p>TTL đã dùng = 3 × 10 = 30. Còn lại = 37 − 30 = 7. Giá trị = 3 × 25 = 75.</p>' },
+  { title: 'Bước 4: Xét vật A', content: '<p>Còn 7. g_A = 15 > 7 → <strong>không lấy</strong> vật A (0 cái).</p><p>Còn lại vẫn 7, giá trị vẫn 75.</p>' },
+  { title: 'Bước 5: Lấy vật D', content: '<p>Còn 7. g_D = 4 → số lượng = ⌊7/4⌋ = <strong>1</strong>.</p><p>TTL đã dùng = 30 + 4 = 34. Còn lại = 7 − 4 = 3. Giá trị = 75 + 6 = 81.</p>' },
+  { title: 'Bước 6: Lấy vật C', content: '<p>Còn 3. g_C = 2 → số lượng = ⌊3/2⌋ = <strong>1</strong>.</p><p>TTL đã dùng = 34 + 2 = 36. Còn lại = 3 − 2 = 1 (dư, không đủ lấy thêm). Giá trị = 81 + 2 = <strong>83</strong>.</p>' },
+  { title: 'Kết quả', content: '<p><strong>Phương án X = (3, 0, 1, 1)</strong> theo thứ tự (B, A, D, C).</p><p>Tổng giá trị = 3·25 + 0·30 + 1·6 + 1·2 = 75 + 0 + 6 + 2 = <strong>83</strong>.</p><p>Tổng trọng lượng = 36 (dư 1). Độ phức tạp O(n log n).</p>' }
+]);
+
+new StepReveal('step-tsp', [
+  { title: 'Đề bài', content: '<p>4 thành phố A, B, C, D. Ma trận khoảng cách:</p><pre><code>     A    B    C    D\nA    -    10   15   20\nB    10   -    35   25\nC    15   35   -    30\nD    20   25   30   -</code></pre><p>Tìm chu trình Hamilton ngắn nhất qua 4 đỉnh (mỗi đỉnh đúng 1 lần).</p>' },
+  { title: 'Bước 1: Liệt kê + sắp xếp cạnh tăng dần', content: '<p>Có 6 cạnh (vì ma trận đối xứng, chỉ lấy nửa trên):</p><ul style="padding-left:20px;"><li>AB = 10</li><li>AC = 15</li><li>AD = 20</li><li>BD = 25</li><li>CD = 30</li><li>BC = 35</li></ul><p>Sắp xếp tăng dần: AB(10) → AC(15) → AD(20) → BD(25) → CD(30) → BC(35).</p>' },
+  { title: 'Bước 2: Chọn AB = 10', content: '<p>Bậc A = 1, B = 1. Chưa vi phạm luật (mỗi đỉnh ≤ 2 cạnh). Chưa tạo chu trình khép kín → <strong>CHỌN</strong>.</p><p>Đã có 1 cạnh, giá = 10.</p>' },
+  { title: 'Bước 3: Chọn AC = 15', content: '<p>Bậc A: 1 → 2. Bậc C: 0 → 1. A vừa đủ 2 cạnh (đúng). Chưa tạo chu trình khép kín → <strong>CHỌN</strong>.</p><p>Đã có 2 cạnh, giá = 10 + 15 = 25.</p>' },
+  { title: 'Bước 4: Xét AD = 20', content: '<p>A đã có bậc 2 (cạnh AB, AC). Nếu chọn AD → A có bậc 3 → vi phạm luật → <strong>BỎ</strong>.</p><p>Vì sao? Mỗi đỉnh trong chu trình Hamilton chỉ có 2 cạnh (vào + ra). Bậc 3 là sai.</p>' },
+  { title: 'Bước 5: Chọn BD = 25', content: '<p>B: 1 → 2. D: 0 → 1. Không tạo chu trình khép kín (còn C chưa nối) → <strong>CHỌN</strong>.</p><p>Đã có 3 cạnh, giá = 25 + 25 = 50.</p>' },
+  { title: 'Bước 6: Chọn CD = 30', content: '<p>C: 1 → 2. D: 1 → 2. Tạo chu trình khép kín A-B-D-C-A (đủ 4 đỉnh) → <strong>CHỌN</strong> (đây là cạnh cuối, kết thúc chu trình).</p><p>Đã có 4 cạnh = n → dừng. Giá = 50 + 30 = <strong>80</strong>.</p>' },
+  { title: 'Bước 7: Bỏ BC = 35', content: '<p>Đã đủ 4 cạnh → không cần xét thêm. Nếu xét: B đã bậc 2, C đã bậc 2 → bồ.</p>' },
+  { title: 'Kết quả', content: '<p><strong>Chu trình: A → B → D → C → A</strong>.</p><p>Tổng độ dài = AB + BD + DC + CA = 10 + 25 + 30 + 15 = <strong>80</strong>.</p><p>Độ phức tạp: O(n²) cho việc sắp xếp và duyệt cạnh.</p><p>⚠️ <strong>Nhận xét:</strong> Greedy TSP thường không tối ưu. Có thể chu trình A → B → D → C → A không phải ngắn nhất — cần DP Held-Karp hoặc vét cạn để chắc chắn.</p>' }
+]);
+</script>
+
+<!-- ============================== BÀI TOÁN 1: ATM ============================== -->
+<h2>1️⃣ Bài toán 1: Máy ATM</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📝 Phát biểu</div>
+  <p>Máy ATM có 4 mệnh giá: <strong>100.000đ, 50.000đ, 20.000đ, 10.000đ</strong>. Rút <code>n</code> đồng (n chia hết cho 10.000). Tìm số tờ ít nhất.</p>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Ý tưởng Greedy</div>
+  <p><strong>Chọn nhiều tờ mệnh giá LỚN NHẤT trước.</strong> Lấy tối đa tờ 100k có thể, phần dư lấy tờ 50k, rồi 20k, rồi 10k.</p>
+  <p><strong>Vì sao?</strong> Mỗi tờ 100k thay thế được 2 tờ 50k → giảm số tờ. Mệnh giá lớn càng ưu tiên thì số tờ càng ít.</p>
+</div>
+
+<h3>🧮 Ví dụ: n = 1.290.000đ</h3>
+<div class="code-block">X₁ = 1.290.000 / 100.000 = 12 (tờ 100k)   ← còn 90.000
+X₂ = 90.000 / 50.000     = 1  (tờ 50k)    ← còn 40.000
+X₃ = 40.000 / 20.000     = 2  (tờ 20k)    ← còn 0
+X₄ = 0 / 10.000          = 0  (tờ 10k)
+
+Phương án X = (12, 1, 2, 0)
+Tổng số tờ = 15</div>
+
+<h3>📝 Giả mã (C)</h3>
+<pre><code>void ATM(int n, int *tigia, int *soluong, int m) {
+    // n: số tiền cần rút
+    // tigia[]: mảng mệnh giá giảm dần
+    // soluong[]: mảng kết quả (số tờ mỗi loại)
+    // m: số mệnh giá
+    for (int i = 0; i &lt; m; i++) {
+        soluong[i] = n / tigia[i];   // lấy tối đa tờ mệnh giá i
+        n = n % tigia[i];            // phần dư
+    }
+}</code></pre>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích độ phức tạp</div>
+  <p><strong>Thời gian:</strong> O(m) — chỉ 1 vòng for qua m mệnh giá, mỗi bước O(1) (phép chia + mod).</p>
+  <p><strong>Bộ nhớ:</strong> O(m) — mảng kết quả soluong[m].</p>
+  <p><strong>Tối ưu?</strong> ✓ Có, <em>với bộ mệnh giá chuẩn</em> (mỗi mệnh giá lớn là bội số của mệnh giá nhỏ hơn: 100k = 2×50k, 50k = 2×20k + 10k, v.v.).</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Khi Greedy ATM KHÔNG tối ưu</div>
+  <p>Ví dụ mệnh giá {500, 200, 100} (đồng), rút 600. Greedy: 1×500 + 1×100 = 2 tờ. Tối ưu: 3×200 = 3 tờ → Greedy thắng.</p>
+  <p>Nhưng mệnh giá {400, 300, 100}, rút 600. Greedy: 1×400 + 2×100 = 3 tờ. Tối ưu: 2×300 = 2 tờ → Greedy <strong>thua</strong>!</p>
+  <p>→ Greedy ATM tối ưu chỉ khi bộ mệnh giá có tính chất "Canon" (mỗi tờ lớn là bội của tờ nhỏ).</p>
+</div>
+
+<!-- ============================== BÀI TOÁN 2: TSP ============================== -->
+<h2>2️⃣ Bài toán 2: Người giao hàng (TSP)</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📝 Phát biểu</div>
+  <p>Có <code>n</code> thành phố. Một người đi từ 1 thành phố, qua tất cả <code>n-1</code> thành phố khác (mỗi thành phố đến đúng 1 lần), rồi trở về thành phố ban đầu. Tìm chu trình có tổng độ dài ngắn nhất.</p>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Vét cạn không khả thi</div>
+  <p>Có <code>(n-1)!/2</code> chu trình Hamilton khác nhau (chia 2 vì chu trình + chiều ngược là 1). Với n=20, có 20!/2 ≈ 1.2×10¹⁸ chu trình → máy tính nhanh nhất cũng mất hàng tỷ năm.</p>
+  <p>→ Phải dùng heuristic như Greedy (không tối ưu nhưng nhanh).</p>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Ý tưởng Greedy</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Sắp xếp</strong> các cạnh theo thứ tự tăng dần của độ dài.</li>
+    <li><strong>Xét</strong> các cạnh từ ngắn nhất đến dài nhất để đưa vào chu trình.</li>
+    <li>Một cạnh được <strong>chọn</strong> nếu thỏa mãn ĐỒNG THỜI 2 điều kiện:
+      <ul style="padding-left: 20px;">
+        <li><strong>Không tạo chu trình thiếu</strong> (không khép kín sớm — chỉ được khép kín khi đã đủ n cạnh).</li>
+        <li><strong>Không tạo đỉnh bậc 3</strong> (mỗi đỉnh chỉ có tối đa 2 cạnh — vì chu trình đi vào + ra mỗi đỉnh).</li>
+      </ul>
+    </li>
+    <li><strong>Lặp lại</strong> cho đến khi xây dựng được 1 chu trình (đủ n cạnh).</li>
+  </ol>
+</div>
+
+<h3>📝 Giả mã (C)</h3>
+<pre><code>void TSP() {
+    Chu_Trinh = ∅;       // tập cạnh của chu trình
+    Gia = 0.0;            // tổng độ dài
+    while (E != ∅) {      // E = tập cạnh còn chưa xét
+        e = cạnh ngắn nhất trong E;
+        if (cạnh e có thể chọn) {  // không bậc 3, không khép kín sớm
+            Chu_Trinh = Chu_Trinh + [e];
+            Gia = Gia + do_dai(e);
+        }
+        E = E - [e];      // loại e khỏi E (dù chọn hay không)
+    }
+}</code></pre>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích độ phức tạp</div>
+  <p><strong>Sắp xếp cạnh:</strong> có n(n-1)/2 cạnh → O(n² log n).</p>
+  <p><strong>Duyệt + kiểm tra:</strong> O(n²) (mỗi cạnh kiểm tra O(1) với Union-Find).</p>
+  <p>→ Tổng: <strong>O(n² log n)</strong> (chi phí sắp xếp). Nếu dùng Bucket Sort (giá trị nguyên) có thể O(n²).</p>
+  <p><strong>Tối ưu?</strong> ✗ <strong>Không</strong> — Greedy TSP chỉ là heuristic, kết quả TỐT nhưng chưa chắc TỐI ƯU.</p>
+</div>
+
+<!-- ============================== BÀI TOÁN 3: Knapsack vô hạn ============================== -->
+<h2>3️⃣ Bài toán 3: Cái ba lô (Knapsack) vô hạn</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📝 Phát biểu</div>
+  <p>Cái ba lô trọng lượng <code>W</code>. Có <code>n</code> loại đồ vật, mỗi loại <code>i</code> có trọng lượng <code>gᵢ</code> và giá trị <code>vᵢ</code>. <strong>Mỗi loại có số lượng KHÔNG HẠN CHẾ.</strong> Tìm cách chọn để tổng trọng lượng ≤ W và tổng giá trị lớn nhất.</p>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Ý tưởng Greedy (3 bước)</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Tính đơn giá</strong> = vᵢ / gᵢ cho mỗi loại (giá trị trên mỗi đơn vị trọng lượng).</li>
+    <li><strong>Sắp xếp</strong> đồ vật theo đơn giá GIẢM dần.</li>
+    <li>Với mỗi đồ vật (theo thứ tự đã sắp), <strong>lấy số lượng tối đa</strong> mà trọng lượng còn lại cho phép: <code>⌊W_còn / gᵢ⌋</code>.</li>
+  </ol>
+  <p><strong>Vì sao?</strong> Đơn giá cao = "hời" nhất (nhiều giá trị / ít trọng lượng) → ưu tiên lấy hết.</p>
+</div>
+
+<h3>🧮 Ví dụ: W=37, 4 đồ vật</h3>
+<table>
+  <tr><th>Đồ vật</th><th>Trọng lượng g</th><th>Giá trị v</th><th>Đơn giá v/g</th></tr>
+  <tr><td>B</td><td>10</td><td>25</td><td><strong>2.5</strong></td></tr>
+  <tr><td>A</td><td>15</td><td>30</td><td>2.0</td></tr>
+  <tr><td>D</td><td>4</td><td>6</td><td>1.5</td></tr>
+  <tr><td>C</td><td>2</td><td>2</td><td>1.0</td></tr>
+</table>
+<p style="margin-top:8px;">Đã sắp xếp theo đơn giá giảm: <strong>B → A → D → C</strong>.</p>
+
+<div class="code-block">Bước 1: Chọn 3 vật B.   TTL = 3·10 = 30. Còn 37-30 = 7.   GT = 3·25 = 75.
+Bước 2: Không chọn A (g=15 > 7).                                  GT = 75.
+Bước 3: Chọn 1 vật D.   TTL = 30+4 = 34.  Còn 7-4 = 3.  GT = 75+6 = 81.
+Bước 4: Chọn 1 vật C.   TTL = 34+2 = 36.  Còn 3-2 = 1.  GT = 81+2 = 83.
+
+Phương án X = (3, 0, 1, 1) theo thứ tự (B, A, D, C).
+Tổng giá trị = 83. Tổng trọng lượng = 36 (dư 1).</div>
+
+<h3>📝 Giả mã (C)</h3>
+<pre><code>void Greedy(Danh_sach_do_vat dsdv, float W) {
+    // Sắp xếp mảng dsdv theo đơn giá GIẢM dần
+    // (don_gia = v / g)
+    sap_xep_giam(dsdv);  // O(n log n)
+    for (int i = 0; i &lt; n; i++) {
+        dsdv[i].Phuong_an = W / dsdv[i].Trong_luong;  // số lượng tối đa
+        W = W - dsdv[i].Phuong_an * dsdv[i].Trong_luong;
+    }
+}</code></pre>
+
+<div class="callout callout-theory">
+  <div class="callout-title">📐 Phân tích độ phức tạp</div>
+  <p><strong>Sắp xếp:</strong> O(n log n).</p>
+  <p><strong>Chọn:</strong> O(n) — 1 vòng for qua n vật.</p>
+  <p>→ Tổng: <strong>O(n log n)</strong> (chi phí sắp xếp chiếm ưu thế).</p>
+  <p><strong>Tối ưu?</strong> ✓ <strong>Có</strong> — với bài vô hạn, Greedy luôn tối ưu vì có thể "phân frac" được (lấy tối đa mỗi loại, phần dư tự nhiên chuyển cho loại kế tiếp có đơn giá thấp hơn).</p>
+</div>
+
+<!-- ============================== BIẾN THỂ 0/1 ============================== -->
+<h2>🔄 Biến thể bài toán cái ba lô</h2>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Biến thể 1: Số lượng hữu hạn</div>
+  <p>Mỗi đồ vật <code>i</code> có số lượng <code>sᵢ</code> (hữu hạn). Greedy vẫn áp dụng được, nhưng khi lấy không vượt quá <code>sᵢ</code>:</p>
+  <p><code>Phuong_an[i] = min(s[i], W / g[i])</code></p>
+</div>
+
+<div class="callout callout-danger" style="background: var(--danger-bg); border-left: 4px solid var(--danger); padding: 16px; border-radius: 10px; margin: 1em 0;">
+  <div class="callout-title" style="color: var(--danger); font-weight: 700; margin-bottom: 8px;">🚨 Biến thể 2: 0/1 Knapsack — Greedy KHÔNG tối ưu!</div>
+  <p>Mỗi đồ vật chỉ có <strong>1 cái</strong> (chọn hoặc không chọn). Greedy theo đơn giá <strong>thường sai</strong>.</p>
+  <p><strong>Lý do:</strong> Khi lấy 1 vật "hời" có thể chặn chỗ của 2 vật khác "kém hời" hơn nhưng tổng giá trị cao hơn.</p>
+  <p><strong>Ví dụ:</strong> W=10, 3 vật: A(g=6,v=12, đơn giá 2.0), B(g=5,v=9, đơn giá 1.8), C(g=5,v=9, đơn giá 1.8).</p>
+  <ul style="padding-left: 20px;">
+    <li><strong>Greedy:</strong> A (đơn giá cao nhất), còn 4. B, C đều g=5 > 4 → bỏ. Tổng GT = 12.</li>
+    <li><strong>DP (tối ưu):</strong> chọn B+C, g=10, GT = 18 → <strong>tốt hơn</strong>!</li>
+  </ul>
+  <p>→ 0/1 Knapsack <strong>phải dùng Quy hoạch động (DP)</strong>, không dùng Greedy. Xem Tab 4 ở mô phỏng trên.</p>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 Cách nhận biết nhanh</div>
+  <ul style="padding-left: 20px;">
+    <li>Đề nói "<strong>số lượng không hạn chế</strong>" → Greedy (bài vô hạn).</li>
+    <li>Đề nói "<strong>mỗi vật có 1 cái</strong>" / "<strong>chọn hoặc không</strong>" → DP (bài 0/1).</li>
+    <li>Đề nói "<strong>số lượng hữu hạn sᵢ</strong>" → Greedy với giới hạn sᵢ (hoặc DP nếu không chắc).</li>
+  </ul>
+</div>
+
+<!-- ============================== BÀI TẬP TỰ GIẢI ============================== -->
+<h2>✍️ Bài tập tự giải (có đáp án chi tiết)</h2>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 1 — ATM rút 1.550.000đ</div>
+  <p>Rút <strong>1.550.000đ</strong> từ ATM có mệnh giá 100k, 50k, 20k, 10k. Tìm số tờ ít nhất bằng Greedy.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-3-1').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-3-1" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức:</strong> Greedy ATM — chia lần lượt cho mệnh giá lớn → nhỏ. <code>Xᵢ = ⌊n / tigia[i]⌋</code>, <code>n = n mod tigia[i]</code>.</p>
+    <p><strong>💡 Cách áp dụng:</strong> Mệnh giá đã sắp giảm: [100000, 50000, 20000, 10000]. Chia lần lượt.</p>
+    <p><strong>🧮 Tính toán:</strong></p>
+    <div class="code-block">X₁ = 1.550.000 / 100.000 = 15  (tờ 100k). Còn 1.550.000 - 1.500.000 = 50.000.
+X₂ = 50.000 / 50.000     = 1  (tờ 50k).  Còn 50.000 - 50.000 = 0.
+X₃ = 0 / 20.000          = 0  (tờ 20k).
+X₄ = 0 / 10.000          = 0  (tờ 10k).
+
+Phương án X = (15, 1, 0, 0).</div>
+    <p><strong>✓ Kết quả:</strong> 15 tờ 100k + 1 tờ 50k = <strong>16 tờ</strong>. Rút đúng 1.550.000đ.</p>
+    <p><strong>🔍 Kiểm tra:</strong> 15·100.000 + 1·50.000 + 0·20.000 + 0·10.000 = 1.500.000 + 50.000 = 1.550.000đ ✓. Độ phức tạp O(m) = O(4) = O(1).</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 2 — Knapsack vô hạn W=20</div>
+  <p>Ba lô W=20. 3 vật: A(g=5, v=10), B(g=10, v=15), C(g=3, v=4). Mỗi loại không hạn chế. Tìm tổng giá trị lớn nhất.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-3-2').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-3-2" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức:</strong> Greedy Knapsack vô hạn — sắp xếp theo đơn giá GIẢM, lấy tối đa mỗi loại.</p>
+    <p><strong>💡 Cách áp dụng:</strong> Đơn giá = v/g. Sắp giảm rồi lấy lần lượt.</p>
+    <p><strong>🧮 Tính toán:</strong></p>
+    <div class="code-block">Tính đơn giá:
+  A: 10/5 = 2.0   ← cao nhất
+  B: 15/10 = 1.5
+  C: 4/3 ≈ 1.33
+
+Sắp xếp giảm: A (2.0) → B (1.5) → C (1.33).
+
+Bước 1: Lấy tối đa A. SL = ⌊20/5⌋ = 4. TTL = 4·5 = 20. Còn 0. GT = 4·10 = 40.
+Bước 2: Còn 0 → không lấy B, C.
+
+Phương án X = (4, 0, 0) theo thứ tự (A, B, C).</div>
+    <p><strong>✓ Kết quả:</strong> Chọn <strong>4 vật A</strong>. TTL = 20 (=W, đầy ba lô). GT = <strong>40</strong>.</p>
+    <p><strong>🔍 Kiểm tra:</strong> 4·5 = 20 ≤ 20 ✓. GT = 4·10 = 40. So sánh: nếu lấy 2B + 0A + 0C: TTL=20, GT=30 (thua). Nếu lấy 0A + 2B + 0C = 30. Nếu lấy 6C + 1A: TTL = 18+5=23 > 20 (sai). → 4A là tối ưu ✓.</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 3 — TSP 4 thành phố</div>
+  <p>4 thành phố A, B, C, D với ma trận khoảng cách:</p>
+  <pre><code>     A    B    C    D
+A    -    10   15   20
+B    10   -    35   25
+C    15   35   -    30
+D    20   25   30   -</code></pre>
+  <p>Tìm chu trình Hamilton bằng Greedy.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-3-3').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-3-3" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức:</strong> Greedy TSP — sắp cạnh tăng dần, chọn cạnh nếu không bậc 3 + không khép kín sớm.</p>
+    <p><strong>💡 Cách áp dụng:</strong> Liệt kê 6 cạnh, sắp tăng, xét lần lượt.</p>
+    <p><strong>🧮 Tính toán:</strong></p>
+    <div class="code-block">Sắp xếp cạnh tăng dần:
+  AB=10, AC=15, AD=20, BD=25, CD=30, BC=35.
+
+Bước 1: AB=10. Bậc A=1, B=1. Chưa khép kín → CHỌN.
+Bước 2: AC=15. A: 1→2, C: 0→1. Chưa khép kín → CHỌN.
+Bước 3: AD=20. A đã bậc 2 → BỎ (tạo bậc 3).
+Bước 4: BD=25. B: 1→2, D: 0→1. Chưa khép kín → CHỌN.
+Bước 5: CD=30. C: 1→2, D: 1→2. Khép kín (đủ 4 đỉnh) → CHỌN.
+        Đã đủ 4 cạnh = n → dừng.
+Bước 6: BC=35. Đã đủ → không xét.</div>
+    <p><strong>✓ Kết quả:</strong> Chu trình <strong>A → B → D → C → A</strong>. Tổng = 10 + 25 + 30 + 15 = <strong>80</strong>.</p>
+    <p><strong>🔍 Kiểm tra:</strong> Mỗi đỉnh đúng 2 cạnh (A: AB,AC; B: AB,BD; C: AC,CD; D: BD,CD) ✓. Đủ 4 cạnh = 4 đỉnh ✓. Tổng = 80. Lưu ý: Greedy thường không tối ưu — có thể chu trình khác (vd A→C→D→B→A = 15+30+25+10 = 80, bằng!) hoặc A→B→C→D→A = 10+35+30+20 = 95 (dài hơn) → trong TH này Greedy đúng.</p>
+  </div>
+</div>
+
+<div class="callout callout-example">
+  <div class="callout-title">📝 Bài 4 — So sánh Greedy vs DP (0/1 Knapsack)</div>
+  <p>W=10. 3 vật (mỗi vật 1 cái): A(g=6, v=12), B(g=5, v=9), C(g=5, v=9). Giải bằng Greedy và DP. So sánh.</p>
+  <button class="btn btn-ghost" onclick="document.getElementById('ans-3-4').classList.toggle('hidden')">Xem đáp án</button>
+  <div id="ans-3-4" class="hidden mt-2" style="background: var(--bg-elevated); padding: 16px; border-radius: 10px; border-left: 4px solid var(--success);">
+    <p><strong>📌 Công thức:</strong></p>
+    <ul style="padding-left:20px;">
+      <li><strong>Greedy 0/1:</strong> Sắp giảm theo đơn giá, lấy vật đầu tiên vừa W_còn.</li>
+      <li><strong>DP 0/1:</strong> <code>dp[i][w] = max(dp[i-1][w], dp[i-1][w-gᵢ] + vᵢ)</code> nếu <code>gᵢ ≤ w</code>.</li>
+    </ul>
+    <p><strong>💡 Cách áp dụng:</strong> Tính đơn giá cho Greedy. Duyệt bảng DP cho DP.</p>
+    <p><strong>🧮 Tính toán GREEDY:</strong></p>
+    <div class="code-block">Đơn giá: A=12/6=2.0, B=9/5=1.8, C=9/5=1.8.
+Sắp giảm: A (2.0) → B (1.8) → C (1.8).
+W=10. Lấy A (g=6 ≤ 10), còn 4, GT=12.
+Lấy B? g=5 > 4 → bỏ. Lấy C? g=5 > 4 → bỏ.
+→ Greedy: GT = 12 (chỉ A).</div>
+    <p><strong>🧮 Tính toán DP (bảng dp[i][w]):</strong></p>
+    <div class="code-block">Xét dp[3][10] (chọn từ 3 vật, sức chứa 10):
+- Không lấy A:  dp[2][10] = ?
+- Lấy A (g=6): dp[2][4] + 12
+
+Tính dp[2][w] (2 vật B, C):
+  dp[2][10] = max(dp[1][10], dp[1][5] + 9)
+  dp[1][w] (chỉ B): dp[1][10] = 9 (lấy B), dp[1][5] = 9.
+  → dp[2][10] = max(9, 9+9) = 18 (lấy B+C).
+  dp[2][4] = 0 (B, C đều g=5 > 4).
+
+dp[3][10]:
+- Không lấy A: dp[2][10] = 18.
+- Lấy A: dp[2][4] + 12 = 0 + 12 = 12.
+→ max(18, 12) = 18. Truy vết: chọn B + C.</div>
+    <p><strong>✓ Kết quả:</strong></p>
+    <ul style="padding-left:20px;">
+      <li><strong>Greedy:</strong> chỉ A. GT = 12. TTL = 6 (dư 4).</li>
+      <li><strong>DP:</strong> B + C. GT = 18. TTL = 10 (đầy ba lô).</li>
+      <li>→ DP <strong>tốt hơn</strong> Greedy (18 > 12). Greedy sai!</li>
+    </ul>
+    <p><strong>🔍 Kiểm tra:</strong> B+C có g=10 ≤ 10, GT=18 ✓. A có GT=12 ✓. Tổ hợp A+B = g=11 > 10 (sai). A+C = g=11 > 10 (sai). A+B+C = g=16 > 10 (sai). Vậy GT tối ưu = 18 → DP đúng, Greedy sai.</p>
+  </div>
+</div>
+
+<!-- ============================== QUIZ ============================== -->
+<h2>❓ Kiểm tra hiểu bài</h2>
+<div id="quiz-greedy"></div>
+
+<script>
+new Quiz('quiz-greedy', [
+  {
+    question: "Greedy luôn cho kết quả TỐI ƯU cho mọi bài toán. Đúng hay sai?",
+    options: ["Đúng", "Sai", "Chỉ đúng với TSP", "Chỉ đúng với ATM"],
+    correct: 1,
+    explanation: "Sai! Greedy chỉ TỐT, chưa chắc TỐI ƯU. Ví dụ TSP và 0/1 Knapsack Greedy thường sai."
+  },
+  {
+    question: "TSP vét cạn cần duyệt bao nhiêu chu trình Hamilton?",
+    options: ["n!", "(n-1)!", "(n-1)!/2", "2^n"],
+    correct: 2,
+    explanation: "(n-1)!/2 — chia (n-1)! cho 2 vì mỗi chu trình đếm 2 lần (chiều thuận + ngược)."
+  },
+  {
+    question: "ATM Greedy dựa trên nguyên tắc gì?",
+    options: ["Chọn mệnh giá nhỏ trước", "Chọn mệnh giá lớn trước", "Chọn ngẫu nhiên", "Chọn mệnh giá trung bình"],
+    correct: 1,
+    explanation: "Chọn mệnh giá LỚN trước — lấy tối đa tờ lớn để giảm số tờ cần thiết."
+  },
+  {
+    question: "Knapsack vô hạn Greedy sắp xếp đồ vật theo thứ tự nào?",
+    options: ["Trọng lượng tăng", "Giá trị giảm", "Đơn giá (v/g) giảm", "Trọng lượng giảm"],
+    correct: 2,
+    explanation: "Sắp xếp theo ĐƠN GIÁ (v/g) GIẢM dần — vật 'hời' nhất (nhiều giá trị/ít trọng lượng) được ưu tiên."
+  },
+  {
+    question: "Độ phức tạp của Greedy Knapsack vô hạn là?",
+    options: ["O(n)", "O(n log n)", "O(n²)", "O(W·n)"],
+    correct: 1,
+    explanation: "O(n log n) — chi phí sắp xếp. Phần chọn chỉ O(n)."
+  },
+  {
+    question: "Bài 0/1 Knapsack nên giải bằng thuật toán nào?",
+    options: ["Greedy", "Quy hoạch động (DP)", "Vét cạn 2^n", "Sắp xếp"],
+    correct: 1,
+    explanation: "DP — vì Greedy không có tính chất chọn tham lam, kết quả thường sai. DP O(n·W) luôn tối ưu."
+  },
+  {
+    question: "Trong Greedy TSP, một cạnh bị BỎ nếu thỏa điều kiện nào?",
+    options: ["Cạnh dài nhất", "Tạo đỉnh bậc 3 hoặc khép kín sớm", "Cạnh ngắn nhất", "Cạnh đối xứng"],
+    correct: 1,
+    explanation: "Bỏ nếu tạo đỉnh bậc 3 (mỗi đỉnh chỉ 2 cạnh) HOẶC khép kín chu trình sớm (trước khi đủ n cạnh)."
+  },
+  {
+    question: "ATM Greedy với mệnh giá {400, 300, 100}, rút 600. Greedy cho kết quả gì và tối ưu không?",
+    options: ["3 tờ — tối ưu", "2 tờ 300 — tối ưu", "3 tờ (1×400 + 2×100) — KHÔNG tối ưu", "0 tờ — không khả thi"],
+    correct: 2,
+    explanation: "Greedy: 1×400 + 2×100 = 3 tờ. Tối ưu: 2×300 = 2 tờ. Greedy THUA vì bộ mệnh giá không 'Canon' (400 không là bội của 300)."
+  }
+]);
+</script>
+
+<!-- ============================== TƯ DUY ============================== -->
+<h2>🧠 Tư duy Greedy</h2>
+
+<div class="callout callout-exam">
+  <div class="callout-title">🏆 Khi nào dùng Greedy? Khi nào KHÔNG?</div>
+
+  <h4>1. Khi nào DÙNG Greedy?</h4>
+  <p>Bài toán phải có 2 tính chất:</p>
+  <ul style="padding-left: 20px;">
+    <li><strong>Greedy choice property (tính chất chọn tham lam):</strong> Lựa chọn tối ưu cục bộ dẫn đến lựa chọn tối ưu toàn cục. Nghĩa là: chọn xong không cần quay lại thay đổi.</li>
+    <li><strong>Optimal substructure (cấu trúc con tối ưu):</strong> Phương án tối ưu của bài toán chứa phương án tối ưu của bài con.</li>
+  </ul>
+  <p>Ví dụ thỏa mãn: ATM (Canon), Knapsack vô hạn, Huffman coding, Dijkstra, Kruskal/Prim MST, Lịch hoạt động (Activity Selection).</p>
+
+  <h4 class="mt-2">2. Khi nào KHÔNG dùng Greedy?</h4>
+  <ul style="padding-left: 20px;">
+    <li><strong>0/1 Knapsack</strong> → DP (Greedy không chọn tham lam được vì lấy 1 vật có thể chặn 2 vật khác).</li>
+    <li><strong>TSP</strong> → Greedy chỉ là heuristic, muốn tối ưu cần DP Held-Karp O(n²·2^n) hoặc nhánh-cận.</li>
+    <li><strong>Bài cần Backtracking</strong> (N-Queens, Sudoku) → phải thử mọi khả năng.</li>
+    <li><strong>Bài cần xét tổng thể</strong> (LCS, Edit Distance) → DP.</li>
+  </ul>
+
+  <h4 class="mt-2">3. Cách nhận biết nhanh trong đề thi</h4>
+  <ul style="padding-left: 20px;">
+    <li>Đề nói "<strong>số lượng không hạn chế</strong>" → Greedy (Knapsack vô hạn).</li>
+    <li>Đề nói "<strong>mỗi vật chỉ có 1 cái</strong>" / "<strong>chọn hoặc không</strong>" → DP (0/1 Knapsack).</li>
+    <li>Đề nói "<strong>tìm số tờ ít nhất</strong>" với mệnh giá chuẩn → Greedy ATM.</li>
+    <li>Đề nói "<strong>tìm chu trình ngắn nhất qua tất cả</strong>" → TSP (Greedy heuristic).</li>
+    <li>Đề nói "<strong>liệt kê tất cả phương án</strong>" → Backtracking.</li>
+  </ul>
+
+  <h4 class="mt-2">4. Mẹo kiểm tra Greedy có tối ưu không</h4>
+  <p>• Tìm 1 phản ví dụ (counter-example): nếu tìm được 1 bộ dữ liệu mà Greedy sai → Greedy không tối ưu.</p>
+  <p>• Nếu không tìm được phản ví dụ sau nhiều lần thử → có thể Greedy tối ưu (cần chứng minh hình thức để chắc chắn).</p>
+</div>
+
+<!-- ============================== CÁCH TRÌNH BÀY BÀI THI ============================== -->
+<h2>🏆 Cách trình bày bài thi</h2>
+
+<div class="callout callout-exam">
+  <div class="callout-title">📋 Mẫu trình bày chuẩn cho bài Greedy</div>
+  <p>Đề bài mẫu: <em>"Trình bày giải thuật Greedy giải bài toán Cái ba lô vô hạn. Phân tích độ phức tạp."</em></p>
+
+  <h4>Trình bày chuẩn (6 phần):</h4>
+  <pre><code>1. NGUYÊN LÝ GREEDY:
+   Greedy giải bài toán tối ưu tổ hợp bằng cách xây dựng
+   phương án X. Mỗi thành phần Xᵢ được chọn tối ưu cục bộ
+   (tốt nhất tại thời điểm xét). Sau khi chọn không quay lại.
+
+2. ÁP DỤNG VÀO BÀI:
+   - Hàm mục tiêu: f(X) = tổng giá trị, cần MAX.
+   - Phương án X = (x₁, x₂, ..., xₙ) — số lượng mỗi vật.
+   - Tiêu chí tham lam: chọn theo đơn giá vᵢ/gᵢ GIẢM dần.
+   - Lấy tối đa mỗi loại: xᵢ = ⌊W_còn / gᵢ⌋.
+
+3. GIẢ MÃ:
+   void Greedy(Danh_sach_do_vat dsdv, float W) {
+       sap_xep_giam(dsdv);  // theo đơn giá
+       for (int i = 0; i &lt; n; i++) {
+           dsdv[i].Phuong_an = W / dsdv[i].Trong_luong;
+           W = W - dsdv[i].Phuong_an * dsdv[i].Trong_luong;
+       }
+   }
+
+4. CHẠY TAY VÍ DỤ:
+   W=37, 4 vật: B(10,25), A(15,30), D(4,6), C(2,2).
+   Đơn giá: B=2.5, A=2.0, D=1.5, C=1.0.
+   Bước 1: 3 vật B. TTL=30, còn 7.  GT=75.
+   Bước 2: 0 vật A (15&gt;7).            GT=75.
+   Bước 3: 1 vật D. TTL=34, còn 3.  GT=81.
+   Bước 4: 1 vật C. TTL=36, còn 1.  GT=83.
+   Phương án X = (3, 0, 1, 1). Tổng GT = 83.
+
+5. PHÂN TÍCH ĐỘ PHỨC TẠP:
+   - Sắp xếp: O(n log n).
+   - Chọn: O(n).
+   - Tổng: O(n log n).
+   - Bộ nhớ: O(n).
+
+6. NHẬN XÉT:
+   - Greedy Knapsack vô hạn TỐI ƯU vì có thể "phân frac" được.
+   - Với 0/1 Knapsack, Greedy KHÔNG tối ưu → phải dùng DP.
+   - Ưu điểm: nhanh (đa thức), dễ cài đặt.
+   - Nhược điểm: không phải lúc nào cũng tối ưu.</code></pre>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">💡 5 bí kíp để được điểm tối đa</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Luôn viết "1. NGUYÊN LÝ GREEDY" trước</strong> — giám khảo cần thấy bạn hiểu tư tưởng "tham ăn" trước khi xem mã.</li>
+    <li><strong>Nêu rõ tiêu chí tham lam</strong> — "chọn mệnh giá lớn" / "chọn đơn giá cao" / "chọn cạnh ngắn". Mỗi bài 1 tiêu chí khác nhau!</li>
+    <li><strong>Chạy tay 1 ví dụ nhỏ</strong> — chứng tỏ hiểu thuật toán không chỉ copy mã. Mỗi bước ghi "còn lại bao nhiêu".</li>
+    <li><strong>Phân tích độ phức tạp đầy đủ</strong> — tách thành "sắp xếp O(n log n) + chọn O(n) = O(n log n)". Đừng chỉ ghi "O(n log n)".</li>
+    <li><strong>Nhận xét TỐI ƯU hay chỉ TỐT</strong> — đây là điểm cộng. Nếu biết phản ví dụ (0/1 Knapsack) thì nêu luôn.</li>
+  </ol>
+</div>
+
+<div class="callout callout-warn">
+  <div class="callout-title">⚠️ Lỗi mất điểm thường gặp</div>
+  <ul style="padding-left: 20px;">
+    <li>❌ <strong>Không phân biệt Knapsack vô hạn và 0/1</strong> — Greedy chỉ tối ưu cho vô hạn. Dùng Greedy cho 0/1 → mất điểm.</li>
+    <li>❌ <strong>Quên sắp xếp</strong> trước khi Greedy (Knapsack phải sắp đơn giá giảm, TSP phải sắp cạnh tăng) → kết quả sai.</li>
+    <li>❌ <strong>Tin Greedy luôn tối ưu</strong> — TSP Greedy thường sai, phải ghi rõ "chỉ TỐT, chưa chắc TỐI ƯU".</li>
+    <li>❌ <strong>Quên điều kiện kiểm tra trong TSP Greedy</strong> — phải kiểm tra 2 điều kiện: (1) không bậc 3, (2) không khép kín sớm.</li>
+    <li>❌ <strong>ATM Greedy với mệnh giá không Canon</strong> — nếu mệnh giá tùy ý, Greedy có thể sai (phản ví dụ {400,300,100} rút 600).</li>
+    <li>❌ <strong>Quên dùng div (⌊⌋) và mod</strong> — Knapsack vô hạn lấy số nguyên: <code>⌊W/g⌋</code>, dư <code>W mod g</code>.</li>
+  </ul>
+</div>
+
+<!-- ============================== TÓM TẮT ============================== -->
+<h2>📌 Tóm tắt cuối bài</h2>
+
+<div class="callout callout-theory">
+  <div class="callout-title">✅ Điểm cần nhớ</div>
+  <ol style="padding-left: 20px;">
+    <li><strong>Greedy</strong> = chọn tối ưu cục bộ từng bước, không quay lại. Nhanh (đa thức) nhưng thường chỉ TỐT, chưa chắc TỐI ƯU.</li>
+    <li><strong>Bài toán ATM</strong>: chọn mệnh giá lớn trước. O(m). Tối ưu nếu mệnh giá Canon.</li>
+    <li><strong>Bài toán TSP</strong>: chọn cạnh ngắn nhất trước (kiểm tra không bậc 3, không khép kín sớm). O(n² log n). KHÔNG tối ưu.</li>
+    <li><strong>Knapsack vô hạn</strong>: sắp đơn giá giảm, lấy tối đa mỗi loại. O(n log n). TỐI ƯU.</li>
+    <li><strong>Knapsack 0/1</strong>: Greedy KHÔNG tối ưu → phải dùng DP O(n·W).</li>
+    <li><strong>2 tính chất Greedy</strong>: greedy choice property + optimal substructure. Cả 2 phải thỏa thì Greedy mới tối ưu.</li>
+    <li><strong>Mẹo nhận biết</strong>: "số lượng không hạn chế" → Greedy; "1 cái / chọn hoặc không" → DP.</li>
+  </ol>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title">🎯 Mẹo thi nhanh</div>
+  <p>• 3 bài toán kinh điển phải thuộc lòng: ATM, TSP, Knapsack vô hạn — đây là 90% đề thi.</p>
+  <p>• Khi gặp đề "đổi tiền" → nghĩ ngay ATM Greedy.</p>
+  <p>• Khi gặp đề "chu trình qua tất cả" → TSP Greedy (chỉ tốt, không tối ưu).</p>
+  <p>• Khi gặp đề "ba lô + số lượng không hạn chế" → Knapsack vô hạn Greedy.</p>
+  <p>• Khi gặp đề "ba lô + mỗi vật 1 cái" → DP, KHÔNG dùng Greedy!</p>
+</div>
+
+<div class="nav-bottom">
+  <a href="02-bigo.html" class="btn btn-ghost">← Bài 2: Độ phức tạp BigO</a>
+  <a href="04-dp.html" class="btn">Bài 4: Quy hoạch động (DP) →</a>
+</div>
+
+</body>
+</html>
